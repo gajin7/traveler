@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FDF8FD">
-<title>Traveler · Madrid</title>
+<title>Cicerone</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%236750A4'/><text x='50' y='68' font-size='60' text-anchor='middle'>🧭</text></svg>">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -271,7 +271,7 @@ nav button{overflow:visible}
 <body>
 <div id="app">
 <header>
-  <h1><span class="logoic" id="logoic"></span>Traveler</h1>
+  <h1><span class="logoic" id="logoic"></span>Cicerone</h1>
   <div style="display:flex;gap:8px;align-items:center">
     <button class="lang-btn ripple" id="citybtn" onclick="toggleCity()"></button>
     <button class="lang-btn ripple" id="langbtn" onclick="toggleLang()">SR</button>
@@ -598,7 +598,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.18-1738";
+const APP_VERSION = "2026.08.18-1749";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -666,7 +666,7 @@ const UI = {
     thinking:"Vodič razmišlja…", chatErr:"Greška u komunikaciji sa AI servisom. Proveri ključ i internet.",
     infoTitle:"Podešavanja", keyLabel:"Anthropic API ključ (za AI chat)", keyHint:"Ključ se čuva samo na tvom telefonu i šalje isključivo Anthropic servisu. Napravi ga na console.anthropic.com.",
     save:"Sačuvaj", saved:"Sačuvano ✓", about:"O aplikaciji",
-    aboutTxt:"Traveler · AI turistički vodič (prototip). Trenutni grad: {city} — {n} mesta u vodiču. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku, pravi ture, planove i predloge. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
+    aboutTxt:"Cicerone · AI turistički vodič (prototip). Trenutni grad: {city} — {n} mesta u vodiču. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku, pravi ture, planove i predloge. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Napomena: čitanje naglas koristi glasove tvog telefona. Ako srpski glas nije instaliran, priča se čita na engleskom.",
     localBtn:"Lokalac mod", localNow:"Sada", localToday:"Danas", localEtq:"Bonton", localTraps:"Zamke",
     localLoad:"Pitam lokalca…", localRefresh:"Osveži", phrasesH:"Fraze za preživljavanje", sayIt:"Izgovori",
@@ -690,12 +690,12 @@ const UI = {
     ticketOpen:"Otvori", ticketDisc:"Savet i link daje AI — pre plaćanja proveri da je sajt zvaničan.",
     ticketNoKey:"Bez API ključa ne mogu da proverim — evo pretrage zvaničnih karata:",
     howTo:"Kako do tamo?", walkG:"Peške (Google mape)", transitG:"Prevozom (Google mape)", askRoute:"Pitaj AI kako da dođem", routeLoad:"Gledam prevoz…",
-    obTitle:"Traveler", obSub:"Tvoj lični AI vodič za gradove Evrope — priče, ture i saveti, na tvom jeziku.",
+    obTitle:"Cicerone", obSub:"Tvoj lični AI vodič za gradove Evrope — priče, ture i saveti, na tvom jeziku.",
     obF1t:"Sada sam ovde", obF1s:"App te locira i priča ti o mestu na kom stojiš — tekstom ili naglas.",
     obF2t:"Ture i planovi", obF2s:"Izaberi mesta, app pravi rutu i sam priča kad stigneš na stanicu.",
     obF3t:"Pitaj bilo šta", obF3s:"AI vodič odgovara na potpitanja, predlaže mesta, karte i prevoz.",
     obStart:"Kreni", feedback:"Pošalji utiske", feedbackSub:"Ovo je prototip — svaki komentar pomaže da napravimo pravu aplikaciju.",
-    shareApp:"Podeli aplikaciju", sharePlace:"Podeli", copied:"Link kopiran ✓", shareTxt:"Pogledaj Traveler — AI turistički vodič:" },
+    shareApp:"Podeli aplikaciju", sharePlace:"Podeli", copied:"Link kopiran ✓", shareTxt:"Pogledaj Cicerone — AI turistički vodič:" },
   en:{ map:"Map", list:"Places", here:"Here", plan:"Trip", chat:"Guide", info:"Info",
     myTrip:"My trip", plansH:"Plans", plansEmptyT:"No plans yet",
     plansEmptyS:"Open any place and tap \"To plan\" — or tap \"Build a tour\" in the Places tab. Name plans by day: \"Friday — center\", \"Saturday — Prado\".",
@@ -765,7 +765,7 @@ const UI = {
     sortRate:"Per voto", openNow:"Aperto ora", openB:"Aperto", closedB:"Chiuso ora", lmMore:"Carica altri",
     plansH:"Piani", myTickets:"I miei biglietti", myTrip:"Il mio viaggio", tripSetup:"Imposta viaggio", startPlanBtn:"Avvia piano", planStart:"Vai", planDel:"Elimina",
     whatThis:"Cos'è questo?", newChat:"Nuova conversazione", gRatings:"Recensioni su Google", aiEst:"STIMA AI",
-    obTitle:"Traveler", obSub:"La tua guida AI per le città d'Europa — storie, tour e consigli, nella tua lingua.",
+    obTitle:"Cicerone", obSub:"La tua guida AI per le città d'Europa — storie, tour e consigli, nella tua lingua.",
     obF1t:"Sono qui ora", obF1s:"L'app ti localizza e ti racconta il luogo dove sei.", obF2t:"Tour e piani", obF2s:"Scegli i luoghi, l'app crea il percorso e parla ad ogni tappa.",
     obF3t:"Chiedi qualsiasi cosa", obF3s:"La guida AI risponde, suggerisce luoghi, biglietti e trasporti.", obStart:"Iniziamo",
     updAvail:"È disponibile una nuova versione!", updBtn:"Aggiorna", cityDetect:"Sembra che tu sia a: {city}", citySwitch:"Cambia",
@@ -782,7 +782,7 @@ const UI = {
     sortRate:"Por nota", openNow:"Abierto ahora", openB:"Abierto", closedB:"Cerrado ahora", lmMore:"Cargar más",
     plansH:"Planes", myTickets:"Mis entradas", myTrip:"Mi viaje", tripSetup:"Configurar viaje", startPlanBtn:"Iniciar plan", planStart:"Vamos", planDel:"Borrar",
     whatThis:"¿Qué es esto?", newChat:"Nueva conversación", gRatings:"Reseñas en Google", aiEst:"ESTIMACIÓN IA",
-    obTitle:"Traveler", obSub:"Tu guía IA para las ciudades de Europa — historias, tours y consejos, en tu idioma.",
+    obTitle:"Cicerone", obSub:"Tu guía IA para las ciudades de Europa — historias, tours y consejos, en tu idioma.",
     obF1t:"Estoy aquí ahora", obF1s:"La app te localiza y te cuenta el lugar donde estás.", obF2t:"Tours y planes", obF2s:"Elige lugares, la app crea la ruta y habla en cada parada.",
     obF3t:"Pregunta lo que sea", obF3s:"La guía IA responde, sugiere lugares, entradas y transporte.", obStart:"Empezar",
     updAvail:"¡Hay una nueva versión!", updBtn:"Actualizar", cityDetect:"Parece que estás en: {city}", citySwitch:"Cambiar",
@@ -799,7 +799,7 @@ const UI = {
     sortRate:"Nach Bewertung", openNow:"Jetzt geöffnet", openB:"Geöffnet", closedB:"Jetzt geschlossen", lmMore:"Mehr laden",
     plansH:"Pläne", myTickets:"Meine Tickets", myTrip:"Meine Reise", tripSetup:"Reise einrichten", startPlanBtn:"Plan starten", planStart:"Los", planDel:"Löschen",
     whatThis:"Was ist das?", newChat:"Neues Gespräch", gRatings:"Bewertungen auf Google", aiEst:"KI-SCHÄTZUNG",
-    obTitle:"Traveler", obSub:"Dein KI-Guide für Europas Städte — Geschichten, Touren und Tipps, in deiner Sprache.",
+    obTitle:"Cicerone", obSub:"Dein KI-Guide für Europas Städte — Geschichten, Touren und Tipps, in deiner Sprache.",
     obF1t:"Ich bin jetzt hier", obF1s:"Die App ortet dich und erzählt dir vom Ort, an dem du stehst.", obF2t:"Touren & Pläne", obF2s:"Wähle Orte — die App baut die Route und spricht an jedem Stopp.",
     obF3t:"Frag alles", obF3s:"Der KI-Guide antwortet, schlägt Orte, Tickets und Verkehrsmittel vor.", obStart:"Los geht's",
     updAvail:"Eine neue Version ist verfügbar!", updBtn:"Aktualisieren", cityDetect:"Du scheinst in {city} zu sein", citySwitch:"Wechseln",
@@ -816,7 +816,7 @@ const UI = {
     sortRate:"Par note", openNow:"Ouvert maintenant", openB:"Ouvert", closedB:"Fermé", lmMore:"Charger plus",
     plansH:"Plans", myTickets:"Mes billets", myTrip:"Mon voyage", tripSetup:"Configurer le voyage", startPlanBtn:"Lancer le plan", planStart:"Partir", planDel:"Supprimer",
     whatThis:"Qu'est-ce que c'est ?", newChat:"Nouvelle conversation", gRatings:"Avis sur Google", aiEst:"ESTIMATION IA",
-    obTitle:"Traveler", obSub:"Ton guide IA pour les villes d'Europe — histoires, tours et conseils, dans ta langue.",
+    obTitle:"Cicerone", obSub:"Ton guide IA pour les villes d'Europe — histoires, tours et conseils, dans ta langue.",
     obF1t:"Je suis ici", obF1s:"L'app te localise et te raconte le lieu où tu es.", obF2t:"Tours et plans", obF2s:"Choisis des lieux, l'app crée l'itinéraire et parle à chaque étape.",
     obF3t:"Demande n'importe quoi", obF3s:"Le guide IA répond, suggère des lieux, billets et transports.", obStart:"C'est parti",
     updAvail:"Une nouvelle version est disponible !", updBtn:"Actualiser", cityDetect:"On dirait que tu es à : {city}", citySwitch:"Changer",
@@ -827,7 +827,7 @@ const UI = {
     thinking:"Guide is thinking…", chatErr:"Error talking to the AI service. Check your key and connection.",
     infoTitle:"Settings", keyLabel:"Anthropic API key (for AI chat)", keyHint:"The key is stored only on your phone and sent only to Anthropic. Create one at console.anthropic.com.",
     save:"Save", saved:"Saved ✓", about:"About",
-    aboutTxt:"Traveler · AI travel guide (prototype). Current city: {city} — {n} places in the guide. The \"I'm here now\" button locates you and tells you about your surroundings; the AI guide answers follow-ups in any language, builds tours, plans and suggestions. Images: Wikimedia. Map: OpenFreeMap © OpenStreetMap.",
+    aboutTxt:"Cicerone · AI travel guide (prototype). Current city: {city} — {n} places in the guide. The \"I'm here now\" button locates you and tells you about your surroundings; the AI guide answers follow-ups in any language, builds tours, plans and suggestions. Images: Wikimedia. Map: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Note: read-aloud uses your phone's voices. If a Serbian voice isn't installed, stories are read in English.",
     suggTitle:"AI suggestions", suggSub:"The guide can also suggest places that aren't in this app — pick what interests you or type it in your own words.",
     suggPlaceholder:"E.g. \"something with kids, nearby, in the shade\"…", suggBtn:"Suggest places", suggLoading:"The guide is thinking…",
@@ -847,12 +847,12 @@ const UI = {
     ticketOpen:"Open", ticketDisc:"Advice and link come from AI — verify the site is official before paying.",
     ticketNoKey:"Without an API key I can't check — here's a search for official tickets:",
     howTo:"How do I get there?", walkG:"Walking (Google Maps)", transitG:"Transit (Google Maps)", askRoute:"Ask AI for the route", routeLoad:"Checking transport…",
-    obTitle:"Traveler", obSub:"Your personal AI guide to Europe's cities — stories, tours and tips, in your language.",
+    obTitle:"Cicerone", obSub:"Your personal AI guide to Europe's cities — stories, tours and tips, in your language.",
     obF1t:"I'm here now", obF1s:"The app locates you and tells you about the place you're standing at — in text or out loud.",
     obF2t:"Tours & plans", obF2s:"Pick places, the app builds a route and speaks up when you reach each stop.",
     obF3t:"Ask anything", obF3s:"The AI guide answers follow-ups, suggests places, tickets and transport.",
     obStart:"Let's go", feedback:"Send feedback", feedbackSub:"This is a prototype — every comment helps us build the real app.",
-    shareApp:"Share the app", sharePlace:"Share", copied:"Link copied ✓", shareTxt:"Check out Traveler — an AI travel guide:" }
+    shareApp:"Share the app", sharePlace:"Share", copied:"Link copied ✓", shareTxt:"Check out Cicerone — an AI travel guide:" }
 };
 /* ============ Material icons (official SVG paths, 24x24) ============ */
 const MI = {
@@ -1447,8 +1447,23 @@ async function anthropicJSON(system, user, maxTok){
   const j = await r.json();
   let txt = j.content.filter(b=>b.type==="text").map(b=>b.text).join("").trim();
   txt = txt.replace(/^```(json)?/,"").replace(/```$/,"").trim();
-  const start = txt.indexOf("["), end = txt.lastIndexOf("]");
-  return JSON.parse(txt.slice(start, end+1));
+  const fb = txt.indexOf("["), ob = txt.indexOf("{");
+  let raw;
+  if(ob!==-1 && (fb===-1 || ob<fb)){ // outermost structure is an object → wrap into an array
+    const oe=txt.lastIndexOf("}");
+    if(oe<=ob) throw new Error("no json");
+    raw="["+txt.slice(ob,oe+1)+"]";
+  } else {
+    const end=txt.lastIndexOf("]");
+    if(fb===-1||end<=fb) throw new Error("no json");
+    raw=txt.slice(fb,end+1);
+  }
+  try{ return JSON.parse(raw); }
+  catch(e){
+    /* repair common model glitches: trailing commas, smart quotes */
+    raw = raw.replace(/,\s*([\]}])/g,"$1").replace(/[\u201C\u201D]/g,'\\"').replace(/[\u2018\u2019]/g,"'");
+    return JSON.parse(raw);
+  }
 }
 
 async function getSuggestions(){
@@ -1730,7 +1745,7 @@ async function makeShareLink(){
   const ct = await crypto.subtle.encrypt({name:"AES-GCM", iv}, aes, new TextEncoder().encode(key));
   const blob = b64e(salt)+"."+b64e(iv)+"."+b64e(ct);
   const url = location.origin + location.pathname + "#k=" + encodeURIComponent(blob);
-  if(navigator.share){ try{ await navigator.share({title:"Traveler", url}); st.textContent=t("linkReady"); return; }catch(e){} }
+  if(navigator.share){ try{ await navigator.share({title:"Cicerone", url}); st.textContent=t("linkReady"); return; }catch(e){} }
   try{ await navigator.clipboard.writeText(url); st.textContent=t("linkReady"); }
   catch(e){ st.textContent = url; }
 }
@@ -1795,7 +1810,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1738"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1749"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -1831,11 +1846,11 @@ function toast(msg){
 async function shareApp(placeTitle){
   const url = location.href.split("#")[0];
   const text = (placeTitle ? placeTitle+" · " : "") + t("shareTxt") + " " + url;
-  if(navigator.share){ try{ await navigator.share({title:"Traveler", text, url}); }catch(e){} }
+  if(navigator.share){ try{ await navigator.share({title:"Cicerone", text, url}); }catch(e){} }
   else { try{ await navigator.clipboard.writeText(text); toast(t("copied")); }catch(e){} }
 }
 function sendFeedback(){
-  const s = encodeURIComponent("Traveler — utisci");
+  const s = encodeURIComponent("Cicerone — utisci");
   const b = encodeURIComponent("Šta ti se svidelo?\n\nŠta te nerviralo?\n\nŠta nedostaje?\n\n");
   location.href = `mailto:gajinjovan@gmail.com?subject=${s}&body=${b}`;
 }
@@ -1888,7 +1903,7 @@ async function loadLocalTab(){
     } else if(localTab==="etq"){
       const arr=await anthropicJSON(
         `You teach visitors how not to look like tourists in ${cityN}. Respond ONLY with a JSON array with exactly one object: {"tips":[6 objects {"t": string (max 5 words, ${LANG_NAME[lang]}), "x": string (20-40 words, ${LANG_NAME[lang]}: unwritten rules — how coffee/meals work, tipping, greetings, what locals never do)}], "code": string (BCP-47 speech code of the local language, e.g. "es-ES","pt-PT"), "phrases":[8 objects {"say": string (the phrase in the LOCAL language, natural everyday register), "mean": string (meaning in ${LANG_NAME[lang]})}]}.`,
-        `Etiquette playbook for ${cityN}.`, 2500);
+        `Etiquette playbook for ${cityN}. Keep every text SHORT so the JSON stays complete.`, 4500);
       const o=arr[0]||{};
       html=(o.tips||[]).map(i=>`<div class="pm-txt"><b>${esc(i.t)}</b><br>${esc(i.x)}</div>`).join("");
       if(o.phrases&&o.phrases.length){
@@ -1905,7 +1920,10 @@ async function loadLocalTab(){
     if(!html) throw new Error("empty");
     LOCALC[key]=html; saveLocal();
     body.innerHTML=html;
-  }catch(e){ body.innerHTML=`<div class="pm-txt">${t("suggErr")}</div>`; }
+  }catch(e){
+    body.innerHTML=`<div class="pm-txt">${t("suggErr")}</div>
+      <button class="pm-item" style="justify-content:center" onclick="loadLocalTab()">${ic("refresh",16)} ${t("localRefresh")}</button>`;
+  }
 }
 
 /* ============ TICKETS (AI find + in-app wallet via IndexedDB) ============ */
@@ -2454,7 +2472,7 @@ function endTour(done){
 function sysPrompt(){
   const near = userPos ? ALL_PLACES.map(p=>({p,d:haversine(userPos.lat,userPos.lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d).slice(0,3).map(x=>`${x.p.en.title} (${Math.round(x.d)}m)`).join(", ") : "unknown";
   const known = cityPlaces().map(p=>`${p.id}|${p.en.title}|${p.lat.toFixed(4)},${p.lng.toFixed(4)}`).join("\n");
-  return `You are "Traveler", a warm, knowledgeable local tour guide. The user is currently exploring: ${CITIES[city].name}. Today: a live conversation with a visitor walking the city.
+  return `You are "Cicerone", a warm, knowledgeable local tour guide. The user is currently exploring: ${CITIES[city].name}. Today: a live conversation with a visitor walking the city.
 RULES:
 - ALWAYS reply in the same language the user writes in (Serbian, English, Spanish, or any other). Default: ${LANG_NAME[lang]}.
 - Be vivid but concise: 2-6 sentences unless asked for more. You are speaking to someone standing in the street.
