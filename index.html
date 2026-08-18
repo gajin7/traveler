@@ -81,6 +81,8 @@ nav button{overflow:visible}
 .card .cat{font-size:11px;color:var(--primary);text-transform:uppercase;letter-spacing:.8px;font-weight:700;display:flex;align-items:center;gap:5px}
 .card .dist{display:flex;align-items:center;gap:4px}
 .cardrate{margin-left:auto;color:#B7791F;font-weight:800;font-size:12px;display:inline-flex;align-items:center;gap:3px;letter-spacing:0}
+.openb{font-size:10px;font-weight:800;padding:2.5px 7px;border-radius:9px;background:#D8F3E3;color:#1B6B45;margin-left:6px;letter-spacing:.2px}
+.openb.cl{background:#FADCD9;color:#B3261E}
 .card p{font-size:13px;color:var(--on-surface-var);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45}
 .card .dist{font-size:12px;color:var(--green);font-weight:700;margin-top:4px}
 /* detail sheet */
@@ -158,7 +160,7 @@ nav button{overflow:visible}
 .ob-feat b{font-size:14.5px;display:block}
 .ob-feat span{font-size:13px;color:var(--on-surface-var);line-height:1.45}
 .ob-langs{display:flex;gap:10px;margin-bottom:14px}
-.ob-lang{flex:1;background:var(--surface);border:1.5px solid var(--outline-var);border-radius:14px;padding:13px;font-size:14.5px;font-weight:600;font-family:inherit;color:var(--on-surface)}
+.ob-lang{flex:1 1 30%;background:var(--surface);border:1.5px solid var(--outline-var);border-radius:14px;padding:12px 6px;font-size:13.5px;font-weight:600;font-family:inherit;color:var(--on-surface)}
 .ob-lang.on{border-color:var(--primary);background:var(--primary-container);color:var(--on-primary-container)}
 .pm-txt{background:var(--sc);border-radius:14px;padding:14px 16px;font-size:14px;line-height:1.6;color:var(--on-surface);margin-bottom:10px;white-space:pre-wrap}
 .pm-disc{color:var(--on-surface-var);font-size:12px;margin:2px 4px 10px}
@@ -248,6 +250,10 @@ nav button{overflow:visible}
 #updbar.on{display:flex}
 #updbar .t{flex:1;font-size:13.5px;font-weight:600}
 #updbar button{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:10px;padding:9px 16px;font-weight:800;font-size:13px;font-family:inherit}
+#citybar{position:fixed;left:14px;right:14px;top:calc(env(safe-area-inset-top) + 64px);background:var(--inverse-surface);color:var(--inverse-on);border-radius:14px;padding:12px 16px;display:none;align-items:center;gap:10px;z-index:115;box-shadow:var(--el3)}
+#citybar.on{display:flex}
+#citybar .t{flex:1;font-size:13.5px;font-weight:600}
+#citybar button{background:var(--primary);border:none;color:#fff;border-radius:10px;padding:9px 16px;font-weight:800;font-size:13px;font-family:inherit;display:flex;align-items:center}
 #speakbar .t{flex:1;font-size:13.5px}
 #speakbar button{background:none;border:none;color:#D0BCFF;border-radius:8px;padding:8px 12px;font-weight:700;font-size:13.5px;font-family:inherit}
 .maplibregl-ctrl-attrib{font-size:9px}
@@ -339,7 +345,7 @@ nav button{overflow:visible}
       <button class="abtn sec ripple" id="gobtn" onclick="openGoMenu()"></button>
       <button class="abtn sec ripple" id="planbtn" onclick="openPlanMenu()"></button>
       <button class="abtn sec ripple" id="ticketbtn" onclick="openTicketMenu()"></button>
-      <button class="abtn sec ripple" id="sharebtn" onclick="shareApp(curPlace ? curPlace[lang].title : null)"></button>
+      <button class="abtn sec ripple" id="sharebtn" onclick="shareApp(curPlace ? Lp(curPlace).title : null)"></button>
     </div>
     <div class="story" id="sheetstory"></div>
     <div class="tipbox" id="sheettip"></div>
@@ -349,6 +355,7 @@ nav button{overflow:visible}
 <div id="speakbar"><div class="t" id="speaktitle"></div><button onclick="stopSpeak()" id="speakstop"></button></div>
 
 <div id="updbar"><div class="t" id="updtxt"></div><button onclick="applyUpdate()" id="updgo"></button></div>
+<div id="citybar"><div class="t" id="citytxt"></div><button onclick="acceptCitySwitch()" id="citygo"></button><button onclick="dismissCitySwitch()" style="background:none;padding:9px 6px" id="cityx"></button></div>
 
 <div id="planmenu" onclick="if(event.target===this)closePlanMenu()"><div id="planmenuin"></div></div>
 
@@ -358,10 +365,7 @@ nav button{overflow:visible}
     <h2 id="obtitle"></h2>
     <p id="obsub"></p>
     <div class="ob-feats" id="obfeats"></div>
-    <div class="ob-langs">
-      <button class="ob-lang" id="oblangsr" onclick="obLang('sr')">🇷🇸 Srpski</button>
-      <button class="ob-lang" id="oblangen" onclick="obLang('en')">🇬🇧 English</button>
-    </div>
+    <div class="ob-langs" id="oblangs" style="flex-wrap:wrap"></div>
     <button class="abtn primary ripple" id="obstart" onclick="closeOnboard()" style="width:100%;padding:16px;font-size:16px"></button>
   </div>
 </div>
@@ -593,7 +597,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.18-1444";
+const APP_VERSION = "2026.08.18-1724";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -638,6 +642,8 @@ const UI = {
     loadMoreFood:"Učitaj još restorana", loadMoreDrink:"Učitaj još barova i kafića",
     fLoad:"Tražim i proveravam na mapi…", fAdded:"Dodato", fDropped:"nije potvrđeno na mapi",
     fNone:"Nisam našao nova mesta koja mogu da potvrdim — probaj drugu kuhinju.",
+    lmMore:"Učitaj još", openNow:"Otvoreno sada", openB:"Otvoreno", closedB:"Zatvoreno sada",
+    hoursLoad:"Proveravam radna vremena…", hoursDisc:"Radna vremena su AI procena tipičnog rasporeda — pred odlazak proveri na Google-u.",
     tripH:"Moj put", tripSetup:"Postavi put", tripArrive:"Dolazak", tripDepart:"Odlazak",
     tripModeL:"Kako dolaziš?", m_plane:"Avionom", m_train:"Vozom", m_bus:"Autobusom", m_car:"Autom — direktno do hotela",
     pointPh:"Aerodrom / stanica — pretraži po imenu…", trL:"Prevoz tokom boravka",
@@ -645,6 +651,7 @@ const UI = {
     transitBtn:"Koje karte za prevoz da kupim?", transitT:"Karte za prevoz", transitLoad:"Gledam koje karte odgovaraju tvom putu…",
     onlineBadge:"ONLINE", transitDisc:"Cene i linkove daje AI — proveri na zvaničnom sajtu pre kupovine.",
     updAvail:"Stigla je nova verzija aplikacije!", updBtn:"Osveži", updLatest:"Imaš najnoviju verziju ✓",
+    cityDetect:"Izgleda da si u gradu: {city}", citySwitch:"Prebaci",
     updCheck:"Proveri ažuriranje", versionL:"Verzija",
     hotelPh:"Hotel — ime ili adresa", notesPh:"Napomene: s kim putuješ, tempo, želje…",
     tripSave:"Sačuvaj put", tripSaved:"Put sačuvan ✓", hotelWarn:"Hotel nije nađen na mapi — sačuvan je samo naziv.",
@@ -660,6 +667,7 @@ const UI = {
     save:"Sačuvaj", saved:"Sačuvano ✓", about:"O aplikaciji",
     aboutTxt:"Traveler · AI turistički vodič (prototip). Trenutni grad: {city} — {n} mesta u vodiču. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku, pravi ture, planove i predloge. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Napomena: čitanje naglas koristi glasove tvog telefona. Ako srpski glas nije instaliran, priča se čita na engleskom.",
+    voiceH:"Glas vodiča", voiceAuto:"Automatski", voiceBetter:"Za prirodniji glas: na Androidu instaliraj/ažuriraj Google govorne servise; na iPhone-u dodaj glasove u Podešavanja → Pristupačnost → Izgovoreni sadržaj → Glasovi. Ili unesi ElevenLabs ključ ispod — studijski AI glas na svim jezicima.", elPh:"ElevenLabs API ključ (opciono)",
     suggTitle:"AI predlozi", suggSub:"Vodič može da predloži i mesta kojih nema u vodiču — izaberi šta te zanima ili upiši svojim rečima.",
     suggPlaceholder:"Npr. „nešto sa decom, blizu, u hladu”…", suggBtn:"Daj mi predloge", suggLoading:"Vodič smišlja predloge…",
     suggErr:"Nije uspelo — proveri ključ i internet, pa probaj ponovo.", aiBadge:"AI PREDLOG", savePlace:"Sačuvaj u vodič", savedPlace:"Sačuvano ✓",
@@ -699,6 +707,7 @@ const UI = {
     codePh:"Unlock code (e.g. madrid26)", makeLink:"Create share link", linkReady:"Link copied — send it ✓",
     needKeyFirst:"First enter and save your API key above.", codeShort:"The code needs at least 4 characters.",
     unlockT:"Enter access code", unlockS:"You've received an access link. Enter the code the owner gave you.", unlockB:"Unlock", wrongCode:"Wrong code — try again.", unlocked:"Access unlocked ✓",
+    voiceH:"Glas vodiča", voiceAuto:"Automatic", voiceBetter:"For a natural voice: on Android install/update Google Speech Services; on iPhone add voices in Settings → Accessibility → Spoken Content → Voices. Or paste an ElevenLabs API key below for a studio-grade AI voice in every language.", elPh:"ElevenLabs API key (optional)",
     cityGen:"Building the guide", cityGenNote:"AI is writing stories for ~10 places — takes up to a minute.",
     cityBad:"That doesn't look like a real city. Check the name and try again.", cityLimit:"Maximum is 10 added cities — delete one to add another.",
     cityNeedKey:"Adding cities requires an API key (enter it in the Info tab).", cityAdded:"City added ✓",
@@ -719,6 +728,8 @@ const UI = {
     loadMoreFood:"Load more restaurants", loadMoreDrink:"Load more bars & cafés",
     fLoad:"Searching and verifying on the map…", fAdded:"Added", fDropped:"couldn't be verified on the map",
     fNone:"Found no new verifiable places — try another cuisine.",
+    lmMore:"Load more", openNow:"Open now", openB:"Open", closedB:"Closed now",
+    hoursLoad:"Checking opening hours…", hoursDisc:"Opening hours are an AI estimate of the typical schedule — verify on Google before going.",
     tripH:"My trip", tripSetup:"Set up trip", tripArrive:"Arrival", tripDepart:"Departure",
     tripModeL:"How do you arrive?", m_plane:"By plane", m_train:"By train", m_bus:"By bus", m_car:"By car — straight to the hotel",
     pointPh:"Airport / station — search by name…", trL:"Getting around during the stay",
@@ -726,6 +737,7 @@ const UI = {
     transitBtn:"Which transit tickets should I buy?", transitT:"Transit tickets", transitLoad:"Checking which tickets fit your trip…",
     onlineBadge:"ONLINE", transitDisc:"Prices and links come from AI — verify on the official site before buying.",
     updAvail:"A new version of the app is available!", updBtn:"Refresh", updLatest:"You're on the latest version ✓",
+    cityDetect:"Looks like you're in: {city}", citySwitch:"Switch",
     updCheck:"Check for updates", versionL:"Version",
     hotelPh:"Hotel — name or address", notesPh:"Notes: who you travel with, pace, wishes…",
     tripSave:"Save trip", tripSaved:"Trip saved ✓", hotelWarn:"Hotel not found on the map — only the name was saved.",
@@ -733,6 +745,58 @@ const UI = {
     plansMade:"Plans created ✓ — edit them freely.", toHotel:"To the hotel", delTripQ:"Delete trip details?",
     tripDatesErr:"Check the arrival and departure dates.",
     dayNames:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+  },
+  it:{ map:"Mappa", list:"Luoghi", here:"Qui", plan:"Viaggio", chat:"Guida", info:"Info",
+    hereTitle:"Sono qui ora", hereSub:"Tocca il pulsante — trovo cosa c'è intorno a te e ti racconto la storia.", hereBtn:"Sono qui ora",
+    locating:"Ti sto localizzando…", locErr:"Impossibile localizzarti. Consenti l'accesso alla posizione.", nearYou:"Vicino a te",
+    listen:"Ascolta", stop:"Stop", ask:"Chiedi alla guida", howTo:"Come ci arrivo?", addToPlan:"Al piano", tickets:"Biglietti", sharePlace:"Condividi",
+    all:"Tutti", landmark:"Monumenti", museum:"Musei", park:"Parchi", quarter:"Quartieri", food:"Cibo", drink:"Bere",
+    chatHello:"Ciao! Sono la tua guida per {city}. Chiedimi qualsiasi cosa — o dimmi di crearti un tour: «fammi un tour per domani, centro storico, un'ora, 5 tappe».",
+    chatPlaceholder:"Chiedi alla guida…", speaking:"La guida parla…", m:"m da te", km:"km da te",
+    tourMake:"Crea un tour", tourStart:"Vai", tourCancel:"Annulla", tourNext:"Salta", tourEnd:"Fine", tourArrived:"Sei arrivato", tourDone:"Tour completato! 🎉",
+    tourFollow:"Segui la linea blu — quando arrivi a una tappa, ti racconto la storia.", tourPick:"Tocca i luoghi che vuoi — li ordino nel percorso più breve.",
+    sortRate:"Per voto", openNow:"Aperto ora", openB:"Aperto", closedB:"Chiuso ora", lmMore:"Carica altri",
+    plansH:"Piani", myTickets:"I miei biglietti", myTrip:"Il mio viaggio", tripSetup:"Imposta viaggio", startPlanBtn:"Avvia piano", planStart:"Vai", planDel:"Elimina",
+    whatThis:"Cos'è questo?", newChat:"Nuova conversazione", gRatings:"Recensioni su Google", aiEst:"STIMA AI",
+    obTitle:"Traveler", obSub:"La tua guida AI per le città d'Europa — storie, tour e consigli, nella tua lingua.",
+    obF1t:"Sono qui ora", obF1s:"L'app ti localizza e ti racconta il luogo dove sei.", obF2t:"Tour e piani", obF2s:"Scegli i luoghi, l'app crea il percorso e parla ad ogni tappa.",
+    obF3t:"Chiedi qualsiasi cosa", obF3s:"La guida AI risponde, suggerisce luoghi, biglietti e trasporti.", obStart:"Iniziamo",
+    updAvail:"È disponibile una nuova versione!", updBtn:"Aggiorna", cityDetect:"Sembra che tu sia a: {city}", citySwitch:"Cambia",
+    citiesT:"Città", savePlace:"Salva nella guida", savedPlace:"Salvato ✓", aiBadge:"SCELTA AI", suggTitle:"Suggerimenti AI", suggBtn:"Suggerisci luoghi" },
+  es:{ map:"Mapa", list:"Lugares", here:"Aquí", plan:"Viaje", chat:"Guía", info:"Info",
+    hereTitle:"Estoy aquí ahora", hereSub:"Pulsa el botón — encuentro lo que te rodea y te cuento su historia.", hereBtn:"Estoy aquí ahora",
+    locating:"Localizándote…", locErr:"No puedo localizarte. Permite el acceso a la ubicación.", nearYou:"Cerca de ti",
+    listen:"Escuchar", stop:"Parar", ask:"Pregunta a la guía", howTo:"¿Cómo llego?", addToPlan:"Al plan", tickets:"Entradas", sharePlace:"Compartir",
+    all:"Todos", landmark:"Monumentos", museum:"Museos", park:"Parques", quarter:"Barrios", food:"Comida", drink:"Bebida",
+    chatHello:"¡Hola! Soy tu guía de {city}. Pregúntame lo que quieras — o pídeme un tour: «hazme un tour para mañana, centro histórico, una hora, 5 paradas».",
+    chatPlaceholder:"Pregunta a la guía…", speaking:"La guía habla…", m:"m de ti", km:"km de ti",
+    tourMake:"Crear un tour", tourStart:"Vamos", tourCancel:"Cancelar", tourNext:"Saltar", tourEnd:"Fin", tourArrived:"Has llegado", tourDone:"¡Tour completado! 🎉",
+    tourFollow:"Sigue la línea azul — al llegar a cada parada, te cuento su historia.", tourPick:"Toca los lugares que quieras — los ordeno en la ruta más corta.",
+    sortRate:"Por nota", openNow:"Abierto ahora", openB:"Abierto", closedB:"Cerrado ahora", lmMore:"Cargar más",
+    plansH:"Planes", myTickets:"Mis entradas", myTrip:"Mi viaje", tripSetup:"Configurar viaje", startPlanBtn:"Iniciar plan", planStart:"Vamos", planDel:"Borrar",
+    whatThis:"¿Qué es esto?", newChat:"Nueva conversación", gRatings:"Reseñas en Google", aiEst:"ESTIMACIÓN IA",
+    obTitle:"Traveler", obSub:"Tu guía IA para las ciudades de Europa — historias, tours y consejos, en tu idioma.",
+    obF1t:"Estoy aquí ahora", obF1s:"La app te localiza y te cuenta el lugar donde estás.", obF2t:"Tours y planes", obF2s:"Elige lugares, la app crea la ruta y habla en cada parada.",
+    obF3t:"Pregunta lo que sea", obF3s:"La guía IA responde, sugiere lugares, entradas y transporte.", obStart:"Empezar",
+    updAvail:"¡Hay una nueva versión!", updBtn:"Actualizar", cityDetect:"Parece que estás en: {city}", citySwitch:"Cambiar",
+    citiesT:"Ciudades", savePlace:"Guardar en la guía", savedPlace:"Guardado ✓", aiBadge:"ELECCIÓN IA", suggTitle:"Sugerencias IA", suggBtn:"Sugerir lugares" },
+  fr:{ map:"Carte", list:"Lieux", here:"Ici", plan:"Voyage", chat:"Guide", info:"Infos",
+    hereTitle:"Je suis ici", hereSub:"Appuie sur le bouton — je trouve ce qui t'entoure et je te raconte son histoire.", hereBtn:"Je suis ici",
+    locating:"Localisation…", locErr:"Impossible de te localiser. Autorise l'accès à la position.", nearYou:"Près de toi",
+    listen:"Écouter", stop:"Stop", ask:"Demande au guide", howTo:"Comment y aller ?", addToPlan:"Au plan", tickets:"Billets", sharePlace:"Partager",
+    all:"Tous", landmark:"Monuments", museum:"Musées", park:"Parcs", quarter:"Quartiers", food:"Manger", drink:"Boire",
+    chatHello:"Salut ! Je suis ton guide pour {city}. Demande-moi ce que tu veux — ou dis-moi de créer un tour : « fais-moi un tour pour demain, centre historique, une heure, 5 étapes ».",
+    chatPlaceholder:"Demande au guide…", speaking:"Le guide parle…", m:"m de toi", km:"km de toi",
+    tourMake:"Créer un tour", tourStart:"Partir", tourCancel:"Annuler", tourNext:"Passer", tourEnd:"Fin", tourArrived:"Tu es arrivé", tourDone:"Tour terminé ! 🎉",
+    tourFollow:"Suis la ligne bleue — à chaque étape, je te raconte son histoire.", tourPick:"Touche les lieux que tu veux — je les ordonne en itinéraire le plus court.",
+    sortRate:"Par note", openNow:"Ouvert maintenant", openB:"Ouvert", closedB:"Fermé", lmMore:"Charger plus",
+    plansH:"Plans", myTickets:"Mes billets", myTrip:"Mon voyage", tripSetup:"Configurer le voyage", startPlanBtn:"Lancer le plan", planStart:"Partir", planDel:"Supprimer",
+    whatThis:"Qu'est-ce que c'est ?", newChat:"Nouvelle conversation", gRatings:"Avis sur Google", aiEst:"ESTIMATION IA",
+    obTitle:"Traveler", obSub:"Ton guide IA pour les villes d'Europe — histoires, tours et conseils, dans ta langue.",
+    obF1t:"Je suis ici", obF1s:"L'app te localise et te raconte le lieu où tu es.", obF2t:"Tours et plans", obF2s:"Choisis des lieux, l'app crée l'itinéraire et parle à chaque étape.",
+    obF3t:"Demande n'importe quoi", obF3s:"Le guide IA répond, suggère des lieux, billets et transports.", obStart:"C'est parti",
+    updAvail:"Une nouvelle version est disponible !", updBtn:"Actualiser", cityDetect:"On dirait que tu es à : {city}", citySwitch:"Changer",
+    citiesT:"Villes", savePlace:"Enregistrer", savedPlace:"Enregistré ✓", aiBadge:"CHOIX IA", suggTitle:"Suggestions IA", suggBtn:"Suggérer des lieux",
     camAsk:"I just took this photo. Tell me what it is and talk about it like a guide — history, curiosities, tips.",
     micErr:"Didn't catch that — try again.",
     speaking:"Guide is speaking…", askAbout:"Tell me more about: ", m:"m from you", km:"km from you",
@@ -849,7 +913,14 @@ function findPlace(id){
     || Object.values(CITY_PLACES).flat().find(p=>p.id===id);
 }
 const $ = id => document.getElementById(id);
-const t = k => UI[lang][k];
+/* structural merge: English keys that live only in the fr block are copied into en (fr keeps them as its own en-fallback) */
+(()=>{ Object.keys(UI.fr).forEach(k=>{ if(UI.en[k]===undefined) UI.en[k]=UI.fr[k]; }); })();
+const LANGS = {sr:"🇷🇸 Srpski", en:"🇬🇧 English", it:"🇮🇹 Italiano", es:"🇪🇸 Español", fr:"🇫🇷 Français"};
+const LANG_NAME = {sr:"Serbian", en:"English", it:"Italian", es:"Spanish", fr:"French"};
+const SPEECH_LANG = {sr:"sr-RS", en:"en-US", it:"it-IT", es:"es-ES", fr:"fr-FR"};
+const t = k => (UI[lang]&&UI[lang][k]) || UI.en[k] || UI.sr[k] || k;
+/* place text in current language, with graceful fallback (curated stories exist in sr+en) */
+const Lp = p => p[lang] || p.en || p.sr;
 const tc = k => t(k).replace(/\{city\}/g, CITIES[city].name).replace(/\{n\}/g, cityPlaces().length);
 
 /* ============ nav ============ */
@@ -873,10 +944,15 @@ function showView(id){
 
 /* ============ language ============ */
 function toggleLang(){
-  lang = lang==="sr" ? "en" : "sr";
-  store.set("tv_lang",lang);
-  $("langbtn").textContent = lang.toUpperCase();
-  renderAll();
+  openMenu(`<h3>${ic("chat",18)} Language / Jezik</h3>` +
+    Object.keys(LANGS).map(l=>`<button class="pm-item" onclick="setLang('${l}')">${lang===l?ic("check",18):ic("place",18)} ${LANGS[l]}</button>`).join("") +
+    `<button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+}
+function setLang(l){
+  lang=l; store.set("tv_lang",l);
+  $("langbtn").textContent = l.toUpperCase();
+  closePlanMenu(); renderAll();
+  if(chatHistory.length===0){ $("chatlog").innerHTML=""; addMsg("bot", esc(tc("chatHello"))); }
 }
 
 /* ============ city ============ */
@@ -956,38 +1032,50 @@ function renderChips(){
 }
 function setChip(c){ activeChip=c; renderChips(); renderFoodCtl(); renderCards(); }
 
-/* ============ load more restaurants / bars, by cuisine ============ */
+/* ============ load more places (any category) + cuisine tags & filter ============ */
 let cuisine="any";
 const CUISINE_EN = {any:"any cuisine", local:"local/traditional cuisine", seafood:"seafood", grill:"grilled meat and steak",
   italian:"Italian (pizza, pasta)", asian:"Asian", veg:"vegetarian/vegan-friendly", sweet:"desserts, pastry, sweets", cheap:"cheap eats, fast casual"};
-function setCuisine(k){ cuisine=k; renderFoodCtl(); }
+/* cuisine tags for curated food places */
+const CU_TAGS = {botin:"local","san-gines":"sweet","casa-lucio":"local","casa-labra":"seafood","casa-abuelo":"seafood",
+  "la-bola":"local",campana:"seafood",gustos:"local",arrabal:"cheap","oven-mozzarella":"italian","roost-chicken":"cheap",
+  "san-miguel":"local","san-anton":"local","pasteis-belem":"sweet","timeout-market":"local","la-crispeta":"local",
+  mediterraneum:"seafood","taberna-gourmet":"local","mercado-central-ali":"local"};
+function cuOf(p){ return p.cu || CU_TAGS[p.id] || "local"; }
+const LM_WHAT = {landmark:"famous landmarks, monuments and viewpoints", museum:"museums and galleries",
+  park:"parks, gardens and scenic viewpoints", quarter:"interesting neighborhoods, quarters and streets",
+  drink:"bars, taverns and cafés"};
+function setCuisine(k){ cuisine=k; renderFoodCtl(); renderCards(); }
 function renderFoodCtl(){
   const el=$("foodctl"); if(!el) return;
-  if(activeChip!=="food" && activeChip!=="drink"){ el.innerHTML=""; return; }
+  if(activeChip==="all"){ el.innerHTML=""; return; }
   const cuChips = activeChip==="food"
     ? `<div class="chips" style="padding:6px 16px 0">${Object.keys(CUISINE_EN).map(k=>
         `<button class="chip ${cuisine===k?'on':''}" onclick="setCuisine('${k}')">${cuisine===k?ic("check",14):""}${t("cu_"+k)}</button>`).join("")}</div>` : "";
+  const label = activeChip==="food" ? t("loadMoreFood") : activeChip==="drink" ? t("loadMoreDrink") : `${t("lmMore")}: ${t(activeChip).toLowerCase()}`;
   el.innerHTML = cuChips + `<div style="padding:8px 16px 0">
-    <button class="abtn primary ripple" style="width:100%" onclick="loadMoreFood(this)">${ic(activeChip==="drink"?"bar":"food",17)} ${t(activeChip==="drink"?"loadMoreDrink":"loadMoreFood")}</button>
+    <button class="abtn primary ripple" style="width:100%" onclick="loadMorePlaces(this)">${ic(CAT_ICON[activeChip]||"place",17)} ${label}</button>
     <p class="pm-disc" id="foodstatus" style="margin-top:6px"></p></div>`;
 }
-async function loadMoreFood(btn){
+async function loadMorePlaces(btn){
   if(!store.get("tv_key")){ $("foodstatus").textContent=t("noKey"); return; }
-  const isDrink = activeChip==="drink";
+  const cat = activeChip==="all" ? "landmark" : activeChip;
   btn.disabled=true;
   $("foodstatus").innerHTML = `<span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("fLoad")}`;
-  const existing = cityPlaces().map(p=>p.en.title).join("; ");
-  const what = isDrink ? "bars, taverns and cafés" : `restaurants serving ${CUISINE_EN[cuisine]}`;
+  const existing = cityPlaces().filter(p=>p.cat===cat).map(p=>p.en.title).join("; ");
+  const what = cat==="food" ? `restaurants serving ${CUISINE_EN[cuisine]}` : LM_WHAT[cat];
+  const cuField = cat==="food" ? `,"cu": one of ${Object.keys(CUISINE_EN).filter(k=>k!=="any").map(k=>`"${k}"`).join("|")} (dominant cuisine)` : "";
   try{
     let arr = await anthropicJSON(
-      `You are a local food expert for ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of 6 objects: {"name":string,"cat":"${isDrink?"drink":"food"}","lat":number,"lng":number,"story":string (50-80 words in ${lang==="sr"?"Serbian":"English"} — what it's known for, the vibe, what to order),"tip":string (one practical tip, same language)}. Real, currently-operating ${what}. NEVER include places already in this list: ${existing}.`,
-      `Give me 6 more real ${what} in ${CITIES[city].name}.`, 4000);
+      `You are a local expert for ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of 8 objects: {"name":string,"lat":number,"lng":number,"story":string (35-55 words in ${LANG_NAME[lang]} — the essence: what it is, why it's worth it, what to order/see),"tip":string (short practical tip)${cuField}}. Real, currently-existing ${what}. NEVER include: ${existing||"—"}.`,
+      `8 more real ${what} in ${CITIES[city].name}. Be fast and concise.`, 3000);
     const raw = arr.filter(x=>x&&x.name);
     const verified = await verifyPlaces(raw, CITIES[city].center);
     const dropped = raw.length - verified.length;
     const added = verified.map((x,i)=>{
       const lb={title:String(x.name), story:String(x.story||x.name), tip:String(x.tip||"")};
-      return { id:"ai-food-"+Date.now()+"-"+i, ai:true, city, cat:isDrink?"drink":"food", lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
+      return { id:"ai-more-"+Date.now()+"-"+i, ai:true, city, cat, cu:(cat==="food" ? (CUISINE_EN[x.cu]&&x.cu!=="any"?x.cu:(cuisine!=="any"?cuisine:"local")) : undefined),
+        lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
     });
     if(!added.length){ $("foodstatus").textContent=t("fNone"); btn.disabled=false; return; }
     CITY_PLACES[city]=(CITY_PLACES[city]||[]).concat(added);
@@ -999,7 +1087,7 @@ async function loadMoreFood(btn){
   btn.disabled=false;
 }
 function cardHTML(p, dist, saveBtn, selectable){
-  const L = p[lang];
+  const L = Lp(p);
   const badge = p.ai ? ` <span class="aibadge">${ic("magic",11)} ${t("aiBadge")}</span>` : "";
   const save = saveBtn ? `<div><button class="savebtn" onclick="event.stopPropagation();savePlace('${p.id}',this)">${ic("star",14)} ${t("savePlace")}</button></div>` : "";
   const sel = selectable && selMode;
@@ -1008,15 +1096,19 @@ function cardHTML(p, dist, saveBtn, selectable){
   const click = sel ? `toggleSel('${p.id}')` : `openSheet('${p.id}')`;
   const rt = RATINGS[p.id];
   const rate = (rt && rt.known) ? `<span class="cardrate">${ic("starfull",12)} ${rt.r.toFixed(1)}</span>` : "";
+  const on = openMode ? openNow(p) : null; // badges only when the "Open now" option is on
+  const openBadge = on===true ? `<span class="openb">${t("openB")}</span>` : on===false ? `<span class="openb cl">${t("closedB")}</span>` : "";
   return `<div class="card${sel?' selmode':''}${selIdx>=0?' selected':''}" onclick="${click}">
     ${selBadge}<div class="thumb" id="th-${p.id}"></div>
-    <div class="cbody"><div class="cat">${ic(CAT_ICON[p.cat],13)} ${t(p.cat)}${badge}${rate}</div>
+    <div class="cbody"><div class="cat">${ic(CAT_ICON[p.cat],13)} ${t(p.cat)}${badge}${rate}${openBadge}</div>
     <h3>${L.title}</h3>
     ${dist!=null?`<div class="dist">${ic("place",13)} ${fmtDist(dist)}</div>`:""}
     <p>${L.story.slice(0,110)}…</p>${save}</div></div>`;
 }
 function renderCards(){
   let list = cityPlaces().filter(p=>activeChip==="all"||p.cat===activeChip);
+  if(activeChip==="food" && cuisine!=="any") list = list.filter(p=>cuOf(p)===cuisine);
+  if(openMode) list = list.filter(p=>openNow(p)===true);
   if(sortMode==="rating"){
     const score=p=>(RATINGS[p.id]&&RATINGS[p.id].known)?RATINGS[p.id].r:-1;
     list=[...list].sort((a,b)=>score(b)-score(a));
@@ -1064,7 +1156,7 @@ function renderMarkers(){
 function openSheet(id){
   curPlace = findPlace(id);
   if(!curPlace) return;
-  const L = curPlace[lang];
+  const L = Lp(curPlace);
   const gq = encodeURIComponent(curPlace.en.title + ", " + CITIES[curPlace.city].name);
   $("sheetcat").innerHTML = `${ic(CAT_ICON[curPlace.cat],14)} ${t(curPlace.cat)}
     <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${gq}','_blank')" style="margin-left:auto;background:none;border:1px solid var(--outline-var);color:var(--on-surface-var);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:700;font-family:inherit;display:inline-flex;align-items:center;gap:4px;letter-spacing:.3px">${ic("starfull",12)} ${t("gRatings")}</button>`;
@@ -1122,7 +1214,7 @@ async function ensureCityRatings(){
   try{
     const listTxt=missing.map((p,i)=>`${i}|${p.en.title} (${p.cat})`).join("\n");
     const arr=await anthropicJSON(
-      `You honestly summarize public reception of places in ${CITIES[city].name}. For EACH input line respond with one object in a JSON array: {"i": number (the input index), "known": boolean, "rating": number (1.0-5.0, one decimal, typical public review score from your training knowledge) or null, "line": string (max 10 words in ${lang==="sr"?"Serbian":"English"}: what reviewers say)}. CRITICAL: known=true ONLY if you genuinely recall public reception of that EXACT place; obscure or uncertain → known:false, rating:null. NEVER invent ratings. Respond ONLY with the JSON array.`,
+      `You honestly summarize public reception of places in ${CITIES[city].name}. For EACH input line respond with one object in a JSON array: {"i": number (the input index), "known": boolean, "rating": number (1.0-5.0, one decimal, typical public review score from your training knowledge) or null, "line": string (max 10 words in ${LANG_NAME[lang]}: what reviewers say)}. CRITICAL: known=true ONLY if you genuinely recall public reception of that EXACT place; obscure or uncertain → known:false, rating:null. NEVER invent ratings. Respond ONLY with the JSON array.`,
       `Places:\n${listTxt}`, 3000);
     (arr||[]).forEach(o=>{
       const p=missing[+o.i]; if(!p) return;
@@ -1135,6 +1227,44 @@ async function ensureCityRatings(){
   ratingsBusy=false;
 }
 function toggleSort(){ sortMode = sortMode==="rating" ? "default" : "rating"; renderTourCtl(); renderCards(); }
+
+/* ============ opening hours (AI estimate of typical schedule, bulk per city, cached) ============ */
+let HOURS={}; try{ HOURS=JSON.parse(store.get("tv_hours")||"{}") }catch(e){ HOURS={} }
+let hoursBusy=false, openMode=false;
+async function ensureCityHours(){
+  if(hoursBusy) return;
+  const key=store.get("tv_key"); if(!key) return;
+  const missing=cityPlaces().filter(p=>!HOURS[p.id]);
+  if(!missing.length) return;
+  hoursBusy=true;
+  try{
+    const listTxt=missing.map((p,i)=>`${i}|${p.en.title} (${p.cat})`).join("\n");
+    const arr=await anthropicJSON(
+      `You estimate TYPICAL opening hours of places in ${CITIES[city].name}. For EACH input line return one object in a JSON array: {"i":number,"known":boolean,"o":"HH:MM" (typical opening),"c":"HH:MM" (typical closing; may be past midnight like "02:00"),"closed":[array of weekday numbers 0=Sunday..6=Saturday when CLOSED all day, usually empty]}. Streets, squares, quarters, parks and viewpoints that are always accessible → known:true,"o":"00:00","c":"23:59",closed:[]. known=true only if you genuinely know the typical schedule; unsure → known:false. NEVER invent precise schedules you don't know. ONLY the JSON array.`,
+      `Places:\n${listTxt}`, 3500);
+    (arr||[]).forEach(x=>{
+      const p=missing[+x.i]; if(!p) return;
+      HOURS[p.id]={known:!!x.known, o:String(x.o||"00:00"), c:String(x.c||"23:59"), closed:Array.isArray(x.closed)?x.closed.map(Number):[]};
+    });
+    missing.forEach(p=>{ if(!HOURS[p.id]) HOURS[p.id]={known:false,o:"",c:"",closed:[]}; });
+    store.set("tv_hours", JSON.stringify(HOURS));
+    renderCards();
+  }catch(e){}
+  hoursBusy=false;
+}
+function openNow(p){
+  const h=HOURS[p.id]; if(!h||!h.known) return null;
+  const d=new Date();
+  if(h.closed.includes(d.getDay())) return false;
+  const toMin=s=>{const m=String(s).split(":");return (+m[0])*60+(+m[1]||0)};
+  const n=d.getHours()*60+d.getMinutes(), o=toMin(h.o), c=toMin(h.c);
+  return c>=o ? (n>=o&&n<=c) : (n>=o||n<=c); // overnight (e.g. bar till 02:00)
+}
+async function toggleOpenNow(){
+  openMode=!openMode;
+  renderTourCtl(); renderCards();
+  if(openMode){ await ensureCityHours(); renderCards(); }
+}
 async function loadRating(p){
   const pid=p.id;
   if(RATINGS[pid]){ renderRating(pid); return; }
@@ -1143,7 +1273,7 @@ async function loadRating(p){
   $("sheetrating").innerHTML=`<span class="rline">${t("repLoad")}</span>`;
   try{
     const arr=await anthropicJSON(
-      `You honestly summarize public reviews of places. Respond ONLY with a JSON array containing exactly one object: {"known": boolean, "rating": number (1.0-5.0, one decimal — your best estimate of this place's typical public review score, e.g. on Google/TripAdvisor, from your training knowledge) or null, "line": string (max 14 words in ${lang==="sr"?"Serbian":"English"}: what reviewers praise and/or complain about)}. CRITICAL: set known=true ONLY if you genuinely recall public reception of THIS EXACT place. If unsure or the place is obscure — known:false. NEVER invent a rating.`,
+      `You honestly summarize public reviews of places. Respond ONLY with a JSON array containing exactly one object: {"known": boolean, "rating": number (1.0-5.0, one decimal — your best estimate of this place's typical public review score, e.g. on Google/TripAdvisor, from your training knowledge) or null, "line": string (max 14 words in ${LANG_NAME[lang]}: what reviewers praise and/or complain about)}. CRITICAL: set known=true ONLY if you genuinely recall public reception of THIS EXACT place. If unsure or the place is obscure — known:false. NEVER invent a rating.`,
       `Place: "${p.en.title}" (${t(p.cat)}) in ${CITIES[p.city].name}.`, 300);
     const o=arr[0]||{};
     RATINGS[pid]={ known:!!o.known && isFinite(+o.rating), r:Math.max(1,Math.min(5,+o.rating||0)), line:String(o.line||"").slice(0,120) };
@@ -1154,7 +1284,7 @@ async function loadRating(p){
 function goCurrent(){
   if(!curPlace) return;
   // AI-suggested places: navigate by name (safer than AI-estimated coordinates)
-  const dest = curPlace.ai ? encodeURIComponent(curPlace[lang].title + ", " + CITIES[curPlace.city].name + ", Spain")
+  const dest = curPlace.ai ? encodeURIComponent(Lp(curPlace).title + ", " + CITIES[curPlace.city].name + ", Spain")
                            : `${curPlace.lat},${curPlace.lng}`;
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=walking`,"_blank");
 }
@@ -1162,33 +1292,61 @@ function goCurrent(){
 /* ============ TTS ============ */
 let voices = [];
 function loadVoices(){ voices = speechSynthesis.getVoices(); }
-if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+if("speechSynthesis" in window){ loadVoices(); speechSynthesis.onvoiceschanged = ()=>{ loadVoices(); const vi=$("view-info"); if(vi&&vi.classList.contains("active")) renderInfo(); }; }
 function pickVoice(langCode){
-  const pref = langCode==="sr" ? ["sr","hr","bs"] : ["en"];
-  for(const p of pref){
-    const v = voices.find(v=>v.lang.toLowerCase().startsWith(p));
-    if(v) return v;
+  /* user-chosen voice first */
+  const saved = store.get("tv_voice_"+langCode);
+  if(saved){ const v=voices.find(v=>v.voiceURI===saved); if(v) return v; }
+  const FAM = {sr:["sr","hr","bs"], en:["en"], it:["it"], es:["es"], fr:["fr"]};
+  for(const p of (FAM[langCode]||["en"])){
+    /* prefer Google/enhanced voices — they sound far more natural than defaults */
+    const cands = voices.filter(v=>v.lang.toLowerCase().startsWith(p));
+    const good = cands.find(v=>/google|natural|enhanced|premium|neural/i.test(v.name));
+    if(good) return good;
+    if(cands.length) return cands[0];
   }
   return null;
 }
-function speak(text, langCode, title){
-  if(!("speechSynthesis" in window)){ alert("TTS not supported"); return; }
-  stopSpeak();
-  let v = pickVoice(langCode), finalText = text;
-  if(langCode==="sr" && !v && curPlace){ // no Serbian voice → read English version
-    v = pickVoice("en"); finalText = curPlace.en.story;
-  }
-  const u = new SpeechSynthesisUtterance(finalText);
-  if(v){ u.voice=v; u.lang=v.lang; } else { u.lang = langCode==="sr"?"sr-RS":"en-US"; }
-  u.rate=0.98;
-  u.onend = ()=> $("speakbar").classList.remove("on");
+let elAudio=null;
+function showSpeakBar(title){
   $("speaktitle").innerHTML = ic("volume",18) + `<span>${esc(title||t("speaking"))}</span>`;
   $("speakstop").textContent = t("stop");
   $("speakbar").classList.add("on");
+}
+async function speak(text, langCode, title){
+  stopSpeak();
+  showSpeakBar(title);
+  /* premium path: ElevenLabs (natural voice in every language) if the user added a key */
+  const xi = store.get("tv_elkey");
+  if(xi){
+    try{
+      const vid = store.get("tv_elvoice") || "21m00Tcm4TlvDq8ikWAM";
+      const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}?output_format=mp3_44100_64`,{
+        method:"POST", headers:{"xi-api-key":xi,"content-type":"application/json"},
+        body:JSON.stringify({text:String(text).slice(0,2500), model_id:"eleven_multilingual_v2"})});
+      if(!r.ok) throw 0;
+      const url = URL.createObjectURL(await r.blob());
+      elAudio = new Audio(url);
+      elAudio.onended = ()=>{ $("speakbar").classList.remove("on"); URL.revokeObjectURL(url); };
+      await elAudio.play();
+      return;
+    }catch(e){ /* fall through to system voice */ }
+  }
+  if(!("speechSynthesis" in window)){ $("speakbar").classList.remove("on"); return; }
+  let v = pickVoice(langCode), finalText = text;
+  if(langCode==="sr" && !v && curPlace){ v = pickVoice("en"); finalText = curPlace.en.story; }
+  const u = new SpeechSynthesisUtterance(finalText);
+  if(v){ u.voice=v; u.lang=v.lang; } else { u.lang = SPEECH_LANG[langCode]||"en-US"; }
+  u.rate=0.98;
+  u.onend = ()=> $("speakbar").classList.remove("on");
   speechSynthesis.speak(u);
 }
-function speakCurrent(){ if(curPlace) speak(curPlace[lang].story + " … " + curPlace[lang].tip, lang, curPlace[lang].title); }
-function stopSpeak(){ try{speechSynthesis.cancel()}catch(e){}; $("speakbar").classList.remove("on"); }
+function speakCurrent(){ if(curPlace) speak(Lp(curPlace).story + " … " + Lp(curPlace).tip, lang, Lp(curPlace).title); }
+function stopSpeak(){
+  try{speechSynthesis.cancel()}catch(e){}
+  if(elAudio){ try{elAudio.pause()}catch(e){}; elAudio=null; }
+  $("speakbar").classList.remove("on");
+}
 
 /* ============ here ============ */
 function fmtDist(m){ return m<1000 ? Math.round(m)+" "+t("m") : (m/1000).toFixed(1)+" "+t("km"); }
@@ -1275,7 +1433,7 @@ async function getSuggestions(){
   const free = $("sugginput").value.trim();
   const curated = cityPlaces().map(p=>p.en.title).join("; ");
   const loc = userPos ? `User's GPS: ${userPos.lat.toFixed(4)},${userPos.lng.toFixed(4)}.` : `User is somewhere in central ${CITIES[city].name}.`;
-  const system = `You are a local expert for ${CITIES[city].name}. ${STRICT} Suggest REAL, currently-existing places a tourist can visit. Respond with ONLY a JSON array, no prose, no markdown. 4-6 items. Each item: {"name": string, "cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "lat": number, "lng": number, "story": string (60-90 words, vivid, in ${lang==="sr"?"Serbian":"English"}), "tip": string (one practical local tip, same language)}. Use your best knowledge of real coordinates. NEVER suggest places already in this list: ${curated}.`;
+  const system = `You are a local expert for ${CITIES[city].name}. ${STRICT} Suggest REAL, currently-existing places a tourist can visit. Respond with ONLY a JSON array, no prose, no markdown. 4-6 items. Each item: {"name": string, "cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "lat": number, "lng": number, "story": string (60-90 words, vivid, in ${LANG_NAME[lang]}), "tip": string (one practical local tip, same language)}. Use your best knowledge of real coordinates. NEVER suggest places already in this list: ${curated}.`;
   const user = `${loc} Interests: ${ints}. ${free?("Extra wish: "+free):""} Suggest places in ${CITIES[city].name} beyond the list.`;
   try{
     let arr = await anthropicJSON(system, user, 2500);
@@ -1368,7 +1526,7 @@ async function foundToPlace(withAI, btn){
   if(withAI){
     try{
       const arr = await anthropicJSON(
-        `You are a local expert for ${CITIES[city].name}, Spain. Respond ONLY with a JSON array containing exactly one object: {"cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "story": string (70-100 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"} about this exact place), "tip": string (one practical tip, same language)}.`,
+        `You are a local expert for ${CITIES[city].name}, Spain. Respond ONLY with a JSON array containing exactly one object: {"cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "story": string (70-100 words, vivid tour-guide story in ${LANG_NAME[lang]} about this exact place), "tip": string (one practical tip, same language)}.`,
         `Place: "${foundPlace.name}" (${foundPlace.sub}), OSM type: ${foundPlace.osm}, coordinates ${foundPlace.lat},${foundPlace.lng} in ${CITIES[city].name}.`, 800);
       const o=arr[0]||{};
       cat=CAT_ICON[o.cat]?o.cat:"landmark"; story=String(o.story||story); tip=String(o.tip||"");
@@ -1447,7 +1605,7 @@ async function generateGuideFor(key){
   openMenu(`<h3>${ic("magic",18)} ${esc(c.name)}</h3><div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("cityGen")}: ${esc(c.name)}… ${t("cityGenNote")}</div>`);
   try{
     let arr = await anthropicJSON(
-      `You are building a city guide for ${c.name} (center: ${c.center[1]},${c.center[0]}). ${STRICT} Respond ONLY with a JSON array of 10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"}),"tip":string (one practical local tip, same language)}. Mix categories: top sights, a quarter or two, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
+      `You are building a city guide for ${c.name} (center: ${c.center[1]},${c.center[0]}). ${STRICT} Respond ONLY with a JSON array of 10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${LANG_NAME[lang]}),"tip":string (one practical local tip, same language)}. Mix categories: top sights, a quarter or two, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
       `Build the guide for ${c.name}. Only places that truly exist in ${c.name}.`, 7000);
     arr = await verifyPlaces(arr.filter(x=>x&&x.name), c.center);
     const places=arr.filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
@@ -1488,7 +1646,7 @@ async function addCity(){
   try{
     const arr = await anthropicJSON(
       `You are building a city guide. ${STRICT} STRICT RULES: if the input is not a real, existing city/town suitable for a tourist guide, or it is offensive, fictional, a joke, a person's name, or nonsense — return [{"ok":false}]. Never invent a city. Otherwise respond ONLY with a JSON array containing exactly one object:
-[{"ok":true,"city":{"name":string (proper local name),"country":string,"lat":number,"lng":number},"places":[10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"}),"tip":string (one practical local tip, same language)}] }]
+[{"ok":true,"city":{"name":string (proper local name),"country":string,"lat":number,"lng":number},"places":[10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${LANG_NAME[lang]}),"tip":string (one practical local tip, same language)}] }]
 Mix categories: top sights, one or two quarters, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
       `Input city name: "${raw}"${geo?` (geocoder match: ${geo.properties.name}, ${geo.properties.country}, coords ${geo.geometry.coordinates[1]},${geo.geometry.coordinates[0]})`:""}`, 7000);
     const o=arr[0]||{};
@@ -1577,6 +1735,33 @@ async function tryUnlock(){
   }catch(e){ openUnlockMenu(t("wrongCode")); }
 }
 
+/* ============ auto-detect city by location on startup ============ */
+let citySuggDismissed=false;
+function autoDetectCity(){
+  if(!navigator.geolocation || citySuggDismissed) return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    userPos={lat:pos.coords.latitude, lng:pos.coords.longitude};
+    let best=null, bd=Infinity;
+    Object.keys(CITIES).forEach(k=>{
+      const d=haversine(userPos.lat,userPos.lng,CITIES[k].center[1],CITIES[k].center[0]);
+      if(d<bd){bd=d;best=k;}
+    });
+    if(best && bd<60000 && best!==city){
+      $("citytxt").textContent = t("cityDetect").replace("{city}", CITIES[best].name);
+      $("citygo").textContent = t("citySwitch");
+      $("cityx").innerHTML = ic("close",16);
+      $("citybar").dataset.k = best;
+      $("citybar").classList.add("on");
+    }
+  }, ()=>{}, {timeout:8000, maximumAge:300000});
+}
+function acceptCitySwitch(){
+  const k=$("citybar").dataset.k;
+  $("citybar").classList.remove("on");
+  if(k && CITIES[k]) setCity(k, true);
+}
+function dismissCitySwitch(){ citySuggDismissed=true; $("citybar").classList.remove("on"); }
+
 /* ============ UPDATE CHECK (cache-busting new-version detection) ============ */
 async function checkUpdate(manual){
   if(!/^https?:/.test(location.protocol)) { if(manual) toast(t("updLatest")); return; }
@@ -1584,7 +1769,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1444"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1724"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -1606,12 +1791,12 @@ function renderOnboard(){
   $("obfeats").innerHTML = [["myloc","obF1"],["walk","obF2"],["chat","obF3"]].map(([i,k])=>
     `<div class="ob-feat"><div class="ic">${ic(i,22)}</div><div><b>${t(k+"t")}</b><span>${t(k+"s")}</span></div></div>`).join("");
   $("obstart").textContent = t("obStart");
-  $("oblangsr").classList.toggle("on", lang==="sr");
-  $("oblangen").classList.toggle("on", lang==="en");
+  $("oblangs").innerHTML = Object.keys(LANGS).map(l=>
+    `<button class="ob-lang ${lang===l?'on':''}" onclick="obLang('${l}')">${LANGS[l]}</button>`).join("");
 }
 function obLang(l){ lang=l; store.set("tv_lang",l); $("langbtn").textContent=l.toUpperCase(); renderOnboard(); renderAll(); }
 function showOnboard(){ renderOnboard(); $("onboard").classList.add("on"); }
-function closeOnboard(){ store.set("tv_seen","1"); $("onboard").classList.remove("on"); }
+function closeOnboard(){ store.set("tv_seen","1"); $("onboard").classList.remove("on"); setTimeout(autoDetectCity, 800); }
 function toast(msg){
   $("speaktitle").innerHTML = ic("check",16)+`<span>${esc(msg)}</span>`;
   $("speakstop").textContent="OK";
@@ -1646,7 +1831,7 @@ function openMenu(html){ $("planmenuin").innerHTML=html; $("planmenu").classList
 
 async function openTicketMenu(){
   if(!curPlace) return;
-  ticketFor = curPlace[lang].title;
+  ticketFor = Lp(curPlace).title;
   const q = encodeURIComponent(`${curPlace.en.title} ${CITIES[curPlace.city].name} tickets official site`);
   const commonBtns = `
     <button class="pm-item" onclick="window.open('https://www.google.com/search?q=${q}','_blank')">${ic("search",18)} ${t("googleTickets")}</button>
@@ -1659,7 +1844,7 @@ async function openTicketMenu(){
   openMenu(`<h3>${ic("ticket",18)} ${t("tickets")}</h3><div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("ticketLoad")}</div>${commonBtns}`);
   try{
     const arr = await anthropicJSON(
-      `You are a travel assistant. Respond ONLY with a JSON array with exactly one object: {"advice": string (2-3 sentences in ${lang==="sr"?"Serbian":"English"}: is entry free or ticketed, roughly how much, whether advance booking is smart, and WHERE tickets are sold), "url": string or null (the OFFICIAL ticket/website URL if you are confident it is correct, else null)}.`,
+      `You are a travel assistant. Respond ONLY with a JSON array with exactly one object: {"advice": string (2-3 sentences in ${LANG_NAME[lang]}: is entry free or ticketed, roughly how much, whether advance booking is smart, and WHERE tickets are sold), "url": string or null (the OFFICIAL ticket/website URL if you are confident it is correct, else null)}.`,
       `Place: "${curPlace.en.title}" in ${CITIES[curPlace.city].name}, Spain.`, 600);
     const o=arr[0]||{};
     const site = (o.url && /^https?:\/\//.test(o.url)) ? `<button class="pm-item" onclick="window.open('${o.url.replace(/'/g,"")}','_blank')">${ic("openext",18)} ${t("openSite")}</button>` : "";
@@ -1707,7 +1892,7 @@ async function deleteTicket(id){ if(!confirm(t("ticketDelQ"))) return; await idb
 /* ============ TRANSPORT (how do I get there) ============ */
 function openGoMenu(){
   if(!curPlace) return;
-  const dest = curPlace.ai ? encodeURIComponent(curPlace[lang].title+", "+CITIES[curPlace.city].name+", Spain") : `${curPlace.lat},${curPlace.lng}`;
+  const dest = curPlace.ai ? encodeURIComponent(Lp(curPlace).title+", "+CITIES[curPlace.city].name+", Spain") : `${curPlace.lat},${curPlace.lng}`;
   const ai = store.get("tv_key") ? `<button class="pm-item" onclick="askAIRoute()">${ic("magic",18)} ${t("askRoute")}</button>` : "";
   openMenu(`<h3>${ic("bus",18)} ${t("howTo")}</h3>
     <button class="pm-item" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=walking','_blank')">${ic("walk",18)} ${t("walkG")}</button>
@@ -1724,7 +1909,7 @@ async function askAIRoute(){
     const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",
       headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
       body:JSON.stringify({model:store.get("tv_model")||"claude-haiku-4-5",max_tokens:500,
-        system:`You are a local transport expert for ${CITIES[city].name}, Spain. Answer in ${lang==="sr"?"Serbian":"English"}, 3-5 sentences: best way (walk/metro/bus/taxi) with concrete line names/numbers if you know them, rough time and price. Be honest if schedules may have changed and suggest checking Google Maps.`,
+        system:`You are a local transport expert for ${CITIES[city].name}, Spain. Answer in ${LANG_NAME[lang]}, 3-5 sentences: best way (walk/metro/bus/taxi) with concrete line names/numbers if you know them, rough time and price. Be honest if schedules may have changed and suggest checking Google Maps.`,
         messages:[{role:"user",content:`How do I get ${from} to "${curPlace.en.title}" (${curPlace.lat},${curPlace.lng}) in ${CITIES[curPlace.city].name}?`}]})});
     const j=await r.json();
     const txt=(j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
@@ -1846,7 +2031,7 @@ async function generateTripPlans(btn){
     : "They use public transport and walking — keep each day a compact, walkable cluster (metro between clusters).";
   try{
     let arr = await anthropicJSON(
-      `You are planning a ${days.length}-day visit to ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short theme in ${lang==="sr"?"Serbian":"English"}, WITHOUT the date), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: DAY 1 starts realistically only after arrival time + transfer + hotel check-in (fewer stops if arrival is late; if arrival is in the evening, day 1 may be just dinner nearby). LAST DAY must end in time: ${depBuffer}. ${trTxt} Group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
+      `You are planning a ${days.length}-day visit to ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short theme in ${LANG_NAME[lang]}, WITHOUT the date), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: DAY 1 starts realistically only after arrival time + transfer + hotel check-in (fewer stops if arrival is late; if arrival is in the evening, day 1 may be just dinner nearby). LAST DAY must end in time: ${depBuffer}. ${trTxt} Group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
 KNOWN PLACES (id | title | lat,lng):\n${known}`,
       `Trip: arrive ${TRIP.arrive}${TRIP.arriveTime?" at "+TRIP.arriveTime:""}, ${modeTxt}. Depart ${TRIP.depart}${TRIP.departTime?" at "+TRIP.departTime:""}${TRIP.point?` from "${TRIP.point.name}"`:""}. (${days.length} days) ${hotelTxt} Notes from the traveler: ${TRIP.notes||"none"}.`, 8000);
     if(!Array.isArray(arr)||!arr.length) throw new Error("empty");
@@ -1901,7 +2086,7 @@ async function openTransitTickets(){
     <div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("transitLoad")}</div>`);
   try{
     const arr = await anthropicJSON(
-      `You are a public-transport ticketing expert for ${CITIES[city].name}. Recommend ONLY real, currently-existing ticket products (travel cards, multi-ride tickets, tourist passes, airport supplements). Respond ONLY with a JSON array of 2-4 objects: {"name": string (official product name), "desc": string (25-45 words in ${lang==="sr"?"Serbian":"English"}: what it covers, rough price, why it fits THIS trip), "where": string (short, same language: where/how to buy — machines, app, online), "url": string (official purchase/info URL ONLY if you are confident it is correct, else null), "online": boolean (can it be bought online?)}. Never invent products or prices you don't know — fewer correct items beat more invented ones.`,
+      `You are a public-transport ticketing expert for ${CITIES[city].name}. Recommend ONLY real, currently-existing ticket products (travel cards, multi-ride tickets, tourist passes, airport supplements). Respond ONLY with a JSON array of 2-4 objects: {"name": string (official product name), "desc": string (25-45 words in ${LANG_NAME[lang]}: what it covers, rough price, why it fits THIS trip), "where": string (short, same language: where/how to buy — machines, app, online), "url": string (official purchase/info URL ONLY if you are confident it is correct, else null), "online": boolean (can it be bought online?)}. Never invent products or prices you don't know — fewer correct items beat more invented ones.`,
       `Trip: ${days} days in ${CITIES[city].name}${TRIP&&TRIP.mode==="plane"?", arriving by plane at "+(TRIP.point?TRIP.point.name:"the airport")+" (consider airport supplement/transfer ticket!)":""}${TRIP&&TRIP.mode==="train"?", arriving by train":""}${TRIP&&TRIP.mode==="bus"?", arriving by bus":""}. Travelers' notes: ${TRIP&&TRIP.notes?TRIP.notes:"none"}. They will use metro/bus + walking daily.`, 1800);
     const items=(arr||[]).filter(x=>x&&x.name);
     if(!items.length) throw new Error("empty");
@@ -1973,7 +2158,7 @@ function renderPlanView(){
   let banner="";
   if(TOUR.active && TOUR.idx<TOUR.stops.length){
     const nx=findPlace(TOUR.stops[TOUR.idx]);
-    banner=`<div class="tourbanner">${ic("walk",22)}<div class="tt"><b>${t("tourActiveT")}</b><span>${t("nextIs")}: ${nx?esc(nx[lang].title):""} · ${TOUR.idx+1}/${TOUR.stops.length}</span></div>
+    banner=`<div class="tourbanner">${ic("walk",22)}<div class="tt"><b>${t("tourActiveT")}</b><span>${t("nextIs")}: ${nx?esc(Lp(nx).title):""} · ${TOUR.idx+1}/${TOUR.stops.length}</span></div>
       <button style="background:var(--primary);color:#fff" onclick="showView('map')">${t("resumeT")}</button>
       <button style="background:none;color:var(--on-primary-container)" onclick="endTour();renderPlanView()">${t("tourEnd")}</button></div>`;
   }
@@ -1992,7 +2177,7 @@ function renderPlans(){
         <button onclick="deletePlan('${pl.id}')">${ic("close",18)}</button></div>
       ${pl.stops.map((id,i)=>{const p=findPlace(id); if(!p) return "";
         return `<div class="stoprow"><div class="n">${i+1}</div>
-          <div class="st" onclick="openSheet('${id}')">${ic(CAT_ICON[p.cat],14)} ${esc(p[lang].title)}</div>
+          <div class="st" onclick="openSheet('${id}')">${ic(CAT_ICON[p.cat],14)} ${esc(Lp(p).title)}</div>
           <button class="sx" onclick="removeStop('${pl.id}','${id}')">${ic("close",15)}</button></div>`;}).join("")}
       <button class="abtn primary ripple" style="width:100%;margin-top:12px" onclick="startPlan('${pl.id}')">${ic("play",17)} ${t("startPlanBtn")}</button>
     </div>`).join("");
@@ -2016,7 +2201,7 @@ function startPlan(planId){
       curPlace=first;
       const dest=`${first.lat},${first.lng}`;
       openMenu(`<h3>${ic("bus",18)} ${t("toStartT")}</h3>
-        <div class="pm-txt">${t("firstStopIs")} <b>${esc(first[lang].title)}</b> — ${fmtDist(d)} ${t("awayIs")}.</div>
+        <div class="pm-txt">${t("firstStopIs")} <b>${esc(Lp(first).title)}</b> — ${fmtDist(d)} ${t("awayIs")}.</div>
         <button class="pm-item" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=transit','_blank')">${ic("bus",18)} ${t("transitG")}</button>
         <button class="pm-item" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=walking','_blank')">${ic("walk",18)} ${t("walkG")}</button>
         ${store.get("tv_key")?`<button class="pm-item" onclick="askAIRoute()">${ic("magic",18)} ${t("askRoute")}</button>`:""}
@@ -2047,7 +2232,9 @@ function saveTour(){ store.set("tv_tour", JSON.stringify(TOUR)); }
 function renderTourCtl(){
   if(!selMode){
     $("tourctl").innerHTML = `<button class="abtn sec ripple" onclick="enterSelMode()">${ic("walk",17)} ${t("tourMake")}</button>
-      <button class="chip ${sortMode==='rating'?'on':''}" onclick="toggleSort()" style="padding:11px 16px">${ic("starfull",15)} ${t("sortRate")}</button>`;
+      <button class="chip ${sortMode==='rating'?'on':''}" onclick="toggleSort()" style="padding:11px 16px">${ic("starfull",15)} ${t("sortRate")}</button>
+      <button class="chip ${openMode?'on':''}" onclick="toggleOpenNow()" style="padding:11px 16px">${openMode?ic("check",14):""}🕐 ${t("openNow")}</button>
+      ${openMode?`<p class="pm-disc" style="flex-basis:100%;margin:2px 4px">${hoursBusy?t("hoursLoad"):t("hoursDisc")}</p>`:""}`;
   } else {
     $("tourctl").innerHTML =
       `<button class="abtn primary ripple" onclick="startTour()" ${tourSel.length<2?"disabled style='opacity:.5'":""}>${ic("walk",17)} ${t("tourStart")} (${tourSel.length})</button>
@@ -2128,7 +2315,7 @@ function renderTourBar(){
   if(!TOUR.active || TOUR.idx>=TOUR.stops.length){ bar.classList.remove("on"); return; }
   const p=findPlace(TOUR.stops[TOUR.idx]);
   $("tbnum").textContent = (TOUR.idx+1);
-  $("tbname").textContent = p ? p[lang].title : "";
+  $("tbname").textContent = p ? Lp(p).title : "";
   $("tbdist").textContent = (userPos&&p) ? fmtDist(haversine(userPos.lat,userPos.lng,p.lat,p.lng))+" · "+(TOUR.idx+1)+"/"+TOUR.stops.length : (TOUR.idx+1)+"/"+TOUR.stops.length;
   $("tbnext").innerHTML = ic("send",14)+t("tourNext");
   $("tbend").innerHTML = ic("close",14)+t("tourEnd");
@@ -2150,7 +2337,7 @@ function arriveAtStop(){
   const p=findPlace(TOUR.stops[TOUR.idx]); if(!p) return;
   try{ navigator.vibrate && navigator.vibrate([200,100,200]) }catch(e){}
   openSheet(p.id);
-  speak(t("tourArrived")+": "+p[lang].title+". "+p[lang].story+" … "+p[lang].tip, lang, p[lang].title);
+  speak(t("tourArrived")+": "+Lp(p).title+". "+Lp(p).story+" … "+Lp(p).tip, lang, Lp(p).title);
   advanceTour(false);
 }
 function advanceTour(manual){
@@ -2175,7 +2362,7 @@ function sysPrompt(){
   const known = cityPlaces().map(p=>`${p.id}|${p.en.title}|${p.lat.toFixed(4)},${p.lng.toFixed(4)}`).join("\n");
   return `You are "Traveler", a warm, knowledgeable local tour guide. The user is currently exploring: ${CITIES[city].name}. Today: a live conversation with a visitor walking the city.
 RULES:
-- ALWAYS reply in the same language the user writes in (Serbian, English, Spanish, or any other). Default: ${lang==="sr"?"Serbian":"English"}.
+- ALWAYS reply in the same language the user writes in (Serbian, English, Spanish, or any other). Default: ${LANG_NAME[lang]}.
 - Be vivid but concise: 2-6 sentences unless asked for more. You are speaking to someone standing in the street.
 - Tell stories, legends, local tips. Recommend real food/drink spots. If asked about practical details you are not sure of (current opening hours, exact prices, train schedules), say so honestly and suggest checking online.
 - User's nearest known places right now: ${near}.
@@ -2288,7 +2475,7 @@ function addMsg(cls,html){
 function askAboutCurrent(){
   if(!curPlace) return;
   closeSheet(); showView("chat");
-  $("chatinput").value = t("askAbout") + curPlace[lang].title;
+  $("chatinput").value = t("askAbout") + Lp(curPlace).title;
   $("chatinput").focus();
 }
 /* ============ chat history persistence ============ */
@@ -2420,7 +2607,7 @@ function toggleMic(){
   if(!SRec) return;
   if(recOn){ try{rec.stop()}catch(e){}; return; }
   rec = new SRec();
-  rec.lang = lang==="sr" ? "sr-RS" : "en-US";
+  rec.lang = SPEECH_LANG[lang] || "en-US";
   rec.interimResults=false; rec.maxAlternatives=1;
   rec.onstart=()=>{ recOn=true; $("micbtn").classList.add("rec"); };
   rec.onend=()=>{ recOn=false; $("micbtn").classList.remove("rec"); };
@@ -2450,6 +2637,14 @@ function renderInfo(){
       <button class="abtn primary" style="margin:0;flex:none;padding:12px 16px" onclick="makeShareLink()">${ic("share",16)} ${t("makeLink")}</button>
     </div>
     <p id="sharestatus" style="font-size:12.5px;margin-top:6px;word-break:break-all"></p>
+    <h2>${ic("volume",19)} ${t("voiceH")}</h2>
+    <div class="pm-new" style="margin:6px 0"><select id="voicesel" onchange="store.set('tv_voice_'+lang,this.value)">
+      <option value="">${t("voiceAuto")}</option>
+      ${voices.filter(v=>{const FAM={sr:["sr","hr","bs"],en:["en"],it:["it"],es:["es"],fr:["fr"]}; return (FAM[lang]||["en"]).some(p=>v.lang.toLowerCase().startsWith(p));}).map(v=>
+        `<option value="${esc(v.voiceURI)}" ${store.get("tv_voice_"+lang)===v.voiceURI?"selected":""}>${esc(v.name)} (${esc(v.lang)})</option>`).join("")}
+    </select></div>
+    <p style="font-size:12.5px">${t("voiceBetter")}</p>
+    <input id="elkey" type="password" placeholder="${t("elPh")}" value="${store.get("tv_elkey")||""}" onchange="store.set('tv_elkey',this.value.trim())">
     <h2>${ic("mail",19)} ${t("feedback")}</h2>
     <p>${t("feedbackSub")}</p>
     <div style="display:flex;gap:10px">
@@ -2514,6 +2709,8 @@ if(TOUR.active){ drawTour(); renderTourBar(); startTourWatch(); }
 if(!store.get("tv_seen")) showOnboard();
 /* shared-access link (#k=...) → unlock dialog */
 checkSharedLink();
+/* auto-detect city (immediately if onboarding already done) */
+if(store.get("tv_seen")) setTimeout(autoDetectCity, 1500);
 
 </script>
 <script>
