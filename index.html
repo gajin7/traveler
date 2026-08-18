@@ -54,9 +54,18 @@ main{flex:1;position:relative;overflow:hidden}
 /* M3 bottom navigation */
 nav{display:flex;background:var(--sc);padding:8px 0 calc(10px + env(safe-area-inset-bottom));box-shadow:0 -1px 0 var(--outline-var)}
 nav button{flex:1;background:none;border:none;color:var(--on-surface-var);font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:500;font-family:inherit}
-nav button .ic{display:flex;align-items:center;justify-content:center;padding:4px 20px;border-radius:16px;transition:background .2s}
+nav button .ic{display:flex;align-items:center;justify-content:center;padding:4px 14px;border-radius:16px;transition:background .2s}
 nav button.active{color:var(--on-surface);font-weight:700}
 nav button.active .ic{background:var(--secondary-container)}
+/* elevated center map tab */
+nav button.maptab .ic{width:56px;height:56px;padding:0;border-radius:50%;background:var(--primary);color:#fff;margin-top:-30px;box-shadow:var(--el3);border:4px solid var(--surface)}
+nav button.maptab.active{color:var(--primary)}
+nav button.maptab.active .ic{background:var(--primary);color:#fff}
+nav{overflow:visible;position:relative;z-index:40}
+nav button{overflow:visible}
+/* header info icon */
+.iconbtn{width:38px;height:38px;border-radius:50%;border:1px solid var(--outline);background:none;color:var(--primary);display:flex;align-items:center;justify-content:center;padding:0}
+.iconbtn.on{background:var(--primary-container);border-color:transparent}
 /* M3 filter chips */
 .chips{display:flex;gap:8px;padding:14px 16px 6px;overflow-x:auto;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
@@ -128,11 +137,44 @@ nav button.active .ic{background:var(--secondary-container)}
 .pm-item span{color:var(--on-surface-var);font-weight:400;font-size:12.5px;margin-left:auto}
 .pm-new{display:flex;gap:8px;margin-top:4px}
 .pm-new input{flex:1;background:var(--surface);border:1px solid var(--outline-var);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;font-family:inherit;min-width:0}
+/* onboarding */
+#onboard{position:fixed;inset:0;background:var(--surface);z-index:100;display:none;overflow-y:auto}
+#onboard.on{display:block}
+.ob-in{max-width:420px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 48px) 28px 40px;display:flex;flex-direction:column;min-height:100%}
+.ob-logo{width:72px;height:72px;border-radius:22px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:var(--el2)}
+#onboard h2{font-size:28px;font-weight:800;letter-spacing:-.3px}
+#onboard>div>p{color:var(--on-surface-var);font-size:15px;margin:8px 0 22px;line-height:1.5}
+.ob-feats{display:flex;flex-direction:column;gap:14px;margin-bottom:26px}
+.ob-feat{display:flex;gap:14px;align-items:flex-start}
+.ob-feat .ic{width:40px;height:40px;border-radius:12px;background:var(--primary-container);color:var(--on-primary-container);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ob-feat b{font-size:14.5px;display:block}
+.ob-feat span{font-size:13px;color:var(--on-surface-var);line-height:1.45}
+.ob-langs{display:flex;gap:10px;margin-bottom:14px}
+.ob-lang{flex:1;background:var(--surface);border:1.5px solid var(--outline-var);border-radius:14px;padding:13px;font-size:14.5px;font-weight:600;font-family:inherit;color:var(--on-surface)}
+.ob-lang.on{border-color:var(--primary);background:var(--primary-container);color:var(--on-primary-container)}
 .pm-txt{background:var(--sc);border-radius:14px;padding:14px 16px;font-size:14px;line-height:1.6;color:var(--on-surface);margin-bottom:10px;white-space:pre-wrap}
 .pm-disc{color:var(--on-surface-var);font-size:12px;margin:2px 4px 10px}
-/* plans + tickets list */
-#planslist{padding:2px 16px 0}
-#ticketslist{padding:2px 16px 0}
+/* Put (trip) view */
+#planview{padding:16px 16px 110px}
+#planview h2{font-size:20px;font-weight:800;margin:14px 0 10px;display:flex;align-items:center;gap:8px}
+.planbig{background:var(--sc);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.pb-head{display:flex;align-items:center;gap:10px}
+.pb-head h4{font-size:16px;font-weight:800;flex:1}
+.pb-head span{color:var(--on-surface-var);font-size:12px}
+.pb-head button{background:none;border:none;color:var(--on-surface-var);padding:6px}
+.stoprow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--sc-highest)}
+.stoprow:last-of-type{border-bottom:none}
+.stoprow .n{width:24px;height:24px;border-radius:50%;background:var(--secondary-container);color:var(--on-secondary-container);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.stoprow .st{flex:1;font-size:14px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stoprow .sx{background:none;border:none;color:var(--on-surface-var);padding:4px 6px}
+.emptybox{background:var(--sc);border-radius:16px;padding:18px;margin-bottom:14px}
+.emptybox b{font-size:15px;display:block;margin-bottom:6px}
+.emptybox p{color:var(--on-surface-var);font-size:13.5px;line-height:1.55}
+.tourbanner{background:var(--primary-container);color:var(--on-primary-container);border-radius:16px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.tourbanner .tt{flex:1;min-width:0}
+.tourbanner b{font-size:14.5px;display:block}
+.tourbanner span{font-size:12.5px;opacity:.85}
+.tourbanner button{border:none;border-radius:12px;padding:9px 12px;font-weight:700;font-size:12.5px;font-family:inherit}
 .plancard{background:var(--sc);border-radius:14px;padding:12px 14px;margin-top:10px;display:flex;align-items:center;gap:10px}
 .plancard .pc-txt{flex:1;min-width:0}
 .plancard h4{font-size:14.5px;font-weight:700}
@@ -209,6 +251,7 @@ nav button.active .ic{background:var(--secondary-container)}
   <div style="display:flex;gap:8px;align-items:center">
     <button class="lang-btn ripple" id="citybtn" onclick="toggleCity()"></button>
     <button class="lang-btn ripple" id="langbtn" onclick="toggleLang()">SR</button>
+    <button class="iconbtn ripple" id="infobtn" onclick="showView('info')"></button>
   </div>
 </header>
 <main>
@@ -223,8 +266,6 @@ nav button.active .ic{background:var(--secondary-container)}
   <div class="view" id="view-list">
     <div class="chips" id="chips"></div>
     <div id="tourctl"></div>
-    <div id="planslist"></div>
-    <div id="ticketslist"></div>
     <div class="cards" id="cards"></div>
   </div>
   <div class="view" id="view-here">
@@ -241,6 +282,13 @@ nav button.active .ic{background:var(--secondary-container)}
       <div class="statusline" id="suggstatus" style="padding:8px 0"></div>
     </div>
     <div class="cards" id="suggcards" style="padding-top:0"></div>
+  </div>
+  <div class="view" id="view-plan">
+    <div id="planview">
+      <div id="tourbanner"></div>
+      <div id="plansec"></div>
+      <div id="ticketsec"></div>
+    </div>
   </div>
   <div class="view" id="view-chat">
     <div id="chatlog"></div>
@@ -267,6 +315,7 @@ nav button.active .ic{background:var(--secondary-container)}
       <button class="abtn sec ripple" id="gobtn" onclick="openGoMenu()"></button>
       <button class="abtn sec ripple" id="planbtn" onclick="openPlanMenu()"></button>
       <button class="abtn sec ripple" id="ticketbtn" onclick="openTicketMenu()"></button>
+      <button class="abtn sec ripple" id="sharebtn" onclick="shareApp(curPlace ? curPlace[lang].title : null)"></button>
     </div>
     <div class="story" id="sheetstory"></div>
     <div class="tipbox" id="sheettip"></div>
@@ -276,6 +325,20 @@ nav button.active .ic{background:var(--secondary-container)}
 <div id="speakbar"><div class="t" id="speaktitle"></div><button onclick="stopSpeak()" id="speakstop"></button></div>
 
 <div id="planmenu" onclick="if(event.target===this)closePlanMenu()"><div id="planmenuin"></div></div>
+
+<div id="onboard">
+  <div class="ob-in">
+    <div class="ob-logo" id="oblogo"></div>
+    <h2 id="obtitle"></h2>
+    <p id="obsub"></p>
+    <div class="ob-feats" id="obfeats"></div>
+    <div class="ob-langs">
+      <button class="ob-lang" id="oblangsr" onclick="obLang('sr')">🇷🇸 Srpski</button>
+      <button class="ob-lang" id="oblangen" onclick="obLang('en')">🇬🇧 English</button>
+    </div>
+    <button class="abtn primary ripple" id="obstart" onclick="closeOnboard()" style="width:100%;padding:16px;font-size:16px"></button>
+  </div>
+</div>
 <input type="file" id="ticketfile" accept="image/*,application/pdf" style="display:none">
 
 <div id="tourbar">
@@ -408,6 +471,57 @@ const PLACES3 = [
  en:{title:"La Campana (bocadillo de calamares)",story:"Madrid is a city without a sea — yet its most famous street food is a fried squid sandwich. Nobody knows exactly why, but every Madrileño knows where: in the lanes around Plaza Mayor, and La Campana on Calle Botoneras has been among the favorites for decades. Crispy squid rings in a soft roll, a squeeze of lemon if you ask, and that's it — 4-5 euros, eaten walking or on the square. There's always a queue, it always moves fast, and it's always worth it.",tip:"Order 'un bocadillo de calamares' and eat it on Plaza Mayor — cheaper and better than any café on the square itself."}}
 ];
 
+const PLACES5 = [
+{id:"belem-tower",cat:"landmark",city:"lisbon",lat:38.6916,lng:-9.2160,wiki:"Belém Tower",wl:"en",
+ sr:{title:"Kula Belem (Torre de Belém)",story:"Simbol Lisabona i doba velikih otkrića: utvrđena kula iz 1519. koja je čuvala ulaz u luku odakle su Vasko da Gama i ostali isplovljavali ka Indiji i Brazilu. Manuelinski stil — kameni konopci, morski čvorovi, kupole kao od šećera — postoji praktično samo u Portugalu, i nigde nije lepši nego ovde. Nekad je stajala usred reke; zemljotres 1755. je pomerio korito pa je danas uz samu obalu.",tip:"Red za ulaz ume da bude sat vremena — spolja je lepša nego iznutra, slikaj je u zalazak i preskoči red."},
+ en:{title:"Belém Tower",story:"The symbol of Lisbon and the Age of Discoveries: a fortified tower from 1519 that guarded the harbor from which Vasco da Gama and others sailed for India and Brazil. The Manueline style — stone ropes, maritime knots, sugar-like cupolas — exists practically only in Portugal, and nowhere finer than here. It once stood mid-river; the 1755 earthquake shifted the riverbed, so today it sits by the bank.",tip:"The entry queue can hit an hour — it's finer outside than in; shoot it at sunset and skip the line."}},
+{id:"jeronimos",cat:"landmark",city:"lisbon",lat:38.6979,lng:-9.2066,wiki:"Jerónimos Monastery",wl:"en",
+ sr:{title:"Manastir Jeronimos",story:"Najveličanstvenija građevina Portugala, plaćena — bukvalno — biberom: porez na začine iz Indije finansirao je sto godina gradnje. Podignut na mestu kapele u kojoj je Vasko da Gama proveo noć pred polazak 1497; danas njegov grob stoji odmah uz ulaz u crkvu, preko puta groba pesnika Kamoinša. Klaustar je vrhunac manuelinskog stila — dvorište gde je svaki stub isklesan drugačije, kao kamena čipka.",tip:"Crkva je besplatna (i u njoj su grobovi) — karta i red su za klaustar. Dođi pre 10h ili kupi online."},
+ en:{title:"Jerónimos Monastery",story:"Portugal's most magnificent building, paid for — literally — with pepper: the tax on Indian spices funded a century of construction. Built where Vasco da Gama spent the night in a chapel before sailing in 1497; his tomb now stands just inside the church, across from the poet Camões. The cloister is the peak of the Manueline style — a courtyard where every column is carved differently, like stone lace.",tip:"The church is free (and holds the tombs) — the ticket and the queue are for the cloister. Come before 10am or buy online."}},
+{id:"pasteis-belem",cat:"food",city:"lisbon",lat:38.6975,lng:-9.2033,wiki:"Pastéis de Belém",wl:"en",
+ sr:{title:"Pastéis de Belém",story:"Ovde je 1837. rođen pastel de nata — i recept se od tada čuva u tajnoj sobi, znaju ga samo trojica. Monasi iz susednog Jeronimosa koristili su žumanca preostala od štirkanja odežde i prodali recept kad je manastir zatvoren. Razlika od svih ostalih nata u gradu: korica puca kao staklo, fil je topao. Prodaju preko 20.000 kolača dnevno i dalje po istom postupku.",tip:"Red ispred je za poneti — uđi unutra, sala ima 400 mesta i seda se skoro odmah. Pospi cimetom, jedi toplo."},
+ en:{title:"Pastéis de Belém",story:"The pastel de nata was born here in 1837 — and the recipe has been kept in a secret room ever since, known to only three people. Monks from neighboring Jerónimos used yolks left over from starching robes, and sold the recipe when the monastery closed. What sets these apart from every other nata in town: the crust cracks like glass and the filling is warm. They sell over 20,000 a day, still made the same way.",tip:"The queue outside is for takeaway — go inside; the hall seats 400 and you're seated almost at once. Dust with cinnamon, eat warm."}},
+{id:"alfama",cat:"quarter",city:"lisbon",lat:38.7117,lng:-9.1290,wiki:"Alfama",wl:"en",
+ sr:{title:"Alfama (kvart)",story:"Najstariji kvart Lisabona i jedini koji je preživeo veliki zemljotres 1755. — mavarski lavirint uličica u koje se sunce jedva probija, veš na konopcima, sardine na roštilju i fado koji uveče dopire iza vrata. Ovde se ne ide po spisku znamenitosti: cilj je izgubiti se. Svaka ulica se ionako na kraju popne do vidikovca ili spusti do reke. Fado — pesma čežnje (saudade) — rođen je baš u ovim ulicama.",tip:"Uveče potraži malu fado kuću bez programa za turiste — gde meštani ćute dok se peva, tu si na pravom mestu."},
+ en:{title:"Alfama (quarter)",story:"Lisbon's oldest quarter and the only one to survive the great 1755 earthquake — a Moorish maze of lanes the sun barely reaches, laundry on lines, sardines on the grill and fado drifting from behind doors at night. You don't come here with a checklist: the goal is to get lost. Every street eventually climbs to a viewpoint or drops to the river anyway. Fado — the song of longing (saudade) — was born in these very streets.",tip:"At night find a small fado house without a tourist program — where locals fall silent during the singing, you're in the right place."}},
+{id:"sao-jorge",cat:"landmark",city:"lisbon",lat:38.7139,lng:-9.1335,wiki:"São Jorge Castle",wl:"en",
+ sr:{title:"Zamak Svetog Đorđa (São Jorge)",story:"Tvrđava na najvišem bregu grada, sa koje se Lisabon prostire kao amfiteatar do reke Težo. Mavri su je držali do 1147, kada ju je posle četvoromesečne opsade uzeo prvi portugalski kralj Afonso Enrikeš — uz pomoć krstaša koji su usput svratili. Po bedemima šetaju paunovi, a pogled sa zidina je najbolji uvod u geografiju grada: odavde razumeš zašto Lisabon zovu gradom na sedam brda.",tip:"Kupi kartu online i dođi do 9h ili posle 17h — u podne su i red i sunce nemilosrdni."},
+ en:{title:"São Jorge Castle",story:"The fortress on the city's highest hill, from which Lisbon spreads like an amphitheater down to the Tagus. The Moors held it until 1147, when Portugal's first king Afonso Henriques took it after a four-month siege — helped by crusaders who happened to stop by. Peacocks stroll the ramparts, and the view from the walls is the best introduction to the city's geography: from here you understand why Lisbon is called the city of seven hills.",tip:"Buy the ticket online and come by 9am or after 5pm — at noon both the queue and the sun are merciless."}},
+{id:"tram28",cat:"landmark",city:"lisbon",lat:38.7159,lng:-9.1361,wiki:"Trams in Lisbon",wl:"en",
+ sr:{title:"Tramvaj 28",story:"Žuti drveni tramvaj iz tridesetih koji se i danas penje uz brda kroz najuže ulice grada — linija 28 je slučajno postala najbolja turistička tura Lisabona: Alfama, katedrala, Baixa, Chiado i Estrela za cenu obične karte. Škripa točkova u krivinama kod Alfame je zvuk grada. Vozi se ceo krug (oko 50 min) i gleda kroz otvoren prozor kako zgrade promiču na pola metra.",tip:"Ulazi na početnoj stanici Martim Moniz pre 9h da uhvatiš mesto do prozora — i drži torbu napred, džeparoši vole ovu liniju."},
+ en:{title:"Tram 28",story:"A yellow wooden tram from the 1930s that still climbs the hills through the city's narrowest streets — line 28 accidentally became Lisbon's best tourist tour: Alfama, the cathedral, Baixa, Chiado and Estrela for the price of a regular ticket. The screech of wheels in the Alfama bends is the sound of the city. Ride the full loop (about 50 min) and watch buildings pass half a meter from the open window.",tip:"Board at the Martim Moniz terminus before 9am to get a window seat — and keep your bag in front; pickpockets love this line."}},
+{id:"comercio",cat:"landmark",city:"lisbon",lat:38.7075,lng:-9.1364,wiki:"Praça do Comércio",wl:"en",
+ sr:{title:"Praça do Comércio (Trg trgovine)",story:"Veličanstveni trg otvoren ka reci — nekada dvorište kraljevske palate, dok je nije progutao zemljotres, cunami i požar 1. novembra 1755, katastrofa koja je promenila evropsku filozofiju (Volter je o njoj pisao u 'Kandidu'). Markiz od Pombala obnovio je ceo donji grad za par decenija po prvom antiseizmičkom urbanističkom planu u Evropi. Kroz trijumfalnu kapiju Rua Augusta uđeš pravo u srce grada.",tip:"Popni se na kapiju Rua Augusta (jeftinije i praznije od svih vidikovaca) i siđi na kej Cais das Colunas na zalazak."},
+ en:{title:"Praça do Comércio",story:"A magnificent square open to the river — once the courtyard of the royal palace, until it was swallowed by the earthquake, tsunami and fire of November 1st, 1755, a catastrophe that changed European philosophy (Voltaire wrote of it in 'Candide'). The Marquis of Pombal rebuilt the entire lower town within decades on Europe's first anti-seismic urban plan. Through the Rua Augusta triumphal arch you walk straight into the city's heart.",tip:"Climb the Rua Augusta Arch (cheaper and emptier than any viewpoint) and step down to the Cais das Colunas quay at sunset."}},
+{id:"se-lisbon",cat:"landmark",city:"lisbon",lat:38.7098,lng:-9.1327,wiki:"Lisbon Cathedral",wl:"en",
+ sr:{title:"Katedrala Se (Sé de Lisboa)",story:"Tvrđava-crkva iz 1147, podignuta odmah po oslobođenju od Mavara — verovatno na mestu glavne džamije, kako je tada bio običaj. Dve zvonare kao kule stražare preživele su sve zemljotrese; iznutra je romanika: gola, kamena, mračna i moćna. Tramvaj 28 protutnji tik uz fasadu — to je jedan od najfotografisanijih kadrova Lisabona.",tip:"Sačekaj tramvaj sa ćoška preko puta — žuti vagon uz kameni portal je razglednica koju svi hoće."},
+ en:{title:"Lisbon Cathedral (Sé)",story:"A fortress-church from 1147, built right after the liberation from the Moors — probably on the site of the main mosque, as was the custom. Its two watchtower belfries have survived every earthquake; inside it's pure Romanesque: bare, stony, dark and mighty. Tram 28 thunders right past the facade — one of Lisbon's most photographed frames.",tip:"Wait for the tram from the corner across the street — the yellow car against the stone portal is the postcard everyone wants."}},
+{id:"carmo",cat:"landmark",city:"lisbon",lat:38.7122,lng:-9.1404,wiki:"Carmo Convent",wl:"en",
+ sr:{title:"Manastir Karmo (ruševina)",story:"Najsnažniji spomenik zemljotresu iz 1755: gotska crkva čiji se krov srušio na vernike okupljene na misi za Dan svih svetih — i nikada nije obnovljen. Danas goli kameni luci stoje uokvirujući nebo, najlepša 'nedovršena' katedrala Evrope. Odmah pored je gornja stanica lifta Santa Justa, pa se pogled i ruševina lepo spajaju u jednu posetu.",tip:"Na lift Santa Justa se čeka dugo i naplaćuje se — do iste platforme dođeš besplatno prečicom iza manastira."},
+ en:{title:"Carmo Convent (ruin)",story:"The most powerful monument to the 1755 earthquake: a Gothic church whose roof collapsed onto worshippers gathered for All Saints' Day mass — and was never rebuilt. Today bare stone arches stand framing the sky, Europe's most beautiful 'unfinished' cathedral. The upper station of the Santa Justa lift is right next door, so the view and the ruin combine neatly into one visit.",tip:"The Santa Justa lift has long queues and a fee — you can reach the same platform free via the shortcut behind the convent."}},
+{id:"bairro-alto",cat:"quarter",city:"lisbon",lat:38.7118,lng:-9.1462,wiki:"Bairro Alto",wl:"en",
+ sr:{title:"Bairro Alto (kvart)",story:"Danju uspavan kvart uskih ulica i zatvorenih kapaka — a od 22h najveći ulični provod u Evropi: stotine malih barova iz kojih se pije napolju, na ulici, svi pomešani sa svima. Nema klubova ni programa; cela poenta je čaša u ruci i razgovor na kaldrmi. Fado kuće i restorani rade od ranije večeri, pa je redosled prirodan: večera, fado, pa ulica.",tip:"Ginjinja ili imperial (malo pivo) se kupi na šalteru bara i pije napolju — tako radi ceo kvart. Petak i subota posle ponoći su vrhunac."},
+ en:{title:"Bairro Alto (quarter)",story:"By day a sleepy quarter of narrow streets and closed shutters — from 10pm, the biggest street party in Europe: hundreds of tiny bars whose drinks are had outside, on the street, everyone mingling with everyone. No clubs, no program; the whole point is a glass in hand and conversation on the cobbles. Fado houses and restaurants open earlier, so the sequence is natural: dinner, fado, then the street.",tip:"Buy a ginjinha or an imperial (small beer) at the bar counter and drink outside — that's how the whole quarter works. Friday and Saturday after midnight are the peak."}},
+{id:"timeout-market",cat:"food",city:"lisbon",lat:38.7069,lng:-9.1460,wiki:"Time Out Market Lisboa",wl:"en",
+ sr:{title:"Time Out Market (Mercado da Ribeira)",story:"Stara gradska pijaca iz 1892. u kojoj je Time Out 2014. okupio najbolje kuvare i lokale grada pod jedan krov — prvi 'kurirani food hall' na svetu, koncept kasnije kopiran svuda. Na 40+ tezgi: od šefova sa Michelin zvezdicama do najboljeg prošuta, sendviča i nata u gradu. Idealno kad društvo ne može da se dogovori šta se jede — svako uzme svoje, sto je zajednički.",tip:"Špic ručka i večere znači borbu za sto — dođi do 12:15 ili oko 17h i prvo zauzmi mesto, pa tek onda kreni po hranu."},
+ en:{title:"Time Out Market (Mercado da Ribeira)",story:"The old 1892 city market where Time Out gathered the city's best chefs and eateries under one roof in 2014 — the world's first 'curated food hall', a concept since copied everywhere. Across 40+ stalls: Michelin-starred chefs, the city's best presunto, sandwiches and natas. Ideal when the group can't agree on what to eat — everyone grabs their own, the table is shared.",tip:"Lunch and dinner rush means fighting for a table — arrive by 12:15 or around 5pm, claim seats first, then go for food."}},
+{id:"lx-factory",cat:"quarter",city:"lisbon",lat:38.7033,lng:-9.1786,wiki:"LX Factory",wl:"en",
+ sr:{title:"LX Factory",story:"Fabrički kompleks iz 1846. ispod mosta 25. aprila, pretvoren u najkreativniji kutak Lisabona: ateljei, koncept-radnje, murali, restorani u halama i knjižara Ler Devagar sa zidom knjiga do plafona i letećim biciklom — jedna od najlepših na svetu. Nedeljom je i buvljak. Duh je berlinski, pogled na most — sanfrancisački.",tip:"Nedelja pre podne: buvljak + brunch, pa se popni na krovni bar Rio Maravilha da se slikaš sa 'Kristom' preko puta."},
+ en:{title:"LX Factory",story:"An 1846 factory complex beneath the 25 de Abril bridge, turned into Lisbon's most creative corner: studios, concept stores, murals, restaurants in the old halls, and the Ler Devagar bookshop with its wall of books to the ceiling and a flying bicycle — one of the world's most beautiful. On Sundays there's a flea market too. The spirit is Berlin; the bridge view, San Francisco.",tip:"Sunday morning: flea market + brunch, then head up to the Rio Maravilha rooftop bar for a photo with the 'Cristo' across the river."}},
+{id:"oceanario",cat:"museum",city:"lisbon",lat:38.7633,lng:-9.0938,wiki:"Lisbon Oceanarium",wl:"en",
+ sr:{title:"Okeanarijum",story:"Jedan od najboljih akvarijuma sveta, sagrađen za EXPO '98 u modernom kvartu Parque das Nações. Centralni rezervoar od pet miliona litara gledaš sa dva nivoa: ajkule, rado, mesečeva riba i jata koja kruže kao srebrni zid. Oko njega četiri okeanska staništa — od morskih vidri do pingvina. Sa decom je ovo pun pogodak, ali i odrasli ovde zanеme.",tip:"Kupi kartu online i dođi na samo otvaranje (10h) — pre školskih grupa. Usput se provozaj žičarom duž reke."},
+ en:{title:"Oceanarium",story:"One of the world's finest aquariums, built for EXPO '98 in the modern Parque das Nações district. You view the five-million-litre central tank from two levels: sharks, rays, an ocean sunfish and shoals circling like a silver wall. Around it, four ocean habitats — from sea otters to penguins. A guaranteed hit with kids, but adults go quiet here too.",tip:"Buy online and arrive right at opening (10am) — before the school groups. Ride the riverside cable car while you're there."}},
+{id:"senhora-monte",cat:"park",city:"lisbon",lat:38.7196,lng:-9.1327,wiki:null,wl:"en",
+ sr:{title:"Vidikovac Senhora do Monte",story:"Najviši i najlepši vidikovac Lisabona, na bregu Graça — ceo grad ti je pod nogama: zamak preko puta, crveni krovovi Mourarije, reka i most u daljini. Za razliku od poznatijeg Portas do Sol, ovde se popne manje ljudi, pa se na zidiću sedi mirno, često uz nečiju gitaru. Zalazak odavde je ritual koji lokalci ljubomorno čuvaju za sebe.",tip:"Ponesi flašu vina i dođi 40 minuta pre zalaska — bez žurbe, ovo je mesto gde se ostaje."},
+ en:{title:"Senhora do Monte viewpoint",story:"Lisbon's highest and loveliest viewpoint, on the Graça hill — the whole city lies at your feet: the castle across the way, the red roofs of Mouraria, the river and bridge in the distance. Unlike the better-known Portas do Sol, fewer people make the climb, so you sit on the low wall in peace, often to someone's guitar. Sunset from here is a ritual locals jealously keep to themselves.",tip:"Bring a bottle of wine and come 40 minutes before sunset — no rush, this is a place for staying."}},
+{id:"ginjinha",cat:"drink",city:"lisbon",lat:38.7143,lng:-9.1387,wiki:"Ginjinha",wl:"en",
+ sr:{title:"A Ginjinha (Espinheira)",story:"Šank od dva kvadrata na trgu São Domingos koji od 1840. služi jedno jedino piće: ginjinju, liker od višanja. Naručuje se 'com' (sa višnjom u čaši) ili 'sem' (bez), popije se na trotoaru u dva gutljaja, čaša se vrati. Pet generacija iste porodice, cena oko dva evra, i verovatno najkraća a najupečatljivija degustacija u Evropi.",tip:"'Com elas' — uvek sa višnjama. I pazi: slatko je, a jako. Dve su dovoljne."},
+ en:{title:"A Ginjinha (Espinheira)",story:"A two-square-meter counter on São Domingos square that has served exactly one drink since 1840: ginjinha, sour cherry liqueur. Order it 'com' (with a cherry in the glass) or 'sem' (without), drink it on the pavement in two sips, hand the glass back. Five generations of the same family, about two euros, and probably Europe's shortest yet most memorable tasting.",tip:"'Com elas' — always with the cherries. And careful: it's sweet, but strong. Two is plenty."}},
+{id:"pink-street",cat:"drink",city:"lisbon",lat:38.7071,lng:-9.1440,wiki:null,wl:"en",
+ sr:{title:"Pink Street (Rua Nova do Carvalho)",story:"Nekadašnja najozloglašenija ulica lučke četvrti Cais do Sodré — mornari, barovi sumnjive reputacije — 2011. je ofarbana u rozе i preporođena u epicentar noćnog Lisabona. Pod ružičastim asfaltom i kišobranima iznad glave nižu se barovi: od kultnog Pensão Amor (bivši bordel pretvoren u bar-kabare) do Musicbox kluba ispod mosta. Posle Bairro Alta, žurka silazi ovde — i traje do zore.",tip:"Pensão Amor pogledaj i ako ne piješ — enterijer je muzej za sebe. Ulica živi od ponoći."},
+ en:{title:"Pink Street (Rua Nova do Carvalho)",story:"Once the most notorious street of the Cais do Sodré port district — sailors, bars of dubious repute — painted pink in 2011 and reborn as the epicenter of Lisbon nightlife. Under the pink asphalt and a canopy of umbrellas run the bars: from the cult Pensão Amor (a former brothel turned bar-cabaret) to the Musicbox club under the bridge. After Bairro Alto, the party moves down here — and runs till dawn.",tip:"See Pensão Amor even if you don't drink — the interior is a museum in itself. The street comes alive after midnight."}}
+];
+
 const PLACES4 = [
 /* ---- Madrid: porodični restorani iz plana ---- */
 {id:"gustos",cat:"food",city:"madrid",lat:40.4152,lng:-3.7067,wiki:null,wl:"en",
@@ -448,7 +562,7 @@ const PLACES4 = [
  sr:{title:"La Taberna del Gourmet",story:"Najozbiljnija gastronomska adresa u ovom vodiču za Alikante (Calle San Fernando 10, uz Explanadu): nagrađivana taverna sa vrhunskim tapasima, morskim plodovima sa obližnje pijace i ozbiljnom vinskom kartom. Za kasni ručak ili raniju večeru pre voza — završni gastronomski akcenat dana na moru.",tip:"Poruči selekciju tapasa umesto glavnih jela — kroz 5-6 malih tanjira prođeš celu regiju."},
  en:{title:"La Taberna del Gourmet",story:"The most serious gastronomic address in this Alicante guide (Calle San Fernando 10, by the Explanada): an award-winning tavern with top-tier tapas, seafood from the nearby market and a serious wine list. For a late lunch or early dinner before the train — the closing gastronomic note of a day at the sea.",tip:"Order a selection of tapas instead of mains — 5-6 small plates take you through the whole region."}}
 ];
-window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).map(p => (p.city = p.city || "madrid", p));
+window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).concat(typeof PLACES5!=="undefined"?PLACES5:[]).map(p => (p.city = p.city || "madrid", p));
 
 </script>
 <script>
@@ -461,7 +575,25 @@ const store = {
 
 /* ============ i18n ============ */
 const UI = {
-  sr:{ map:"Mapa", list:"Mesta", here:"Ovde", chat:"Vodič", info:"Info",
+  sr:{ map:"Mapa", list:"Mesta", here:"Ovde", plan:"Put", chat:"Vodič", info:"Info",
+    myTrip:"Moj put", plansH:"Planovi", plansEmptyT:"Još nemaš planova",
+    plansEmptyS:"Otvori bilo koje mesto i tapni „U plan” — ili u tabu Mesta tapni „Napravi turu”. Nazovi planove po danima: „Petak — centar”, „Subota — Prado”.",
+    ticketsEmptyT:"Još nemaš sačuvanih karata",
+    ticketsEmptyS:"Na kartici mesta tapni „Karte”: AI ti kaže gde se kupuju, kupiš na sajtu, pa kartu (PDF ili screenshot) sačuvaš ovde. Otvara se i bez interneta.",
+    startPlanBtn:"Pokreni plan", toStartT:"Prvo do početne tačke", firstStopIs:"Prva stanica je", awayIs:"udaljena",
+    startAnyway:"Već sam tu — kreni", tourActiveT:"Tura u toku", nextIs:"Sledeća", resumeT:"Nastavi",
+    citiesT:"Gradovi", addCityT:"Dodaj grad", cityPh:"Npr. Solun, Valensija…", cityCheck:"Proveravam grad…",
+    citySearchPh:"Pretraži gradove…", cityFind:"Nađi grad po mojoj lokaciji", popularH:"Top destinacije", myCitiesH:"Vodiči",
+    noGuideS:"nema još vodič — AI ga pravi za minut.", genGuide:"Napravi AI vodič", locating2:"Tražim te…",
+    notOnList:"nije na listi — dodaj ga ovde:", locFail:"Ne mogu da te lociram.",
+    accessH:"Pristup za društvo", accessS:"Napravi link sa šifrovanim ključem: drugar otvori link, unese kod koji mu ti kažeš (npr. uživo ili porukom), i AI radi i kod njega — bez svog naloga.",
+    codePh:"Kod za otključavanje (npr. madrid26)", makeLink:"Napravi link za deljenje", linkReady:"Link kopiran — pošalji ga ✓",
+    needKeyFirst:"Prvo unesi i sačuvaj svoj API ključ iznad.", codeShort:"Kod mora imati bar 4 znaka.",
+    unlockT:"Unesi pristupni kod", unlockS:"Dobio si link sa pristupom. Unesi kod koji ti je poslao vlasnik.", unlockB:"Otključaj", wrongCode:"Pogrešan kod — probaj ponovo.", unlocked:"Pristup otključan ✓",
+    cityGen:"Pravim vodič", cityGenNote:"AI piše priče za 10-ak mesta — traje do minut.",
+    cityBad:"To ne izgleda kao pravi grad. Proveri ime i probaj ponovo.", cityLimit:"Maksimum je 10 dodatih gradova — obriši neki pa dodaj novi.",
+    cityNeedKey:"Za dodavanje gradova treba API ključ (unesi ga u Info tabu).", cityAdded:"Grad dodat ✓",
+    cityDelQ:"Obrisati ovaj grad i sva njegova mesta?", cityAiNote:"AI vodič za ovaj grad — mesta i priče je napisao AI, proveri detalje na licu mesta.",
     hereTitle:"Sada sam ovde", hereSub:"Pritisni dugme — pronaći ću šta je oko tebe i ispričati ti priču.",
     hereBtn:"Sada sam ovde", locating:"Tražim te…", locErr:"Ne mogu da te lociram. Dozvoli pristup lokaciji u podešavanjima browsera.",
     nearYou:"U tvojoj blizini", listen:"Slušaj", stop:"Zaustavi", ask:"Pitaj vodiča", nav:"Vodi me",
@@ -491,8 +623,32 @@ const UI = {
     saveTicket:"Sačuvaj kupljenu kartu", myTickets:"Moje karte", ticketSaved:"Karta sačuvana ✓", ticketDelQ:"Obrisati ovu kartu?",
     ticketOpen:"Otvori", ticketDisc:"Savet i link daje AI — pre plaćanja proveri da je sajt zvaničan.",
     ticketNoKey:"Bez API ključa ne mogu da proverim — evo pretrage zvaničnih karata:",
-    howTo:"Kako do tamo?", walkG:"Peške (Google mape)", transitG:"Prevozom (Google mape)", askRoute:"Pitaj AI kako da dođem", routeLoad:"Gledam prevoz…" },
-  en:{ map:"Map", list:"Places", here:"Here", chat:"Guide", info:"Info",
+    howTo:"Kako do tamo?", walkG:"Peške (Google mape)", transitG:"Prevozom (Google mape)", askRoute:"Pitaj AI kako da dođem", routeLoad:"Gledam prevoz…",
+    obTitle:"Traveler", obSub:"Tvoj lični AI vodič kroz Madrid i Alikante — priče, ture i saveti, na tvom jeziku.",
+    obF1t:"Sada sam ovde", obF1s:"App te locira i priča ti o mestu na kom stojiš — tekstom ili naglas.",
+    obF2t:"Ture i planovi", obF2s:"Izaberi mesta, app pravi rutu i sam priča kad stigneš na stanicu.",
+    obF3t:"Pitaj bilo šta", obF3s:"AI vodič odgovara na potpitanja, predlaže mesta, karte i prevoz.",
+    obStart:"Kreni", feedback:"Pošalji utiske", feedbackSub:"Ovo je prototip — svaki komentar pomaže da napravimo pravu aplikaciju.",
+    shareApp:"Podeli aplikaciju", sharePlace:"Podeli", copied:"Link kopiran ✓", shareTxt:"Pogledaj Traveler — AI vodič za Madrid i Alikante:" },
+  en:{ map:"Map", list:"Places", here:"Here", plan:"Trip", chat:"Guide", info:"Info",
+    myTrip:"My trip", plansH:"Plans", plansEmptyT:"No plans yet",
+    plansEmptyS:"Open any place and tap \"To plan\" — or tap \"Build a tour\" in the Places tab. Name plans by day: \"Friday — center\", \"Saturday — Prado\".",
+    ticketsEmptyT:"No saved tickets yet",
+    ticketsEmptyS:"On a place card tap \"Tickets\": AI tells you where they're sold, you buy on the site, then save the ticket (PDF or screenshot) here. Opens even offline.",
+    startPlanBtn:"Start plan", toStartT:"Get to the starting point first", firstStopIs:"The first stop is", awayIs:"away",
+    startAnyway:"I'm already there — go", tourActiveT:"Tour in progress", nextIs:"Next", resumeT:"Resume",
+    citiesT:"Cities", addCityT:"Add a city", cityPh:"E.g. Thessaloniki, Valencia…", cityCheck:"Checking the city…",
+    citySearchPh:"Search cities…", cityFind:"Find city by my location", popularH:"Top destinations", myCitiesH:"Guides",
+    noGuideS:"has no guide yet — AI builds one in a minute.", genGuide:"Build AI guide", locating2:"Locating you…",
+    notOnList:"isn't on the list — add it here:", locFail:"Can't locate you.",
+    accessH:"Access for friends", accessS:"Create a link with an encrypted key: your friend opens the link, enters the code you tell them (in person or by message), and AI works for them too — no account needed.",
+    codePh:"Unlock code (e.g. madrid26)", makeLink:"Create share link", linkReady:"Link copied — send it ✓",
+    needKeyFirst:"First enter and save your API key above.", codeShort:"The code needs at least 4 characters.",
+    unlockT:"Enter access code", unlockS:"You've received an access link. Enter the code the owner gave you.", unlockB:"Unlock", wrongCode:"Wrong code — try again.", unlocked:"Access unlocked ✓",
+    cityGen:"Building the guide", cityGenNote:"AI is writing stories for ~10 places — takes up to a minute.",
+    cityBad:"That doesn't look like a real city. Check the name and try again.", cityLimit:"Maximum is 10 added cities — delete one to add another.",
+    cityNeedKey:"Adding cities requires an API key (enter it in the Info tab).", cityAdded:"City added ✓",
+    cityDelQ:"Delete this city and all its places?", cityAiNote:"AI guide for this city — places and stories were written by AI; double-check details on the spot.",
     hereTitle:"I'm here now", hereSub:"Tap the button — I'll find what's around you and tell you its story.",
     hereBtn:"I'm here now", locating:"Locating you…", locErr:"Can't locate you. Allow location access in your browser settings.",
     nearYou:"Near you", listen:"Listen", stop:"Stop", ask:"Ask the guide", nav:"Take me there",
@@ -522,7 +678,13 @@ const UI = {
     saveTicket:"Save purchased ticket", myTickets:"My tickets", ticketSaved:"Ticket saved ✓", ticketDelQ:"Delete this ticket?",
     ticketOpen:"Open", ticketDisc:"Advice and link come from AI — verify the site is official before paying.",
     ticketNoKey:"Without an API key I can't check — here's a search for official tickets:",
-    howTo:"How do I get there?", walkG:"Walking (Google Maps)", transitG:"Transit (Google Maps)", askRoute:"Ask AI for the route", routeLoad:"Checking transport…" }
+    howTo:"How do I get there?", walkG:"Walking (Google Maps)", transitG:"Transit (Google Maps)", askRoute:"Ask AI for the route", routeLoad:"Checking transport…",
+    obTitle:"Traveler", obSub:"Your personal AI guide to Madrid and Alicante — stories, tours and tips, in your language.",
+    obF1t:"I'm here now", obF1s:"The app locates you and tells you about the place you're standing at — in text or out loud.",
+    obF2t:"Tours & plans", obF2s:"Pick places, the app builds a route and speaks up when you reach each stop.",
+    obF3t:"Ask anything", obF3s:"The AI guide answers follow-ups, suggests places, tickets and transport.",
+    obStart:"Let's go", feedback:"Send feedback", feedbackSub:"This is a prototype — every comment helps us build the real app.",
+    shareApp:"Share the app", sharePlace:"Share", copied:"Link copied ✓", shareTxt:"Check out Traveler — an AI guide for Madrid and Alicante:" }
 };
 /* ============ Material icons (official SVG paths, 24x24) ============ */
 const MI = {
@@ -556,6 +718,8 @@ ticket:"M22 10V6c0-1.1-.9-2-2-2H4c-1.1 0-1.99.9-1.99 2v4c1.1 0 1.99.9 1.99 2s-.8
 bus:"M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z",
 openext:"M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z",
 download:"M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z",
+share:"M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z",
+mail:"M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z",
 magic:"M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"
 };
 function ic(name, size=24){ return `<svg class="mi" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${MI[name]}"/></svg>`; }
@@ -564,31 +728,57 @@ const CAT_COLOR = {landmark:"#e8a13c", museum:"#7e6bd4", park:"#4caf7d", quarter
 
 let lang = store.get("tv_lang") || "sr";
 let city = store.get("tv_city") || "madrid";
-const CITIES = {
+const BUILT_CITIES = {
   madrid:{name:"Madrid", center:[-3.7038,40.4168], zoom:13.4},
-  alicante:{name:"Alicante", center:[-0.4810,38.3455], zoom:14.2}
+  alicante:{name:"Alicante", center:[-0.4810,38.3455], zoom:14.2},
+  lisbon:{name:"Lisabon", center:[-9.1393,38.7223], zoom:13.2}
 };
+/* top European destinations — selectable out of the box, AI guide generated on first use */
+const EURO_CITIES = {
+  "e-paris":{name:"Pariz",center:[2.3522,48.8566],zoom:13,euro:true}, "e-london":{name:"London",center:[-0.1276,51.5072],zoom:13,euro:true},
+  "e-rome":{name:"Rim",center:[12.4964,41.9028],zoom:13,euro:true}, "e-barcelona":{name:"Barselona",center:[2.1734,41.3851],zoom:13,euro:true},
+  "e-amsterdam":{name:"Amsterdam",center:[4.9041,52.3676],zoom:13,euro:true}, "e-berlin":{name:"Berlin",center:[13.4050,52.5200],zoom:13,euro:true},
+  "e-vienna":{name:"Beč",center:[16.3738,48.2082],zoom:13,euro:true}, "e-prague":{name:"Prag",center:[14.4378,50.0755],zoom:13,euro:true},
+  "e-budapest":{name:"Budimpešta",center:[19.0402,47.4979],zoom:13,euro:true}, "e-athens":{name:"Atina",center:[23.7275,37.9838],zoom:13,euro:true},
+  "e-venice":{name:"Venecija",center:[12.3155,45.4408],zoom:13.5,euro:true}, "e-florence":{name:"Firenca",center:[11.2558,43.7696],zoom:13.5,euro:true},
+  "e-munich":{name:"Minhen",center:[11.5820,48.1351],zoom:13,euro:true}, "e-istanbul":{name:"Istanbul",center:[28.9784,41.0082],zoom:12.5,euro:true},
+  "e-porto":{name:"Porto",center:[-8.6291,41.1579],zoom:13.5,euro:true}, "e-seville":{name:"Sevilja",center:[-5.9845,37.3891],zoom:13.5,euro:true},
+  "e-dubrovnik":{name:"Dubrovnik",center:[18.0944,42.6507],zoom:14,euro:true}, "e-belgrade":{name:"Beograd",center:[20.4573,44.8176],zoom:13,euro:true},
+  "e-krakow":{name:"Krakov",center:[19.9450,50.0647],zoom:13.5,euro:true}, "e-copenhagen":{name:"Kopenhagen",center:[12.5683,55.6761],zoom:13,euro:true}
+};
+let CUSTOM_CITIES={}; try{ CUSTOM_CITIES=JSON.parse(store.get("tv_cities")||"{}") }catch(e){ CUSTOM_CITIES={} }
+let CITY_PLACES={}; try{ CITY_PLACES=JSON.parse(store.get("tv_cityplaces")||"{}") }catch(e){ CITY_PLACES={} }
+let CITIES = Object.assign({}, BUILT_CITIES, EURO_CITIES, CUSTOM_CITIES);
+if(!CITIES[city]) city="madrid";
 let curPlace = null, userPos = null, map = null, chatHistory = [], activeChip = "all", markers = [];
 /* saved AI places (persisted) + current session suggestions */
 let SAVED = []; try{ SAVED = JSON.parse(store.get("tv_saved")||"[]") }catch(e){ SAVED=[] }
 let SUGG = [];
-function cityPlaces(){ return ALL_PLACES.concat(SAVED).filter(p=>p.city===city); }
-function findPlace(id){ return ALL_PLACES.find(p=>p.id===id) || SAVED.find(p=>p.id===id) || SUGG.find(p=>p.id===id); }
+function customPlaces(){ return CITY_PLACES[city]||[]; }
+function cityPlaces(){ return ALL_PLACES.concat(SAVED).concat(customPlaces()).filter(p=>p.city===city); }
+function findPlace(id){
+  return ALL_PLACES.find(p=>p.id===id) || SAVED.find(p=>p.id===id) || SUGG.find(p=>p.id===id)
+    || Object.values(CITY_PLACES).flat().find(p=>p.id===id);
+}
 const $ = id => document.getElementById(id);
 const t = k => UI[lang][k];
 
 /* ============ nav ============ */
-const TABS = [["map","map"],["list","book"],["here","myloc"],["chat","chat"],["info","settings"]];
+const TABS = [["list","book"],["here","myloc"],["map","map"],["plan","event"],["chat","chat"]];
 function renderNav(){
   $("nav").innerHTML = TABS.map(([id,icn]) =>
-    `<button id="tab-${id}" onclick="showView('${id}')"><span class="ic">${ic(icn,22)}</span>${t(id)}</button>`).join("");
+    id==="map"
+      ? `<button id="tab-map" class="maptab" onclick="showView('map')"><span class="ic">${ic("map",26)}</span>${t("map")}</button>`
+      : `<button id="tab-${id}" onclick="showView('${id}')"><span class="ic">${ic(icn,22)}</span>${t(id)}</button>`).join("");
 }
 function showView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
   $("view-"+id).classList.add("active");
-  $("tab-"+id).classList.add("active");
+  const tb=$("tab-"+id); if(tb) tb.classList.add("active");
+  $("infobtn").classList.toggle("on", id==="info");
   if(id==="map" && map) setTimeout(()=>map.resize(),50);
+  if(id==="plan") renderPlanView();
 }
 
 /* ============ language ============ */
@@ -600,7 +790,7 @@ function toggleLang(){
 }
 
 /* ============ city ============ */
-function toggleCity(){ setCity(city==="madrid" ? "alicante" : "madrid", true); }
+function toggleCity(){ openCityMenu(); }
 function setCity(c, fly){
   city = c; store.set("tv_city", c);
   $("citybtn").innerHTML = ic("swap",15) + CITIES[c].name;
@@ -609,7 +799,14 @@ function setCity(c, fly){
   if(map && fly) map.flyTo({center:CITIES[c].center, zoom:CITIES[c].zoom});
   $("herecards").innerHTML=""; $("herestatus").textContent="";
   SUGG=[]; $("suggcards").innerHTML=""; $("suggstatus").textContent="";
-  clearSearch(); renderPlans();
+  clearSearch(); renderPlanView();
+  /* Euro city without a guide yet → offer to build one */
+  if(!hasGuide(c) && CITIES[c] && CITIES[c].euro){
+    openMenu(`<h3>${ic("place",18)} ${esc(CITIES[c].name)}</h3>
+      <div class="pm-txt">${esc(CITIES[c].name)} ${t("noGuideS")}</div>
+      <button class="pm-item" style="background:var(--primary-container);color:var(--on-primary-container);justify-content:center" onclick="generateGuideFor('${c}')">${ic("magic",18)} ${t("genGuide")}</button>
+      <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+  }
 }
 
 /* ============ images via Wikipedia REST (loaded by the phone, cached in-page) ============ */
@@ -702,6 +899,7 @@ function openSheet(id){
   $("gobtn").innerHTML = ic("bus",19) + `<span>${t("howTo")}</span>`;
   $("planbtn").innerHTML = ic("event",18) + `<span>${t("addToPlan")}</span>`;
   $("ticketbtn").innerHTML = ic("ticket",18) + `<span>${t("tickets")}</span>`;
+  $("sharebtn").innerHTML = ic("share",17) + `<span>${t("sharePlace")}</span>`;
   const hero = $("sheethero");
   hero.style.backgroundImage="none";
   hero.style.background=`linear-gradient(135deg,${CAT_COLOR[curPlace.cat]}55,${CAT_COLOR[curPlace.cat]}22)`;
@@ -922,6 +1120,222 @@ async function enrichFound(btn){
 }
 function openSheetForFound(p){ $("foundcard").classList.remove("on"); openSheet(p.id); }
 
+/* ============ CITY MENU + AI CITY ONBOARDING ============ */
+function hasGuide(k){ return ALL_PLACES.some(p=>p.city===k) || (CITY_PLACES[k]||[]).length>0; }
+function cityRow(k){
+  const c=CITIES[k];
+  const del = c.custom ? `<span onclick="event.stopPropagation();deleteCity('${k}')" style="padding:4px 8px">${ic("close",15)}</span>` : "";
+  const badge = (c.custom || (c.euro&&hasGuide(k))) ? ` <span class="aibadge" style="margin-left:6px">${ic("magic",10)} AI</span>` : "";
+  return `<button class="pm-item cityrow" data-name="${esc(c.name.toLowerCase())}" onclick="closePlanMenu();setCity('${k}',true)">${city===k?ic("check",18):ic("place",18)} ${esc(c.name)}${badge}${del}</button>`;
+}
+function openCityMenu(){
+  const built=Object.keys(BUILT_CITIES), custom=Object.keys(CUSTOM_CITIES),
+        euro=Object.keys(EURO_CITIES).sort((a,b)=>CITIES[a].name.localeCompare(CITIES[b].name));
+  let html=`<h3>${ic("map",18)} ${t("citiesT")}</h3>
+    <div class="pm-new" style="margin-bottom:10px"><input id="cityfilter" placeholder="${t("citySearchPh")}" oninput="filterCities(this.value)"></div>
+    <button class="pm-item" onclick="locateCity()">${ic("myloc",18)} ${t("cityFind")}</button>
+    <p class="pm-disc" style="margin-top:8px;text-transform:uppercase;font-weight:700;letter-spacing:.5px">${t("myCitiesH")}</p>
+    ${built.concat(custom).map(cityRow).join("")}
+    <p class="pm-disc" style="margin-top:8px;text-transform:uppercase;font-weight:700;letter-spacing:.5px">${t("popularH")}</p>
+    ${euro.map(cityRow).join("")}
+    <p class="pm-disc" style="margin-top:8px">${t("addCityT")}:</p>
+    <div class="pm-new"><input id="newcityname" placeholder="${t("cityPh")}" maxlength="40"><button class="abtn primary" onclick="addCity()">${t("planCreate")}</button></div>
+    <div class="pm-disc" id="citystatus" style="margin-top:8px"></div>
+    <button class="pm-item" style="margin-top:6px;justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`;
+  openMenu(html);
+}
+function filterCities(q){
+  q=(q||"").toLowerCase().trim();
+  document.querySelectorAll(".cityrow").forEach(el=>{
+    el.style.display = (!q || el.dataset.name.includes(q)) ? "flex" : "none";
+  });
+}
+function locateCity(){
+  cityStatus(t("locating2"), true);
+  if(!navigator.geolocation){ cityStatus(t("locFail")); return; }
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    userPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    let best=null,bd=Infinity;
+    Object.keys(CITIES).forEach(k=>{
+      const d=haversine(userPos.lat,userPos.lng,CITIES[k].center[1],CITIES[k].center[0]);
+      if(d<bd){bd=d;best=k;}
+    });
+    if(best && bd<60000){ closePlanMenu(); setCity(best,true); return; }
+    /* not on the list — try to name where the user is and offer to add it */
+    try{
+      const r=await fetch(`https://photon.komoot.io/reverse?lat=${userPos.lat}&lon=${userPos.lng}&lang=en`);
+      const j=await r.json();
+      const p=((j.features||[])[0]||{}).properties||{};
+      const name=p.city||p.town||p.name||"";
+      if(name){ $("newcityname").value=name; cityStatus(`„${name}” ${t("notOnList")}`); return; }
+    }catch(e){}
+    cityStatus(t("locFail"));
+  }, ()=>cityStatus(t("locFail")), {timeout:8000, maximumAge:120000});
+}
+/* generate an AI guide for a known (built-in Euro) city */
+async function generateGuideFor(key){
+  const c=CITIES[key]; if(!c) return;
+  if(!store.get("tv_key")){ toast(t("cityNeedKey")); showView("info"); return; }
+  openMenu(`<h3>${ic("magic",18)} ${esc(c.name)}</h3><div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("cityGen")}: ${esc(c.name)}… ${t("cityGenNote")}</div>`);
+  try{
+    const arr = await anthropicJSON(
+      `You are building a city guide for ${c.name} (center: ${c.center[1]},${c.center[0]}). Respond ONLY with a JSON array of 10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"}),"tip":string (one practical local tip, same language)}. Mix categories: top sights, a quarter or two, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
+      `Build the guide for ${c.name}.`, 7000);
+    const places=arr.filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
+      const lb={title:String(x.name), story:String(x.story||""), tip:String(x.tip||"")};
+      return { id:key+"-"+i, ai:true, city:key, cat:(CAT_ICON[x.cat]?x.cat:"landmark"), lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
+    });
+    if(places.length<5) throw new Error("few");
+    CITY_PLACES[key]=places;
+    store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
+    closePlanMenu();
+    renderChips(); renderCards(); renderMarkers();
+    toast(t("cityAdded")+" · "+c.name);
+  }catch(e){ openMenu(`<h3>${esc(c.name)}</h3><div class="pm-txt">${t("suggErr")}</div><button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">OK</button>`); }
+}
+function cityStatus(msg, spin){
+  const el=$("citystatus"); if(!el) return;
+  el.innerHTML = (spin?`<span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> `:"") + esc(msg);
+}
+async function addCity(){
+  const raw=($("newcityname").value||"").trim();
+  /* guards */
+  if(!store.get("tv_key")){ cityStatus(t("cityNeedKey")); return; }
+  if(raw.length<2 || raw.length>40 || !/^[\p{L}][\p{L}\s\-'.]*$/u.test(raw)){ cityStatus(t("cityBad")); return; }
+  if(Object.keys(CUSTOM_CITIES).length>=10){ cityStatus(t("cityLimit")); return; }
+  const key="c-"+raw.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  if(CITIES[key] || Object.values(CITIES).some(c=>c.name.toLowerCase()===raw.toLowerCase())){ closePlanMenu(); setCity(Object.keys(CITIES).find(k=>CITIES[k].name.toLowerCase()===raw.toLowerCase())||key, true); return; }
+  /* 1) geocoder check — does this city actually exist? */
+  cityStatus(t("cityCheck"), true);
+  let geo=null;
+  try{
+    const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(raw)}&limit=5&lang=en`);
+    const j=await r.json();
+    geo=(j.features||[]).find(f=>["city","town","village","municipality"].includes((f.properties||{}).osm_value) || ["city","town"].includes((f.properties||{}).type));
+  }catch(e){ /* geocoder unreachable — AI check still applies */ }
+  /* 2) AI validation + content generation (single call) */
+  cityStatus(`${t("cityGen")}: ${raw}… ${t("cityGenNote")}`, true);
+  try{
+    const arr = await anthropicJSON(
+      `You are building a city guide. STRICT RULES: if the input is not a real, existing city/town suitable for a tourist guide, or it is offensive, fictional, a joke, a person's name, or nonsense — return [{"ok":false}]. Never invent a city. Otherwise respond ONLY with a JSON array containing exactly one object:
+[{"ok":true,"city":{"name":string (proper local name),"country":string,"lat":number,"lng":number},"places":[10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"}),"tip":string (one practical local tip, same language)}] }]
+Mix categories: top sights, one or two quarters, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
+      `Input city name: "${raw}"${geo?` (geocoder match: ${geo.properties.name}, ${geo.properties.country}, coords ${geo.geometry.coordinates[1]},${geo.geometry.coordinates[0]})`:""}`, 7000);
+    const o=arr[0]||{};
+    if(!o.ok || !o.city || !Array.isArray(o.places) || o.places.length<5){ cityStatus(t("cityBad")); return; }
+    /* 3) cross-check: if geocoder found the city, its coords win; big mismatch with no geocoder match → reject */
+    let center=[+o.city.lng, +o.city.lat];
+    if(geo){
+      const [glng,glat]=geo.geometry.coordinates;
+      if(haversine(glat,glng,+o.city.lat,+o.city.lng) > 150000){ center=[glng,glat]; } else { center=[glng,glat]; }
+    } else if(!isFinite(center[0])||!isFinite(center[1])){ cityStatus(t("cityBad")); return; }
+    const places=o.places.filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
+      const lb={title:String(x.name), story:String(x.story||""), tip:String(x.tip||"")};
+      return { id:key+"-"+i, ai:true, city:key, cat:(CAT_ICON[x.cat]?x.cat:"landmark"), lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
+    });
+    CUSTOM_CITIES[key]={name:String(o.city.name||raw), center, zoom:13, custom:true};
+    CITIES=Object.assign({}, BUILT_CITIES, EURO_CITIES, CUSTOM_CITIES);
+    CITY_PLACES[key]=places;
+    store.set("tv_cities", JSON.stringify(CUSTOM_CITIES));
+    store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
+    closePlanMenu();
+    setCity(key, true);
+    toast(t("cityAdded")+" · "+CITIES[key].name);
+  }catch(e){ cityStatus(t("suggErr")); }
+}
+function deleteCity(k){
+  if(!CUSTOM_CITIES[k]) return;
+  if(!confirm(t("cityDelQ"))) return;
+  delete CUSTOM_CITIES[k]; delete CITY_PLACES[k];
+  CITIES=Object.assign({}, BUILT_CITIES, EURO_CITIES, CUSTOM_CITIES);
+  PLANS=PLANS.filter(p=>p.city!==k); savePlans();
+  store.set("tv_cities", JSON.stringify(CUSTOM_CITIES));
+  store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
+  if(city===k) setCity("madrid", true); else openCityMenu();
+}
+
+/* ============ SHARED ACCESS (encrypted key + unlock code) ============ */
+const b64e = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const b64d = s => Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+async function deriveAes(code, salt){
+  const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt, iterations:150000, hash:"SHA-256"}, km,
+    {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+}
+async function makeShareLink(){
+  const key = store.get("tv_key");
+  const code = ($("sharecode").value||"").trim();
+  const st = $("sharestatus");
+  if(!key){ st.textContent = t("needKeyFirst"); return; }
+  if(code.length<4){ st.textContent = t("codeShort"); return; }
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const aes = await deriveAes(code, salt);
+  const ct = await crypto.subtle.encrypt({name:"AES-GCM", iv}, aes, new TextEncoder().encode(key));
+  const blob = b64e(salt)+"."+b64e(iv)+"."+b64e(ct);
+  const url = location.origin + location.pathname + "#k=" + encodeURIComponent(blob);
+  if(navigator.share){ try{ await navigator.share({title:"Traveler", url}); st.textContent=t("linkReady"); return; }catch(e){} }
+  try{ await navigator.clipboard.writeText(url); st.textContent=t("linkReady"); }
+  catch(e){ st.textContent = url; }
+}
+function checkSharedLink(){
+  const m = location.hash.match(/[#&]k=([^&]+)/);
+  if(m){
+    store.set("tv_locked", decodeURIComponent(m[1]));
+    history.replaceState(null,"",location.pathname+location.search);
+  }
+  if(store.get("tv_locked") && !store.get("tv_key")) openUnlockMenu();
+}
+function openUnlockMenu(msg){
+  openMenu(`<h3>${ic("ticket",18)} ${t("unlockT")}</h3>
+    <div class="pm-txt">${t("unlockS")}</div>
+    ${msg?`<p class="pm-disc" style="color:#B3261E">${esc(msg)}</p>`:""}
+    <div class="pm-new"><input id="unlockcode" placeholder="${t("codePh")}" autocomplete="off"><button class="abtn primary" onclick="tryUnlock()">${t("unlockB")}</button></div>
+    <button class="pm-item" style="margin-top:10px;justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+}
+async function tryUnlock(){
+  const code=($("unlockcode").value||"").trim();
+  const blob=store.get("tv_locked"); if(!blob||!code) return;
+  try{
+    const [s,i,c]=blob.split(".");
+    const aes=await deriveAes(code, b64d(s));
+    const pt=await crypto.subtle.decrypt({name:"AES-GCM", iv:b64d(i)}, aes, b64d(c));
+    store.set("tv_key", new TextDecoder().decode(pt));
+    closePlanMenu(); renderInfo(); toast(t("unlocked"));
+  }catch(e){ openUnlockMenu(t("wrongCode")); }
+}
+
+/* ============ ONBOARDING + SHARE + FEEDBACK ============ */
+function renderOnboard(){
+  $("oblogo").innerHTML = ic("explore",40);
+  $("obtitle").textContent = t("obTitle");
+  $("obsub").textContent = t("obSub");
+  $("obfeats").innerHTML = [["myloc","obF1"],["walk","obF2"],["chat","obF3"]].map(([i,k])=>
+    `<div class="ob-feat"><div class="ic">${ic(i,22)}</div><div><b>${t(k+"t")}</b><span>${t(k+"s")}</span></div></div>`).join("");
+  $("obstart").textContent = t("obStart");
+  $("oblangsr").classList.toggle("on", lang==="sr");
+  $("oblangen").classList.toggle("on", lang==="en");
+}
+function obLang(l){ lang=l; store.set("tv_lang",l); $("langbtn").textContent=l.toUpperCase(); renderOnboard(); renderAll(); }
+function showOnboard(){ renderOnboard(); $("onboard").classList.add("on"); }
+function closeOnboard(){ store.set("tv_seen","1"); $("onboard").classList.remove("on"); }
+function toast(msg){
+  $("speaktitle").innerHTML = ic("check",16)+`<span>${esc(msg)}</span>`;
+  $("speakstop").textContent="OK";
+  $("speakbar").classList.add("on"); setTimeout(()=>$("speakbar").classList.remove("on"),1800);
+}
+async function shareApp(placeTitle){
+  const url = location.href.split("#")[0];
+  const text = (placeTitle ? placeTitle+" · " : "") + t("shareTxt") + " " + url;
+  if(navigator.share){ try{ await navigator.share({title:"Traveler", text, url}); }catch(e){} }
+  else { try{ await navigator.clipboard.writeText(text); toast(t("copied")); }catch(e){} }
+}
+function sendFeedback(){
+  const s = encodeURIComponent("Traveler — utisci");
+  const b = encodeURIComponent("Šta ti se svidelo?\n\nŠta te nerviralo?\n\nŠta nedostaje?\n\n");
+  location.href = `mailto:gajinjovan@gmail.com?subject=${s}&body=${b}`;
+}
+
 /* ============ TICKETS (AI find + in-app wallet via IndexedDB) ============ */
 const idb = {
   _db:null,
@@ -974,14 +1388,19 @@ async function saveTicketFile(file){
   $("speakbar").classList.add("on"); setTimeout(()=>$("speakbar").classList.remove("on"),1800);
 }
 async function renderTickets(){
+  const el=$("ticketsec"); if(!el) return;
   let list=[]; try{ list=await idb.all() }catch(e){}
-  $("ticketslist").innerHTML = !list.length ? "" :
-    `<p style="color:var(--on-surface-var);font-size:12.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:12px">${t("myTickets")}</p>`+
-    list.map(tk=>`<div class="plancard">
+  let html=`<h2>${ic("ticket",20)} ${t("myTickets")}</h2>`;
+  if(!list.length){
+    html+=`<div class="emptybox"><b>${t("ticketsEmptyT")}</b><p>${t("ticketsEmptyS")}</p></div>`;
+  } else {
+    html+=list.map(tk=>`<div class="plancard">
       <div class="pc-txt"><h4>${ic("ticket",14)} ${esc(tk.place||tk.name)}</h4><span>${esc(tk.name)} · ${tk.added}</span></div>
       <button class="pc-start ripple" onclick="openTicket('${tk.id}')">${ic("openext",14)} ${t("ticketOpen")}</button>
       <button class="pc-del" onclick="deleteTicket('${tk.id}')">${ic("close",16)}</button>
     </div>`).join("");
+  }
+  el.innerHTML=html;
 }
 async function openTicket(id){
   const list=await idb.all(); const tk=list.find(x=>x.id===id); if(!tk) return;
@@ -990,7 +1409,7 @@ async function openTicket(id){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
-async function deleteTicket(id){ if(!confirm(t("ticketDelQ"))) return; await idb.del(id); renderTickets(); }
+async function deleteTicket(id){ if(!confirm(t("ticketDelQ"))) return; await idb.del(id); renderPlanView(); }
 
 /* ============ TRANSPORT (how do I get there) ============ */
 function openGoMenu(){
@@ -1056,32 +1475,80 @@ function createPlanAndAdd(){
   savePlans(); finishAdd();
 }
 function finishAdd(){
-  closePlanMenu(); renderPlans(); renderCards(); renderMarkers();
+  closePlanMenu(); renderPlanView(); renderCards(); renderMarkers();
   $("herestatus").textContent="";
   const bar=$("speakbar"); // quick toast via snackbar
   $("speaktitle").innerHTML=ic("check",16)+`<span>${t("planAdded")}</span>`;
   $("speakstop").textContent="OK";
   bar.classList.add("on"); setTimeout(()=>bar.classList.remove("on"),1800);
 }
+function renderPlanView(){
+  // active tour banner
+  let banner="";
+  if(TOUR.active && TOUR.idx<TOUR.stops.length){
+    const nx=findPlace(TOUR.stops[TOUR.idx]);
+    banner=`<div class="tourbanner">${ic("walk",22)}<div class="tt"><b>${t("tourActiveT")}</b><span>${t("nextIs")}: ${nx?esc(nx[lang].title):""} · ${TOUR.idx+1}/${TOUR.stops.length}</span></div>
+      <button style="background:var(--primary);color:#fff" onclick="showView('map')">${t("resumeT")}</button>
+      <button style="background:none;color:var(--on-primary-container)" onclick="endTour();renderPlanView()">${t("tourEnd")}</button></div>`;
+  }
+  $("tourbanner").innerHTML = banner;
+  renderPlans(); renderTickets();
+}
 function renderPlans(){
+  const el=$("plansec"); if(!el) return;
   const myPlans=PLANS.filter(p=>!p.city||p.city===city);
-  $("planslist").innerHTML = !myPlans.length ? "" :
-    `<p style="color:var(--on-surface-var);font-size:12.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:12px">${t("plans")}</p>`+
-    myPlans.map(pl=>`<div class="plancard">
-      <div class="pc-txt"><h4>${esc(pl.name)}</h4><span>${pl.stops.map(id=>{const p=findPlace(id);return p?p[lang].title:""}).filter(Boolean).join(" → ")||"—"}</span></div>
-      <button class="pc-start ripple" onclick="startPlan('${pl.id}')">${ic("play",15)} ${t("planStart")}</button>
-      <button class="pc-del" onclick="deletePlan('${pl.id}')">${ic("close",16)}</button>
+  let html=`<h2>${ic("event",20)} ${t("plansH")} · ${CITIES[city].name}</h2>`;
+  if(!myPlans.length){
+    html+=`<div class="emptybox"><b>${t("plansEmptyT")}</b><p>${t("plansEmptyS")}</p></div>`;
+  } else {
+    html+=myPlans.map(pl=>`<div class="planbig">
+      <div class="pb-head"><h4>${esc(pl.name)}</h4><span>${pl.stops.length} ${t("stops")}</span>
+        <button onclick="deletePlan('${pl.id}')">${ic("close",18)}</button></div>
+      ${pl.stops.map((id,i)=>{const p=findPlace(id); if(!p) return "";
+        return `<div class="stoprow"><div class="n">${i+1}</div>
+          <div class="st" onclick="openSheet('${id}')">${ic(CAT_ICON[p.cat],14)} ${esc(p[lang].title)}</div>
+          <button class="sx" onclick="removeStop('${pl.id}','${id}')">${ic("close",15)}</button></div>`;}).join("")}
+      <button class="abtn primary ripple" style="width:100%;margin-top:12px" onclick="startPlan('${pl.id}')">${ic("play",17)} ${t("startPlanBtn")}</button>
     </div>`).join("");
+  }
+  el.innerHTML=html;
+}
+function removeStop(planId, stopId){
+  const pl=PLANS.find(x=>x.id===planId); if(!pl) return;
+  pl.stops=pl.stops.filter(s=>s!==stopId);
+  if(!pl.stops.length) PLANS=PLANS.filter(x=>x.id!==planId);
+  savePlans(); renderPlanView();
 }
 function startPlan(planId){
   const pl=PLANS.find(x=>x.id===planId); if(!pl||pl.stops.length<1) return;
-  tourSel = pl.stops.slice();
-  if(tourSel.length===1){ tourSel=tourSel; } // single stop tour is fine
-  startTour();
+  const decide=()=>{
+    const ordered=orderStops(pl.stops.slice(), userPos);
+    const first=findPlace(ordered[0]);
+    const d = (userPos&&first) ? haversine(userPos.lat,userPos.lng,first.lat,first.lng) : null;
+    if(first && d!=null && d>800){
+      // too far from the start — help the user get there first
+      curPlace=first;
+      const dest=`${first.lat},${first.lng}`;
+      openMenu(`<h3>${ic("bus",18)} ${t("toStartT")}</h3>
+        <div class="pm-txt">${t("firstStopIs")} <b>${esc(first[lang].title)}</b> — ${fmtDist(d)} ${t("awayIs")}.</div>
+        <button class="pm-item" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=transit','_blank')">${ic("bus",18)} ${t("transitG")}</button>
+        <button class="pm-item" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=walking','_blank')">${ic("walk",18)} ${t("walkG")}</button>
+        ${store.get("tv_key")?`<button class="pm-item" onclick="askAIRoute()">${ic("magic",18)} ${t("askRoute")}</button>`:""}
+        <button class="pm-item" style="background:var(--primary-container);color:var(--on-primary-container);justify-content:center" onclick="closePlanMenu();launchTour(${JSON.stringify(ordered).replace(/"/g,"&quot;")})">${ic("play",18)} ${t("startAnyway")}</button>
+        <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+    } else {
+      launchTour(ordered);
+    }
+  };
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos=>{ userPos={lat:pos.coords.latitude,lng:pos.coords.longitude}; decide(); },
+      ()=>decide(), {timeout:4000, maximumAge:60000});
+  } else decide();
 }
 function deletePlan(planId){
   if(!confirm(t("planDelQ"))) return;
-  PLANS=PLANS.filter(x=>x.id!==planId); savePlans(); renderPlans();
+  PLANS=PLANS.filter(x=>x.id!==planId); savePlans(); renderPlanView();
 }
 
 /* ============ TOUR MODE ============ */
@@ -1130,10 +1597,13 @@ function startTour(){
   } else beginTour();
 }
 function beginTour(){
-  TOUR = {active:true, stops:orderStops(tourSel, userPos), idx:0};
-  saveTour();
+  launchTour(orderStops(tourSel, userPos));
   selMode=false; tourSel=[];
   renderTourCtl(); renderCards();
+}
+function launchTour(orderedStops){
+  TOUR = {active:true, stops:orderedStops, idx:0};
+  saveTour();
   showView("map");
   drawTour(); renderTourBar(); startTourWatch();
   const first = findPlace(TOUR.stops[0]);
@@ -1215,7 +1685,7 @@ function endTour(done){
 /* ============ chat (Anthropic API, key stays on device) ============ */
 function sysPrompt(){
   const near = userPos ? ALL_PLACES.map(p=>({p,d:haversine(userPos.lat,userPos.lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d).slice(0,3).map(x=>`${x.p.en.title} (${Math.round(x.d)}m)`).join(", ") : "unknown";
-  return `You are "Traveler", a warm, knowledgeable local tour guide for MADRID and ALICANTE, Spain. The user is currently browsing: ${CITIES[city].name}. Today: a live conversation with a visitor walking the city.
+  return `You are "Traveler", a warm, knowledgeable local tour guide. The user is currently exploring: ${CITIES[city].name}. Today: a live conversation with a visitor walking the city.
 RULES:
 - ALWAYS reply in the same language the user writes in (Serbian, English, Spanish, or any other). Default: ${lang==="sr"?"Serbian":"English"}.
 - Be vivid but concise: 2-6 sentences unless asked for more. You are speaking to someone standing in the street.
@@ -1272,6 +1742,19 @@ function renderInfo(){
     <input id="keyinput" type="password" placeholder="sk-ant-…" value="${store.get("tv_key")||""}">
     <p style="font-size:12.5px">${t("keyHint")}</p>
     <button class="abtn primary" onclick="saveKey(this)">${t("save")}</button>
+    <h2>${ic("ticket",19)} ${t("accessH")}</h2>
+    <p style="font-size:13px">${t("accessS")}</p>
+    <div style="display:flex;gap:8px">
+      <input id="sharecode" placeholder="${t("codePh")}" style="margin:0;flex:1" autocomplete="off">
+      <button class="abtn primary" style="margin:0;flex:none;padding:12px 16px" onclick="makeShareLink()">${ic("share",16)} ${t("makeLink")}</button>
+    </div>
+    <p id="sharestatus" style="font-size:12.5px;margin-top:6px;word-break:break-all"></p>
+    <h2>${ic("mail",19)} ${t("feedback")}</h2>
+    <p>${t("feedbackSub")}</p>
+    <div style="display:flex;gap:10px">
+      <button class="abtn primary" style="margin-top:0" onclick="sendFeedback()">${ic("mail",17)} ${t("feedback")}</button>
+      <button class="abtn sec" style="margin-top:0" onclick="shareApp()">${ic("share",17)} ${t("shareApp")}</button>
+    </div>
     <h2>${ic("info",19)} ${t("about")}</h2>
     <p>${t("aboutTxt")}</p>
     <p style="font-size:12.5px">${t("voiceNote")}</p>
@@ -1285,10 +1768,11 @@ function saveKey(btn){
 
 /* ============ render all ============ */
 function renderAll(){
-  renderNav(); renderChips(); renderTourCtl(); renderPlans(); renderTickets(); renderCards(); renderInfo();
+  renderNav(); renderChips(); renderTourCtl(); renderPlanView(); renderCards(); renderInfo();
   renderTourBar();
   $("searchinput").placeholder = t("search");
   $("logoic").innerHTML = ic("explore",24);
+  $("infobtn").innerHTML = ic("settings",19);
   $("citybtn").innerHTML = ic("swap",15) + CITIES[city].name;
   $("hereic").innerHTML = ic("myloc",22);
   $("sendbtn").innerHTML = ic("send",20);
@@ -1316,6 +1800,10 @@ initSearch();
 showView("map");
 /* resume an active tour after reload */
 if(TOUR.active){ drawTour(); renderTourBar(); startTourWatch(); }
+/* first launch → onboarding */
+if(!store.get("tv_seen")) showOnboard();
+/* shared-access link (#k=...) → unlock dialog */
+checkSharedLink();
 
 </script>
 <script>
