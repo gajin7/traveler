@@ -219,6 +219,10 @@ nav button{overflow:visible}
 #chatinput{flex:1;background:var(--sc-high);border:none;border-radius:28px;color:var(--on-surface);padding:13px 18px;font-size:15px;outline:none;font-family:inherit}
 #chatinput::placeholder{color:var(--on-surface-var)}
 #sendbtn{background:var(--primary);border:none;width:48px;height:48px;border-radius:50%;font-size:18px;color:var(--on-primary);box-shadow:var(--el1)}
+.cbtn{background:var(--sc-high);border:none;width:44px;height:44px;border-radius:50%;color:var(--on-surface-var);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cbtn.rec{background:#B3261E;color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(179,38,30,.5)}50%{box-shadow:0 0 0 10px rgba(179,38,30,0)}}
+.msg img{max-width:100%;border-radius:12px;display:block;margin-bottom:6px}
 /* info */
 .infobox{padding:18px 16px 120px}
 .infobox h2{font-size:19px;font-weight:600;margin:18px 0 8px}
@@ -271,6 +275,7 @@ nav button{overflow:visible}
   <div class="view" id="view-here">
     <div class="herehead"><h2 id="heretitle"></h2><p id="heresub"></p></div>
     <button class="bigbtn ripple" id="herebtn" onclick="locateMe()"><span id="hereic"></span><span id="herebtntxt"></span></button>
+    <button class="bigbtn ripple" id="cambtn" style="background:var(--secondary-container);color:var(--on-secondary-container);margin-top:0" onclick="$('camfile').click()"><span id="camic"></span><span id="cambtntxt"></span></button>
     <div class="statusline" id="herestatus"></div>
     <div class="cards" id="herecards" style="padding-bottom:8px"></div>
     <div class="suggblock">
@@ -293,6 +298,8 @@ nav button{overflow:visible}
   <div class="view" id="view-chat">
     <div id="chatlog"></div>
     <div id="chatbar">
+      <button id="chatcam" class="cbtn ripple" onclick="$('camfile').click()"></button>
+      <button id="micbtn" class="cbtn ripple" onclick="toggleMic()"></button>
       <input id="chatinput" autocomplete="off">
       <button id="sendbtn" class="ripple" onclick="sendChat()"></button>
     </div>
@@ -340,6 +347,7 @@ nav button{overflow:visible}
   </div>
 </div>
 <input type="file" id="ticketfile" accept="image/*,application/pdf" style="display:none">
+<input type="file" id="camfile" accept="image/*" capture="environment" style="display:none">
 
 <div id="tourbar">
   <div class="tb-info" onclick="openNextStop()">
@@ -601,6 +609,9 @@ const UI = {
     chatHello:"Zdravo! Ja sam tvoj vodič kroz {city}. Pitaj me bilo šta — o mestima, istoriji, hrani. A mogu i da ti napravim turu: reci npr. „napravi mi turu za sutra, uži centar, sat vremena, 5 mesta”.",
     chatPlaceholder:"Pitaj vodiča ili traži turu…", noKey:"Za razgovor sa AI vodičem unesi API ključ u Info tabu. Priče i slušanje rade i bez ključa!",
     openPlanB:"Otvori plan", openListB:"Pogledaj mesta",
+    whatThis:"Šta je ovo?", camSub:"Slikaj zgradu, statuu, jelo — vodič ti kaže šta gledaš.",
+    camAsk:"Upravo sam ovo slikao. Reci mi šta je i ispričaj mi o tome kao vodič — istorija, zanimljivosti, saveti.",
+    micErr:"Nisam te razumeo — probaj ponovo.",
     speaking:"Vodič priča…", askAbout:"Ispričaj mi više o: ", m:"m od tebe", km:"km od tebe",
     thinking:"Vodič razmišlja…", chatErr:"Greška u komunikaciji sa AI servisom. Proveri ključ i internet.",
     infoTitle:"Podešavanja", keyLabel:"Anthropic API ključ (za AI chat)", keyHint:"Ključ se čuva samo na tvom telefonu i šalje isključivo Anthropic servisu. Napravi ga na console.anthropic.com.",
@@ -657,6 +668,9 @@ const UI = {
     chatHello:"Hi! I'm your {city} guide. Ask me anything — places, history, food. I can also build you a tour: say e.g. \"make me a tour for tomorrow, old center, one hour, 5 stops\".",
     chatPlaceholder:"Ask the guide or request a tour…", noKey:"To chat with the AI guide, add an API key in the Info tab. Stories and listening work without a key!",
     openPlanB:"Open plan", openListB:"See places",
+    whatThis:"What is this?", camSub:"Snap a building, statue or dish — the guide tells you what you're looking at.",
+    camAsk:"I just took this photo. Tell me what it is and talk about it like a guide — history, curiosities, tips.",
+    micErr:"Didn't catch that — try again.",
     speaking:"Guide is speaking…", askAbout:"Tell me more about: ", m:"m from you", km:"km from you",
     thinking:"Guide is thinking…", chatErr:"Error talking to the AI service. Check your key and connection.",
     infoTitle:"Settings", keyLabel:"Anthropic API key (for AI chat)", keyHint:"The key is stored only on your phone and sent only to Anthropic. Create one at console.anthropic.com.",
@@ -720,6 +734,8 @@ ticket:"M22 10V6c0-1.1-.9-2-2-2H4c-1.1 0-1.99.9-1.99 2v4c1.1 0 1.99.9 1.99 2s-.8
 bus:"M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z",
 openext:"M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z",
 download:"M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z",
+camera:"M12 15.2c1.77 0 3.2-1.43 3.2-3.2S13.77 8.8 12 8.8 8.8 10.23 8.8 12s1.43 3.2 3.2 3.2zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z",
+mic:"M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z",
 share:"M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z",
 mail:"M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z",
 magic:"M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"
@@ -988,6 +1004,34 @@ function renderIntChips(){
 }
 function toggleInt(k){ activeInts.has(k) ? activeInts.delete(k) : activeInts.add(k); renderIntChips(); }
 
+/* ============ anti-hallucination: every AI-invented place must be verified against OpenStreetMap ============
+   A place survives only if the geocoder finds it near the city (≤20 km from center) — and then we use the
+   geocoder's REAL coordinates, not the AI's. Unverifiable places are dropped. */
+async function verifyPlaces(list, center, radiusM){
+  const R = radiusM || 20000;
+  const out = [];
+  await Promise.all(list.map(async p=>{
+    if(!p || !p.name) return;
+    try{
+      const r = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(p.name)}&lat=${center[1]}&lon=${center[0]}&limit=4`);
+      const j = await r.json();
+      const hit = (j.features||[]).find(f=>{
+        const [lng,lat] = f.geometry.coordinates;
+        return haversine(center[1],center[0],lat,lng) <= R;
+      });
+      if(!hit) return; // not found near this city → dropped (this kills "Zeleni venac in Subotica" type errors)
+      const [lng,lat] = hit.geometry.coordinates;
+      p.lat = lat; p.lng = lng; // snap to real OSM coordinates
+      out.push(p);
+    }catch(e){
+      // geocoder unreachable → fall back to a sanity check on the AI's own coords
+      if(isFinite(+p.lat) && isFinite(+p.lng) && haversine(center[1],center[0],+p.lat,+p.lng) <= R) out.push(p);
+    }
+  }));
+  return out;
+}
+const STRICT = `CRITICAL ANTI-HALLUCINATION RULE: include ONLY places you are CERTAIN really exist in this exact city. Never include places from other cities, never invent names, never guess. Fewer correct places are ALWAYS better than more invented ones. Every place will be verified against a map database and invented ones will be discarded.`;
+
 async function anthropicJSON(system, user, maxTok){
   const key = store.get("tv_key");
   if(!key) throw new Error("nokey");
@@ -1013,10 +1057,11 @@ async function getSuggestions(){
   const free = $("sugginput").value.trim();
   const curated = cityPlaces().map(p=>p.en.title).join("; ");
   const loc = userPos ? `User's GPS: ${userPos.lat.toFixed(4)},${userPos.lng.toFixed(4)}.` : `User is somewhere in central ${CITIES[city].name}.`;
-  const system = `You are a local expert for ${CITIES[city].name}, Spain. Suggest REAL, currently-existing places a tourist can visit. Respond with ONLY a JSON array, no prose, no markdown. 4-6 items. Each item: {"name": string, "cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "lat": number, "lng": number, "story": string (60-90 words, vivid, in ${lang==="sr"?"Serbian":"English"}), "tip": string (one practical local tip, same language)}. Use your best knowledge of real coordinates. NEVER suggest places already in this list: ${curated}.`;
+  const system = `You are a local expert for ${CITIES[city].name}. ${STRICT} Suggest REAL, currently-existing places a tourist can visit. Respond with ONLY a JSON array, no prose, no markdown. 4-6 items. Each item: {"name": string, "cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "lat": number, "lng": number, "story": string (60-90 words, vivid, in ${lang==="sr"?"Serbian":"English"}), "tip": string (one practical local tip, same language)}. Use your best knowledge of real coordinates. NEVER suggest places already in this list: ${curated}.`;
   const user = `${loc} Interests: ${ints}. ${free?("Extra wish: "+free):""} Suggest places in ${CITIES[city].name} beyond the list.`;
   try{
-    const arr = await anthropicJSON(system, user, 2500);
+    let arr = await anthropicJSON(system, user, 2500);
+    arr = await verifyPlaces(arr.filter(x=>x&&x.name), CITIES[city].center);
     SUGG = arr.filter(x=>x && x.name && x.lat && x.lng).map((x,i)=>{
       const langBlock = {title:x.name, story:String(x.story||""), tip:String(x.tip||"")};
       return { id:"ai-"+Date.now()+"-"+i, ai:true, city, cat:(CAT_ICON[x.cat]?x.cat:"landmark"),
@@ -1183,14 +1228,15 @@ async function generateGuideFor(key){
   if(!store.get("tv_key")){ toast(t("cityNeedKey")); showView("info"); return; }
   openMenu(`<h3>${ic("magic",18)} ${esc(c.name)}</h3><div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("cityGen")}: ${esc(c.name)}… ${t("cityGenNote")}</div>`);
   try{
-    const arr = await anthropicJSON(
-      `You are building a city guide for ${c.name} (center: ${c.center[1]},${c.center[0]}). Respond ONLY with a JSON array of 10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"}),"tip":string (one practical local tip, same language)}. Mix categories: top sights, a quarter or two, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
-      `Build the guide for ${c.name}.`, 7000);
+    let arr = await anthropicJSON(
+      `You are building a city guide for ${c.name} (center: ${c.center[1]},${c.center[0]}). ${STRICT} Respond ONLY with a JSON array of 10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"}),"tip":string (one practical local tip, same language)}. Mix categories: top sights, a quarter or two, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
+      `Build the guide for ${c.name}. Only places that truly exist in ${c.name}.`, 7000);
+    arr = await verifyPlaces(arr.filter(x=>x&&x.name), c.center);
     const places=arr.filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
       const lb={title:String(x.name), story:String(x.story||""), tip:String(x.tip||"")};
       return { id:key+"-"+i, ai:true, city:key, cat:(CAT_ICON[x.cat]?x.cat:"landmark"), lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
     });
-    if(places.length<5) throw new Error("few");
+    if(places.length<4) throw new Error("few");
     CITY_PLACES[key]=places;
     store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
     closePlanMenu();
@@ -1223,7 +1269,7 @@ async function addCity(){
   cityStatus(`${t("cityGen")}: ${raw}… ${t("cityGenNote")}`, true);
   try{
     const arr = await anthropicJSON(
-      `You are building a city guide. STRICT RULES: if the input is not a real, existing city/town suitable for a tourist guide, or it is offensive, fictional, a joke, a person's name, or nonsense — return [{"ok":false}]. Never invent a city. Otherwise respond ONLY with a JSON array containing exactly one object:
+      `You are building a city guide. ${STRICT} STRICT RULES: if the input is not a real, existing city/town suitable for a tourist guide, or it is offensive, fictional, a joke, a person's name, or nonsense — return [{"ok":false}]. Never invent a city. Otherwise respond ONLY with a JSON array containing exactly one object:
 [{"ok":true,"city":{"name":string (proper local name),"country":string,"lat":number,"lng":number},"places":[10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"}),"tip":string (one practical local tip, same language)}] }]
 Mix categories: top sights, one or two quarters, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
       `Input city name: "${raw}"${geo?` (geocoder match: ${geo.properties.name}, ${geo.properties.country}, coords ${geo.geometry.coordinates[1]},${geo.geometry.coordinates[0]})`:""}`, 7000);
@@ -1235,7 +1281,9 @@ Mix categories: top sights, one or two quarters, real well-known food/drink spot
       const [glng,glat]=geo.geometry.coordinates;
       if(haversine(glat,glng,+o.city.lat,+o.city.lng) > 150000){ center=[glng,glat]; } else { center=[glng,glat]; }
     } else if(!isFinite(center[0])||!isFinite(center[1])){ cityStatus(t("cityBad")); return; }
-    const places=o.places.filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
+    const verified = await verifyPlaces(o.places.filter(x=>x&&x.name), center);
+    if(verified.length<4){ cityStatus(t("cityBad")); return; }
+    const places=verified.filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
       const lb={title:String(x.name), story:String(x.story||""), tip:String(x.tip||"")};
       return { id:key+"-"+i, ai:true, city:key, cat:(CAT_ICON[x.cat]?x.cat:"landmark"), lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
     });
@@ -1700,6 +1748,7 @@ RULES:
 - User's nearest known places right now: ${near}.
 - When the user asks you to CREATE / BUILD a tour, plan, itinerary or route (for now, tomorrow, or any day) — you MUST call the create_tour tool. Respect their wishes: the area (e.g. "old center"), duration (count ≈ 10-15 min per stop plus walking between), number of stops, interests. Order stops as a sensible walking route. Prefer KNOWN PLACES via their "id"; for stops not on the list use real places with real coordinates and write "story" and "tip" in the user's language. After the tool result, confirm briefly what you created.
 - When the user asks you to ADD places to a guide ("add X to Madrid", "add 10 restaurants in Lisbon", "5 local taverns in Thessaloniki") — you MUST call the add_places tool. Only REAL, existing places with real coordinates; write story and tip in the user's language; match their criteria (authentic, local, cheap...). The target city may differ from the current one — pass its proper name and center coordinates. Never invent cities or places; if the request is nonsense or offensive, refuse without calling the tool.
+- ${STRICT} Every place you propose is verified against a map database; if the tool result says some were discarded or unverified, tell the user honestly — never claim something was added when it wasn't.
 KNOWN PLACES in ${CITIES[city].name} (id | title | lat,lng):
 ${known}`;
 }
@@ -1746,20 +1795,23 @@ function resolveCityKey(name, lat, lng){
   store.set("tv_cities", JSON.stringify(CUSTOM_CITIES));
   return key;
 }
-function addPlacesFromAI(inp){
+async function addPlacesFromAI(inp){
   try{
     const key=resolveCityKey(inp.city_name, inp.city_lat, inp.city_lng);
     if(!key) return "ERROR: could not resolve the city (missing center coordinates or city limit reached)";
-    const added=(inp.places||[]).filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
+    const raw=(inp.places||[]).filter(x=>x&&x.name);
+    const verified=await verifyPlaces(raw, CITIES[key].center);
+    const dropped=raw.length-verified.length;
+    const added=verified.filter(x=>isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
       const lb={title:String(x.name), story:String(x.story||x.name), tip:String(x.tip||"")};
       return { id:"ai-add-"+Date.now()+"-"+i, ai:true, city:key, cat:(CAT_ICON[x.cat]?x.cat:"landmark"), lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
     });
-    if(!added.length) return "ERROR: no valid places";
+    if(!added.length) return "ERROR: none of the places could be verified on the map — they may not exist in "+CITIES[key].name+". Tell the user honestly that you couldn't verify them and do NOT claim they were added.";
     CITY_PLACES[key]=(CITY_PLACES[key]||[]).concat(added);
     store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
     window._lastAddKey=key;
     if(key===city){ renderChips(); renderCards(); renderMarkers(); renderInfo(); }
-    return `OK: added ${added.length} places to ${CITIES[key].name}${key!==city?" (user can switch city via the top button)":""}.`;
+    return `OK: added ${added.length} map-verified places to ${CITIES[key].name}${dropped?` (${dropped} could not be verified on the map and were discarded — tell the user)`:""}${key!==city?" (user can switch city via the top button)":""}.`;
   }catch(e){ return "ERROR: "+e.message; }
 }
 function openAddedList(){
@@ -1767,26 +1819,33 @@ function openAddedList(){
   if(k && k!==city) setCity(k,true);
   showView("list");
 }
-function createTourFromAI(inp){
+async function createTourFromAI(inp){
   try{
-    const stopIds=[];
+    /* split stops into known (by id) and new; verify the new ones against the map */
+    const rawNew=(inp.stops||[]).filter(s=>!(s.id&&findPlace(s.id))&&s&&s.name);
+    const verifiedNew=await verifyPlaces(rawNew, CITIES[city].center);
+    const okNames=new Set(verifiedNew.map(v=>v.name));
+    const stopIds=[]; let droppedNames=[];
     (inp.stops||[]).forEach((s,i)=>{
       const existing = s.id && findPlace(s.id);
       if(existing){ stopIds.push(existing.id); return; }
-      if(!s.name || !isFinite(+s.lat) || !isFinite(+s.lng)) return;
+      if(!s || !s.name) return;
+      if(!okNames.has(s.name)){ droppedNames.push(s.name); return; }
+      const v=verifiedNew.find(x=>x.name===s.name);
       const lb={title:String(s.name), story:String(s.story||s.name), tip:String(s.tip||"")};
-      const p={ id:"ai-chat-"+Date.now()+"-"+i, ai:true, city, cat:(CAT_ICON[s.cat]?s.cat:"landmark"), lat:+s.lat, lng:+s.lng, wiki:null, sr:lb, en:lb };
+      const p={ id:"ai-chat-"+Date.now()+"-"+i, ai:true, city, cat:(CAT_ICON[s.cat]?s.cat:"landmark"), lat:+v.lat, lng:+v.lng, wiki:null, sr:lb, en:lb };
       SAVED.push(p); stopIds.push(p.id);
     });
     store.set("tv_saved", JSON.stringify(SAVED));
-    if(!stopIds.length) return "ERROR: no valid stops";
+    if(!stopIds.length) return "ERROR: no valid stops (none could be verified on the map)";
+    const dropNote = droppedNames.length ? ` NOTE: ${droppedNames.length} stops (${droppedNames.join(", ")}) could not be verified on the map and were excluded — mention this to the user.` : "";
     if(inp.start_now){
       launchTour(stopIds);
-      return `OK: tour "${inp.name}" started now with ${stopIds.length} stops. The user is now on the map view.`;
+      return `OK: tour "${inp.name}" started now with ${stopIds.length} stops. The user is now on the map view.${dropNote}`;
     }
     PLANS.push({id:"plan-"+Date.now(), name:String(inp.name||"Tura"), city, stops:stopIds});
     savePlans(); renderPlanView(); renderCards(); renderMarkers();
-    return `OK: plan "${inp.name}" saved with ${stopIds.length} stops. The user can open it in the "${t("plan")}" tab and press "${t("startPlanBtn")}".`;
+    return `OK: plan "${inp.name}" saved with ${stopIds.length} stops. The user can open it in the "${t("plan")}" tab and press "${t("startPlanBtn")}".${dropNote}`;
   }catch(e){ return "ERROR: "+e.message; }
 }
 function addMsg(cls,html){
@@ -1799,6 +1858,15 @@ function askAboutCurrent(){
   $("chatinput").value = t("askAbout") + curPlace[lang].title;
   $("chatinput").focus();
 }
+/* strip image blocks from all but the newest message (keeps API cost sane) */
+function buildMsgs(){
+  const msgs = chatHistory.slice(-14);
+  return msgs.map((m,i)=>{
+    if(i===msgs.length-1 || typeof m.content==="string") return m;
+    const c = m.content.map(b => b.type==="image" ? {type:"text",text:"[photo the user sent earlier]"} : b);
+    return {role:m.role, content:c};
+  });
+}
 async function sendChat(){
   const inp=$("chatinput"), text=inp.value.trim();
   if(!text) return;
@@ -1807,6 +1875,9 @@ async function sendChat(){
   if(!key){ addMsg("sys", esc(t("noKey"))); showView("chat"); return; }
   chatHistory.push({role:"user",content:text});
   const tw = addMsg("bot",'<div class="typing"><i></i><i></i><i></i></div>');
+  await runChatTurn(tw, key);
+}
+async function runChatTurn(tw, key){
   try{
     let madePlan=false, madeAdd=false, guard=0, reply="";
     while(guard++ < 4){
@@ -1815,19 +1886,19 @@ async function sendChat(){
         headers:{ "content-type":"application/json", "x-api-key":key,
           "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
         body:JSON.stringify({ model: store.get("tv_model")||"claude-haiku-4-5",
-          max_tokens:4000, system: sysPrompt(), tools:[TOUR_TOOL, ADD_TOOL], messages: chatHistory.slice(-14) })
+          max_tokens:4000, system: sysPrompt(), tools:[TOUR_TOOL, ADD_TOOL], messages: buildMsgs() })
       });
       if(!r.ok){ const e=await r.text(); throw new Error(e.slice(0,200)); }
       const j = await r.json();
       const toolUses = (j.content||[]).filter(b=>b.type==="tool_use");
       if(j.stop_reason==="tool_use" && toolUses.length){
         chatHistory.push({role:"assistant",content:j.content});
-        const results = toolUses.map(tu=>{
+        const results = await Promise.all(toolUses.map(async tu=>{
           let res="ERROR: unknown tool";
-          if(tu.name==="create_tour"){ res=createTourFromAI(tu.input||{}); if(String(res).startsWith("OK")) madePlan=true; }
-          if(tu.name==="add_places"){ res=addPlacesFromAI(tu.input||{}); if(String(res).startsWith("OK")) madeAdd=true; }
+          if(tu.name==="create_tour"){ res=await createTourFromAI(tu.input||{}); if(String(res).startsWith("OK")) madePlan=true; }
+          if(tu.name==="add_places"){ res=await addPlacesFromAI(tu.input||{}); if(String(res).startsWith("OK")) madeAdd=true; }
           return {type:"tool_result", tool_use_id:tu.id, content:String(res)};
-        });
+        }));
         chatHistory.push({role:"user",content:results});
         continue;
       }
@@ -1845,6 +1916,57 @@ async function sendChat(){
   $("chatlog").scrollTop=$("chatlog").scrollHeight;
 }
 function speakLast(btn){ const tmp=document.createElement("div"); tmp.innerHTML=btn.dataset.txt; speak(tmp.textContent, lang); }
+
+/* ============ "What is this?" — camera + AI vision ============ */
+async function analyzePhoto(file){
+  if(!file) return;
+  const key = store.get("tv_key");
+  showView("chat");
+  if(!key){ addMsg("sys", esc(t("noKey"))); return; }
+  /* downscale to max 1200px JPEG */
+  const dataUrl = await new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      const s=Math.min(1, 1200/Math.max(img.width,img.height));
+      const cv=document.createElement("canvas");
+      cv.width=Math.round(img.width*s); cv.height=Math.round(img.height*s);
+      cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+      res(cv.toDataURL("image/jpeg",0.8));
+    };
+    img.src=URL.createObjectURL(file);
+  });
+  const b64=dataUrl.split(",")[1];
+  addMsg("user", `<img src="${dataUrl}">📷 ${esc(t("whatThis"))}`);
+  const loc = userPos
+    ? `My GPS: ${userPos.lat.toFixed(5)},${userPos.lng.toFixed(5)}. Nearest known places: ${cityPlaces().map(p=>({p,d:haversine(userPos.lat,userPos.lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d).slice(0,3).map(x=>`${x.p.en.title} (${Math.round(x.d)}m)`).join(", ")}.`
+    : `I'm somewhere in ${CITIES[city].name}.`;
+  chatHistory.push({role:"user",content:[
+    {type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},
+    {type:"text",text:`${t("camAsk")} ${loc}`}
+  ]});
+  const tw = addMsg("bot",'<div class="typing"><i></i><i></i><i></i></div>');
+  await runChatTurn(tw, key);
+}
+
+/* ============ voice input (speech recognition) ============ */
+const SRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, recOn=false;
+function toggleMic(){
+  if(!SRec) return;
+  if(recOn){ try{rec.stop()}catch(e){}; return; }
+  rec = new SRec();
+  rec.lang = lang==="sr" ? "sr-RS" : "en-US";
+  rec.interimResults=false; rec.maxAlternatives=1;
+  rec.onstart=()=>{ recOn=true; $("micbtn").classList.add("rec"); };
+  rec.onend=()=>{ recOn=false; $("micbtn").classList.remove("rec"); };
+  rec.onerror=()=>{ recOn=false; $("micbtn").classList.remove("rec"); };
+  rec.onresult=e=>{
+    const txt=(e.results[0][0].transcript||"").trim();
+    if(txt){ $("chatinput").value=txt; sendChat(); }
+    else addMsg("sys", esc(t("micErr")));
+  };
+  try{ rec.start(); }catch(e){}
+}
 function esc(s){ const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
 
 /* ============ info ============ */
@@ -1889,6 +2011,11 @@ function renderAll(){
   $("infobtn").innerHTML = ic("settings",19);
   $("citybtn").innerHTML = ic("swap",15) + CITIES[city].name;
   $("hereic").innerHTML = ic("myloc",22);
+  $("camic").innerHTML = ic("camera",22);
+  $("cambtntxt").textContent = t("whatThis");
+  $("chatcam").innerHTML = ic("camera",20);
+  $("micbtn").innerHTML = ic("mic",20);
+  $("micbtn").style.display = SRec ? "flex" : "none";
   $("sendbtn").innerHTML = ic("send",20);
   $("backbtn").innerHTML = ic("close",20);
   $("heretitle").textContent = t("hereTitle");
@@ -1908,6 +2035,7 @@ function renderAll(){
 $("langbtn").textContent = lang.toUpperCase();
 $("chatinput").addEventListener("keydown",e=>{ if(e.key==="Enter") sendChat(); });
 $("ticketfile").addEventListener("change", e=>{ saveTicketFile(e.target.files[0]); e.target.value=""; });
+$("camfile").addEventListener("change", e=>{ analyzePhoto(e.target.files[0]); e.target.value=""; });
 renderAll();
 initMap();
 initSearch();
