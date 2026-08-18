@@ -80,6 +80,7 @@ nav button{overflow:visible}
 .card h3{font-size:15.5px;font-weight:600;margin-bottom:3px;color:var(--on-surface)}
 .card .cat{font-size:11px;color:var(--primary);text-transform:uppercase;letter-spacing:.8px;font-weight:700;display:flex;align-items:center;gap:5px}
 .card .dist{display:flex;align-items:center;gap:4px}
+.cardrate{margin-left:auto;color:#B7791F;font-weight:800;font-size:12px;display:inline-flex;align-items:center;gap:3px;letter-spacing:0}
 .card p{font-size:13px;color:var(--on-surface-var);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45}
 .card .dist{font-size:12px;color:var(--green);font-weight:700;margin-top:4px}
 /* detail sheet */
@@ -277,6 +278,7 @@ nav button{overflow:visible}
   <div class="view" id="view-list">
     <div class="chips" id="chips"></div>
     <div id="tourctl"></div>
+    <div id="foodctl"></div>
     <div class="cards" id="cards"></div>
   </div>
   <div class="view" id="view-here">
@@ -621,6 +623,12 @@ const UI = {
     whatThis:"Šta je ovo?", camSub:"Slikaj zgradu, statuu, jelo — vodič ti kaže šta gledaš.",
     newChat:"Nova konverzacija", gRatings:"Ocene na Google-u",
     aiEst:"AI PROCENA", repUnknown:"Nemam pouzdane recenzije za ovo mesto — proveri na Google-u.", repLoad:"Proveravam reputaciju…",
+    sortRate:"Po ocenama",
+    cu_any:"Sve", cu_local:"Lokalna", cu_seafood:"Morska", cu_grill:"Roštilj/meso", cu_italian:"Italijanska",
+    cu_asian:"Azijska", cu_veg:"Vege", cu_sweet:"Slatko", cu_cheap:"Jeftino",
+    loadMoreFood:"Učitaj još restorana", loadMoreDrink:"Učitaj još barova i kafića",
+    fLoad:"Tražim i proveravam na mapi…", fAdded:"Dodato", fDropped:"nije potvrđeno na mapi",
+    fNone:"Nisam našao nova mesta koja mogu da potvrdim — probaj drugu kuhinju.",
     tripH:"Moj put", tripSetup:"Postavi put", tripArrive:"Dolazak", tripDepart:"Odlazak",
     hotelPh:"Hotel — ime ili adresa", notesPh:"Napomene: s kim putuješ, tempo, želje…",
     tripSave:"Sačuvaj put", tripSaved:"Put sačuvan ✓", hotelWarn:"Hotel nije nađen na mapi — sačuvan je samo naziv.",
@@ -689,6 +697,12 @@ const UI = {
     whatThis:"What is this?", camSub:"Snap a building, statue or dish — the guide tells you what you're looking at.",
     newChat:"New conversation", gRatings:"Ratings on Google",
     aiEst:"AI ESTIMATE", repUnknown:"No reliable reviews known for this place — check Google.", repLoad:"Checking reputation…",
+    sortRate:"By rating",
+    cu_any:"All", cu_local:"Local", cu_seafood:"Seafood", cu_grill:"Grill/meat", cu_italian:"Italian",
+    cu_asian:"Asian", cu_veg:"Veggie", cu_sweet:"Sweets", cu_cheap:"Cheap eats",
+    loadMoreFood:"Load more restaurants", loadMoreDrink:"Load more bars & cafés",
+    fLoad:"Searching and verifying on the map…", fAdded:"Added", fDropped:"couldn't be verified on the map",
+    fNone:"Found no new verifiable places — try another cuisine.",
     tripH:"My trip", tripSetup:"Set up trip", tripArrive:"Arrival", tripDepart:"Departure",
     hotelPh:"Hotel — name or address", notesPh:"Notes: who you travel with, pace, wishes…",
     tripSave:"Save trip", tripSaved:"Trip saved ✓", hotelWarn:"Hotel not found on the map — only the name was saved.",
@@ -828,6 +842,7 @@ function showView(id){
   $("infobtn").classList.toggle("on", id==="info");
   if(id==="map" && map) setTimeout(()=>map.resize(),50);
   if(id==="plan") renderPlanView();
+  if(id==="list") ensureCityRatings();
 }
 
 /* ============ language ============ */
@@ -871,7 +886,7 @@ async function placeImage(p){
       const r = await fetch(`https://${p.wl||"en"}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.wiki)}`);
       if(r.ok){
         const j = await r.json();
-        if(j.thumbnail && j.thumbnail.source) url = j.thumbnail.source.replace(/\/\d+px-/, "/640px-");
+        if(j.thumbnail && j.thumbnail.source) url = j.thumbnail.source; // original thumb URL — no size rewriting (rewrites can 404)
       }
     }catch(e){}
   }
@@ -891,10 +906,20 @@ async function placeImage(p){
   return url;
 }
 function applyThumb(el,p){
+  if(!el) return;
   el.style.background = `linear-gradient(135deg,${CAT_COLOR[p.cat]}44,${CAT_COLOR[p.cat]}22)`;
   el.style.color = CAT_COLOR[p.cat];
   el.innerHTML = ic(CAT_ICON[p.cat],36);
-  placeImage(p).then(u=>{ if(u){ el.innerHTML=""; el.style.backgroundImage=`url('${u}')`; el.style.backgroundSize="cover"; el.style.backgroundPosition="center"; }});
+  placeImage(p).then(u=>{
+    if(!u) return;
+    /* preload first — only swap in if the image actually loads (otherwise the icon stays) */
+    const im = new Image();
+    im.onload = ()=>{ if(!el.isConnected && !document.getElementById(el.id)) return;
+      const target = document.getElementById(el.id) || el;
+      target.innerHTML=""; target.style.backgroundImage=`url('${u}')`; target.style.backgroundSize="cover"; target.style.backgroundPosition="center"; };
+    im.onerror = ()=>{ imgCache[p.id]=null; };
+    im.src = u;
+  });
 }
 
 /* ============ list ============ */
@@ -903,7 +928,50 @@ function renderChips(){
   $("chips").innerHTML = CATS.map(c=>
     `<button class="chip ${activeChip===c?'on':''}" onclick="setChip('${c}')">${activeChip===c?ic("check",16):(c==='all'?'':ic(CAT_ICON[c],16))}${t(c)}</button>`).join("");
 }
-function setChip(c){ activeChip=c; renderChips(); renderCards(); }
+function setChip(c){ activeChip=c; renderChips(); renderFoodCtl(); renderCards(); }
+
+/* ============ load more restaurants / bars, by cuisine ============ */
+let cuisine="any";
+const CUISINE_EN = {any:"any cuisine", local:"local/traditional cuisine", seafood:"seafood", grill:"grilled meat and steak",
+  italian:"Italian (pizza, pasta)", asian:"Asian", veg:"vegetarian/vegan-friendly", sweet:"desserts, pastry, sweets", cheap:"cheap eats, fast casual"};
+function setCuisine(k){ cuisine=k; renderFoodCtl(); }
+function renderFoodCtl(){
+  const el=$("foodctl"); if(!el) return;
+  if(activeChip!=="food" && activeChip!=="drink"){ el.innerHTML=""; return; }
+  const cuChips = activeChip==="food"
+    ? `<div class="chips" style="padding:6px 16px 0">${Object.keys(CUISINE_EN).map(k=>
+        `<button class="chip ${cuisine===k?'on':''}" onclick="setCuisine('${k}')">${cuisine===k?ic("check",14):""}${t("cu_"+k)}</button>`).join("")}</div>` : "";
+  el.innerHTML = cuChips + `<div style="padding:8px 16px 0">
+    <button class="abtn primary ripple" style="width:100%" onclick="loadMoreFood(this)">${ic(activeChip==="drink"?"bar":"food",17)} ${t(activeChip==="drink"?"loadMoreDrink":"loadMoreFood")}</button>
+    <p class="pm-disc" id="foodstatus" style="margin-top:6px"></p></div>`;
+}
+async function loadMoreFood(btn){
+  if(!store.get("tv_key")){ $("foodstatus").textContent=t("noKey"); return; }
+  const isDrink = activeChip==="drink";
+  btn.disabled=true;
+  $("foodstatus").innerHTML = `<span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("fLoad")}`;
+  const existing = cityPlaces().map(p=>p.en.title).join("; ");
+  const what = isDrink ? "bars, taverns and cafés" : `restaurants serving ${CUISINE_EN[cuisine]}`;
+  try{
+    let arr = await anthropicJSON(
+      `You are a local food expert for ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of 6 objects: {"name":string,"cat":"${isDrink?"drink":"food"}","lat":number,"lng":number,"story":string (50-80 words in ${lang==="sr"?"Serbian":"English"} — what it's known for, the vibe, what to order),"tip":string (one practical tip, same language)}. Real, currently-operating ${what}. NEVER include places already in this list: ${existing}.`,
+      `Give me 6 more real ${what} in ${CITIES[city].name}.`, 4000);
+    const raw = arr.filter(x=>x&&x.name);
+    const verified = await verifyPlaces(raw, CITIES[city].center);
+    const dropped = raw.length - verified.length;
+    const added = verified.map((x,i)=>{
+      const lb={title:String(x.name), story:String(x.story||x.name), tip:String(x.tip||"")};
+      return { id:"ai-food-"+Date.now()+"-"+i, ai:true, city, cat:isDrink?"drink":"food", lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
+    });
+    if(!added.length){ $("foodstatus").textContent=t("fNone"); btn.disabled=false; return; }
+    CITY_PLACES[city]=(CITY_PLACES[city]||[]).concat(added);
+    store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
+    renderCards(); renderMarkers();
+    $("foodstatus").textContent = `${t("fAdded")} ${added.length} ✓${dropped?` (${dropped} ${t("fDropped")})`:""}`;
+    ensureCityRatings();
+  }catch(e){ $("foodstatus").textContent=t("suggErr"); }
+  btn.disabled=false;
+}
 function cardHTML(p, dist, saveBtn, selectable){
   const L = p[lang];
   const badge = p.ai ? ` <span class="aibadge">${ic("magic",11)} ${t("aiBadge")}</span>` : "";
@@ -912,15 +980,21 @@ function cardHTML(p, dist, saveBtn, selectable){
   const selIdx = sel ? tourSel.indexOf(p.id) : -1;
   const selBadge = selIdx>=0 ? `<div class="selbadge">${selIdx+1}</div>` : "";
   const click = sel ? `toggleSel('${p.id}')` : `openSheet('${p.id}')`;
+  const rt = RATINGS[p.id];
+  const rate = (rt && rt.known) ? `<span class="cardrate">${ic("starfull",12)} ${rt.r.toFixed(1)}</span>` : "";
   return `<div class="card${sel?' selmode':''}${selIdx>=0?' selected':''}" onclick="${click}">
     ${selBadge}<div class="thumb" id="th-${p.id}"></div>
-    <div class="cbody"><div class="cat">${ic(CAT_ICON[p.cat],13)} ${t(p.cat)}${badge}</div>
+    <div class="cbody"><div class="cat">${ic(CAT_ICON[p.cat],13)} ${t(p.cat)}${badge}${rate}</div>
     <h3>${L.title}</h3>
     ${dist!=null?`<div class="dist">${ic("place",13)} ${fmtDist(dist)}</div>`:""}
     <p>${L.story.slice(0,110)}…</p>${save}</div></div>`;
 }
 function renderCards(){
-  const list = cityPlaces().filter(p=>activeChip==="all"||p.cat===activeChip);
+  let list = cityPlaces().filter(p=>activeChip==="all"||p.cat===activeChip);
+  if(sortMode==="rating"){
+    const score=p=>(RATINGS[p.id]&&RATINGS[p.id].known)?RATINGS[p.id].r:-1;
+    list=[...list].sort((a,b)=>score(b)-score(a));
+  }
   $("cards").innerHTML = list.map(p=>cardHTML(p,null,false,true)).join("");
   list.forEach(p=>applyThumb($("th-"+p.id),p));
 }
@@ -984,7 +1058,12 @@ function openSheet(id){
   if(!hi){ hi = document.createElement("div"); hi.className="heroic"; hero.insertBefore(hi, hero.firstChild); }
   hi.style.color = CAT_COLOR[curPlace.cat];
   hi.innerHTML = ic(CAT_ICON[curPlace.cat],84);
-  placeImage(curPlace).then(u=>{ if(u && curPlace && $("sheet").classList.contains("open")){ hero.style.backgroundImage=`url('${u}')`; hi.innerHTML=""; }});
+  placeImage(curPlace).then(u=>{
+    if(!u) return;
+    const im=new Image();
+    im.onload=()=>{ if(curPlace && $("sheet").classList.contains("open")){ hero.style.backgroundImage=`url('${u}')`; hi.innerHTML=""; } };
+    im.src=u;
+  });
   $("sheet").classList.add("open");
   $("sheet").scrollTop=0;
   loadRating(curPlace);
@@ -1006,6 +1085,30 @@ function renderRating(pid){
     ? `${starsHTML(c.r)}<span class="rnum">${c.r.toFixed(1)}</span><span class="aibadge">${ic("magic",9)} ${t("aiEst")}</span><span class="rline">„${esc(c.line)}”</span>`
     : `<span class="rline">${t("repUnknown")}</span>`;
 }
+/* bulk ratings for the whole city — ONE API call, cached forever */
+let ratingsBusy=false, sortMode="default";
+async function ensureCityRatings(){
+  if(ratingsBusy) return;
+  const key=store.get("tv_key"); if(!key) return;
+  const missing=cityPlaces().filter(p=>!RATINGS[p.id]);
+  if(!missing.length) return;
+  ratingsBusy=true;
+  try{
+    const listTxt=missing.map((p,i)=>`${i}|${p.en.title} (${p.cat})`).join("\n");
+    const arr=await anthropicJSON(
+      `You honestly summarize public reception of places in ${CITIES[city].name}. For EACH input line respond with one object in a JSON array: {"i": number (the input index), "known": boolean, "rating": number (1.0-5.0, one decimal, typical public review score from your training knowledge) or null, "line": string (max 10 words in ${lang==="sr"?"Serbian":"English"}: what reviewers say)}. CRITICAL: known=true ONLY if you genuinely recall public reception of that EXACT place; obscure or uncertain → known:false, rating:null. NEVER invent ratings. Respond ONLY with the JSON array.`,
+      `Places:\n${listTxt}`, 3000);
+    (arr||[]).forEach(o=>{
+      const p=missing[+o.i]; if(!p) return;
+      RATINGS[p.id]={ known:!!o.known && isFinite(+o.rating), r:Math.max(1,Math.min(5,+o.rating||0)), line:String(o.line||"").slice(0,120) };
+    });
+    missing.forEach(p=>{ if(!RATINGS[p.id]) RATINGS[p.id]={known:false,r:0,line:""}; });
+    store.set("tv_ratings", JSON.stringify(RATINGS));
+    renderCards();
+  }catch(e){}
+  ratingsBusy=false;
+}
+function toggleSort(){ sortMode = sortMode==="rating" ? "default" : "rating"; renderTourCtl(); renderCards(); }
 async function loadRating(p){
   const pid=p.id;
   if(RATINGS[pid]){ renderRating(pid); return; }
@@ -1800,7 +1903,8 @@ const ARRIVE_M = 60;
 function saveTour(){ store.set("tv_tour", JSON.stringify(TOUR)); }
 function renderTourCtl(){
   if(!selMode){
-    $("tourctl").innerHTML = `<button class="abtn sec ripple" onclick="enterSelMode()">${ic("walk",17)} ${t("tourMake")}</button>`;
+    $("tourctl").innerHTML = `<button class="abtn sec ripple" onclick="enterSelMode()">${ic("walk",17)} ${t("tourMake")}</button>
+      <button class="chip ${sortMode==='rating'?'on':''}" onclick="toggleSort()" style="padding:11px 16px">${ic("starfull",15)} ${t("sortRate")}</button>`;
   } else {
     $("tourctl").innerHTML =
       `<button class="abtn primary ripple" onclick="startTour()" ${tourSel.length<2?"disabled style='opacity:.5'":""}>${ic("walk",17)} ${t("tourStart")} (${tourSel.length})</button>
@@ -2222,7 +2326,7 @@ function saveKey(btn){
 
 /* ============ render all ============ */
 function renderAll(){
-  renderNav(); renderChips(); renderTourCtl(); renderPlanView(); renderCards(); renderInfo();
+  renderNav(); renderChips(); renderTourCtl(); renderFoodCtl(); renderPlanView(); renderCards(); renderInfo();
   renderTourBar();
   $("searchinput").placeholder = t("search");
   $("logoic").innerHTML = ic("explore",24);
