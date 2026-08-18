@@ -297,6 +297,7 @@ nav button{overflow:visible}
     <div class="herehead"><h2 id="heretitle"></h2><p id="heresub"></p></div>
     <button class="bigbtn ripple" id="herebtn" onclick="locateMe()"><span id="hereic"></span><span id="herebtntxt"></span></button>
     <button class="bigbtn ripple" id="cambtn" style="background:var(--secondary-container);color:var(--on-secondary-container);margin-top:0" onclick="$('camfile').click()"><span id="camic"></span><span id="cambtntxt"></span></button>
+    <button class="bigbtn ripple" id="localbtn" style="background:linear-gradient(135deg,#B7791F,#E8A13C);color:#fff;margin-top:0" onclick="openLocalMenu()"><span id="localic"></span><span id="localbtntxt"></span></button>
     <div class="statusline" id="herestatus"></div>
     <div class="cards" id="herecards" style="padding-bottom:8px"></div>
     <div class="suggblock">
@@ -597,7 +598,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.18-1731";
+const APP_VERSION = "2026.08.18-1738";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -667,6 +668,9 @@ const UI = {
     save:"Sačuvaj", saved:"Sačuvano ✓", about:"O aplikaciji",
     aboutTxt:"Traveler · AI turistički vodič (prototip). Trenutni grad: {city} — {n} mesta u vodiču. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku, pravi ture, planove i predloge. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Napomena: čitanje naglas koristi glasove tvog telefona. Ako srpski glas nije instaliran, priča se čita na engleskom.",
+    localBtn:"Lokalac mod", localNow:"Sada", localToday:"Danas", localEtq:"Bonton", localTraps:"Zamke",
+    localLoad:"Pitam lokalca…", localRefresh:"Osveži", phrasesH:"Fraze za preživljavanje", sayIt:"Izgovori",
+    localDisc:"Saveti su AI znanje o lokalnim običajima — sjajan kompas, ali nije zamena za oči i uši.",
     voiceH:"Glas vodiča", voiceAuto:"Automatski", voiceBetter:"Za prirodniji glas: na Androidu instaliraj/ažuriraj Google govorne servise; na iPhone-u dodaj glasove u Podešavanja → Pristupačnost → Izgovoreni sadržaj → Glasovi. Ili unesi ElevenLabs ključ ispod — studijski AI glas na svim jezicima.", elPh:"ElevenLabs API ključ (opciono)",
     suggTitle:"AI predlozi", suggSub:"Vodič može da predloži i mesta kojih nema u vodiču — izaberi šta te zanima ili upiši svojim rečima.",
     suggPlaceholder:"Npr. „nešto sa decom, blizu, u hladu”…", suggBtn:"Daj mi predloge", suggLoading:"Vodič smišlja predloge…",
@@ -707,6 +711,9 @@ const UI = {
     codePh:"Unlock code (e.g. madrid26)", makeLink:"Create share link", linkReady:"Link copied — send it ✓",
     needKeyFirst:"First enter and save your API key above.", codeShort:"The code needs at least 4 characters.",
     unlockT:"Enter access code", unlockS:"You've received an access link. Enter the code the owner gave you.", unlockB:"Unlock", wrongCode:"Wrong code — try again.", unlocked:"Access unlocked ✓",
+    localBtn:"Local mode", localNow:"Now", localToday:"Today", localEtq:"Etiquette", localTraps:"Traps",
+    localLoad:"Asking a local…", localRefresh:"Refresh", phrasesH:"Survival phrases", sayIt:"Say it",
+    localDisc:"Tips are AI knowledge of local customs — a great compass, not a substitute for your own eyes and ears.",
     voiceH:"Glas vodiča", voiceAuto:"Automatic", voiceBetter:"For a natural voice: on Android install/update Google Speech Services; on iPhone add voices in Settings → Accessibility → Spoken Content → Voices. Or paste an ElevenLabs API key below for a studio-grade AI voice in every language.", elPh:"ElevenLabs API key (optional)",
     cityGen:"Building the guide", cityGenNote:"AI is writing stories for ~10 places — takes up to a minute.",
     cityBad:"That doesn't look like a real city. Check the name and try again.", cityLimit:"Maximum is 10 added cities — delete one to add another.",
@@ -1317,7 +1324,7 @@ function pickVoice(langCode){
   const saved = store.get("tv_voice_"+langCode);
   if(saved){ const v=voices.find(v=>v.voiceURI===saved); if(v) return v; }
   const FAM = {sr:["sr","hr","bs"], en:["en"], de:["de"], it:["it"], es:["es"], fr:["fr"]};
-  for(const p of (FAM[langCode]||["en"])){
+  for(const p of (FAM[langCode]||[String(langCode).slice(0,2)])){
     /* prefer Google/enhanced voices — they sound far more natural than defaults */
     const cands = voices.filter(v=>v.lang.toLowerCase().startsWith(p));
     const good = cands.find(v=>/google|natural|enhanced|premium|neural/i.test(v.name));
@@ -1355,7 +1362,7 @@ async function speak(text, langCode, title){
   let v = pickVoice(langCode), finalText = text;
   if(langCode==="sr" && !v && curPlace){ v = pickVoice("en"); finalText = curPlace.en.story; }
   const u = new SpeechSynthesisUtterance(finalText);
-  if(v){ u.voice=v; u.lang=v.lang; } else { u.lang = SPEECH_LANG[langCode]||"en-US"; }
+  if(v){ u.voice=v; u.lang=v.lang; } else { u.lang = SPEECH_LANG[langCode]||langCode||"en-US"; }
   u.rate=0.98;
   u.onend = ()=> $("speakbar").classList.remove("on");
   speechSynthesis.speak(u);
@@ -1788,7 +1795,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1731"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1738"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -1831,6 +1838,74 @@ function sendFeedback(){
   const s = encodeURIComponent("Traveler — utisci");
   const b = encodeURIComponent("Šta ti se svidelo?\n\nŠta te nerviralo?\n\nŠta nedostaje?\n\n");
   location.href = `mailto:gajinjovan@gmail.com?subject=${s}&body=${b}`;
+}
+
+/* ============ LOCAL MODE — feel like a local (Now / Today / Etiquette / Traps) ============ */
+const MI_PERSON="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z";
+MI.person=MI_PERSON;
+let LOCALC={}; try{ LOCALC=JSON.parse(store.get("tv_local")||"{}") }catch(e){ LOCALC={} }
+let localTab="now";
+function saveLocal(){ try{ store.set("tv_local", JSON.stringify(LOCALC)) }catch(e){} }
+function openLocalMenu(){ localTab="now"; renderLocalMenu(); loadLocalTab(); }
+function renderLocalMenu(){
+  const tabs=[["now",t("localNow")],["today",t("localToday")],["etq",t("localEtq")],["traps",t("localTraps")]];
+  openMenu(`<h3>${ic("person",18)} ${t("localBtn")} · ${esc(CITIES[city].name)}</h3>
+    <div class="chips" style="padding:0 0 10px">${tabs.map(([k,l])=>`<button class="chip ${localTab===k?'on':''}" onclick="localTab='${k}';renderLocalMenu();loadLocalTab()">${localTab===k?ic("check",13):""}${l}</button>`).join("")}</div>
+    <div id="localbody"><div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("localLoad")}</div></div>
+    <p class="pm-disc">${t("localDisc")}</p>
+    ${localTab==="now"?`<button class="pm-item" style="justify-content:center" onclick="delete LOCALC[localKey()];loadLocalTab()">${ic("refresh",16)} ${t("localRefresh")}</button>`:""}
+    <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+}
+function localKey(){
+  const d=new Date();
+  if(localTab==="now") return `${city}:now:${d.getHours()}`;               // fresh per hour
+  if(localTab==="today") return `${city}:day:${d.toISOString().slice(0,10)}`; // per date
+  return `${city}:${localTab}`;                                            // etiquette/traps forever
+}
+function localTimeCtx(){
+  const d=new Date();
+  return `Local context: ${["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]}, ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}, date ${d.toISOString().slice(0,10)}.${userPos?` User GPS: ${userPos.lat.toFixed(4)},${userPos.lng.toFixed(4)}. Nearest known: ${cityPlaces().map(p=>({p,d:haversine(userPos.lat,userPos.lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d).slice(0,3).map(x=>x.p.en.title).join(", ")}.`:""}`;
+}
+async function loadLocalTab(){
+  const body=$("localbody"); if(!body) return;
+  const key=localKey();
+  if(LOCALC[key]){ body.innerHTML=LOCALC[key]; return; }
+  if(!store.get("tv_key")){ body.innerHTML=`<div class="pm-txt">${t("noKey")}</div>`; return; }
+  body.innerHTML=`<div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("localLoad")}</div>`;
+  const cityN=cityFull(city);
+  try{
+    let html="";
+    if(localTab==="now"){
+      const arr=await anthropicJSON(
+        `You are a lifelong local of ${cityN}, whispering insider advice. Respond ONLY with a JSON array of 3 objects: {"t": string (punchy title, max 6 words, in ${LANG_NAME[lang]}), "x": string (30-50 words in ${LANG_NAME[lang]}: what a LOCAL would do RIGHT NOW given the exact time and day — unwritten rules, rhythms, where locals actually are; concrete and specific, never generic tourist advice)}.`,
+        `${localTimeCtx()} What would a local do right now in ${cityN}?`, 1200);
+      html=arr.map(o=>`<div class="pm-txt"><b>${esc(o.t)}</b><br>${esc(o.x)}</div>`).join("");
+    } else if(localTab==="today"){
+      const arr=await anthropicJSON(
+        `You are a local flatmate in ${cityN} briefing a friend over morning coffee. Respond ONLY with a JSON array of 4 objects: {"t": string (max 6 words, ${LANG_NAME[lang]}), "x": string (25-45 words, ${LANG_NAME[lang]}: what matters TODAY given the weekday/date — typical market days, what's usually closed today, meal rhythms, where the evening is lively, any typical seasonal happening. Only things you actually know; no invented events)}.`,
+        `${localTimeCtx()} Brief me for today in ${cityN}.`, 1400);
+      html=arr.map(o=>`<div class="pm-txt"><b>${esc(o.t)}</b><br>${esc(o.x)}</div>`).join("");
+    } else if(localTab==="etq"){
+      const arr=await anthropicJSON(
+        `You teach visitors how not to look like tourists in ${cityN}. Respond ONLY with a JSON array with exactly one object: {"tips":[6 objects {"t": string (max 5 words, ${LANG_NAME[lang]}), "x": string (20-40 words, ${LANG_NAME[lang]}: unwritten rules — how coffee/meals work, tipping, greetings, what locals never do)}], "code": string (BCP-47 speech code of the local language, e.g. "es-ES","pt-PT"), "phrases":[8 objects {"say": string (the phrase in the LOCAL language, natural everyday register), "mean": string (meaning in ${LANG_NAME[lang]})}]}.`,
+        `Etiquette playbook for ${cityN}.`, 2500);
+      const o=arr[0]||{};
+      html=(o.tips||[]).map(i=>`<div class="pm-txt"><b>${esc(i.t)}</b><br>${esc(i.x)}</div>`).join("");
+      if(o.phrases&&o.phrases.length){
+        html+=`<p class="pm-disc" style="text-transform:uppercase;font-weight:700;letter-spacing:.5px">${t("phrasesH")}</p>`;
+        html+=o.phrases.map(f=>`<div class="pm-txt" style="display:flex;align-items:center;gap:10px"><div style="flex:1"><b>${esc(f.say)}</b><br><span style="font-size:12.5px;opacity:.8">${esc(f.mean)}</span></div>
+          <button class="abtn sec" style="min-width:0;padding:9px 11px;font-size:12px;flex:none" onclick="speak(${JSON.stringify(String(f.say)).replace(/"/g,"&quot;")},'${esc(String(o.code||"en"))}')">${ic("volume",15)}</button></div>`).join("");
+      }
+    } else {
+      const arr=await anthropicJSON(
+        `You save visitors of ${cityN} from tourist traps. Respond ONLY with a JSON array of 4-5 objects: {"trap": string (a REAL well-known tourist trap or overpriced pattern in ${cityN}), "instead": string (a REAL specific local alternative nearby), "x": string (20-35 words in ${LANG_NAME[lang]}: why, and how much you save)}. Only traps and alternatives you genuinely know; never invent names.`,
+        `Tourist traps and local alternatives in ${cityN}.`, 1600);
+      html=arr.map(o=>`<div class="pm-txt"><b>⛔ ${esc(o.trap)}</b><br>→ <b style="color:var(--primary)">${esc(o.instead)}</b><br>${esc(o.x)}</div>`).join("");
+    }
+    if(!html) throw new Error("empty");
+    LOCALC[key]=html; saveLocal();
+    body.innerHTML=html;
+  }catch(e){ body.innerHTML=`<div class="pm-txt">${t("suggErr")}</div>`; }
 }
 
 /* ============ TICKETS (AI find + in-app wallet via IndexedDB) ============ */
@@ -2693,6 +2768,8 @@ function renderAll(){
   $("hereic").innerHTML = ic("myloc",22);
   $("camic").innerHTML = ic("camera",22);
   $("cambtntxt").textContent = t("whatThis");
+  $("localic").innerHTML = ic("person",22);
+  $("localbtntxt").textContent = t("localBtn");
   $("chatcam").innerHTML = ic("camera",20);
   $("micbtn").innerHTML = ic("mic",20);
   $("micbtn").style.display = SRec ? "flex" : "none";
