@@ -143,6 +143,8 @@ nav button{overflow:visible}
 .pm-item span{color:var(--on-surface-var);font-weight:400;font-size:12.5px;margin-left:auto}
 .pm-new{display:flex;gap:8px;margin-top:4px}
 .pm-new input{flex:1;background:var(--surface);border:1px solid var(--outline-var);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;font-family:inherit;min-width:0}
+.pm-new select{flex:1;background:var(--surface);border:1px solid var(--outline-var);border-radius:12px;padding:12px 10px;font-size:14px;outline:none;font-family:inherit;min-width:0;color:var(--on-surface)}
+.georesults{background:var(--surface);border:1px solid var(--outline-var);border-radius:12px;margin-top:4px;display:none;max-height:170px;overflow-y:auto}
 /* onboarding */
 #onboard{position:fixed;inset:0;background:var(--surface);z-index:100;display:none;overflow-y:auto}
 #onboard.on{display:block}
@@ -630,6 +632,9 @@ const UI = {
     fLoad:"Tražim i proveravam na mapi…", fAdded:"Dodato", fDropped:"nije potvrđeno na mapi",
     fNone:"Nisam našao nova mesta koja mogu da potvrdim — probaj drugu kuhinju.",
     tripH:"Moj put", tripSetup:"Postavi put", tripArrive:"Dolazak", tripDepart:"Odlazak",
+    tripModeL:"Kako dolaziš?", m_plane:"Avionom", m_train:"Vozom", m_bus:"Autobusom", m_car:"Autom — direktno do hotela",
+    pointPh:"Aerodrom / stanica — pretraži po imenu…", trL:"Prevoz tokom boravka",
+    tr_public:"Javni prevoz + pešačenje", tr_car:"Svoj auto", tr_rent:"Rent-a-car",
     hotelPh:"Hotel — ime ili adresa", notesPh:"Napomene: s kim putuješ, tempo, želje…",
     tripSave:"Sačuvaj put", tripSaved:"Put sačuvan ✓", hotelWarn:"Hotel nije nađen na mapi — sačuvan je samo naziv.",
     genPlans:"Generiši planove po danima", genning:"Pravim planove po danima… traje do minut.",
@@ -704,6 +709,9 @@ const UI = {
     fLoad:"Searching and verifying on the map…", fAdded:"Added", fDropped:"couldn't be verified on the map",
     fNone:"Found no new verifiable places — try another cuisine.",
     tripH:"My trip", tripSetup:"Set up trip", tripArrive:"Arrival", tripDepart:"Departure",
+    tripModeL:"How do you arrive?", m_plane:"By plane", m_train:"By train", m_bus:"By bus", m_car:"By car — straight to the hotel",
+    pointPh:"Airport / station — search by name…", trL:"Getting around during the stay",
+    tr_public:"Public transport + walking", tr_car:"Own car", tr_rent:"Rental car",
     hotelPh:"Hotel — name or address", notesPh:"Notes: who you travel with, pace, wishes…",
     tripSave:"Save trip", tripSaved:"Trip saved ✓", hotelWarn:"Hotel not found on the map — only the name was saved.",
     genPlans:"Generate day-by-day plans", genning:"Building day plans… up to a minute.",
@@ -780,6 +788,9 @@ mic:"M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1
 hotel:"M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z",
 starfull:"M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
 refresh:"M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
+plane:"M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z",
+train:"M12 2c-4 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h2.23l2-2H14l2 2h2.22v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-3.58-4-8-4zM7.5 17c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm3.5-6H6V7h5v4zm5.5 6c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6h-5V7h5v4z",
+car:"M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z",
 share:"M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z",
 mail:"M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z",
 magic:"M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"
@@ -1687,34 +1698,82 @@ async function askAIRoute(){
 
 /* ============ MY TRIP (arrival, hotel, AI day-by-day plans) ============ */
 let TRIP=null; try{ TRIP=JSON.parse(store.get("tv_trip")||"null") }catch(e){}
+let tripPick={hotel:null, point:null};
+/* reusable geo-autocomplete: attach to an input, results in a dropdown, pick → {name,lat,lng} */
+function attachGeoSearch(inputId, boxId, onPick){
+  const inp=$(inputId), box=$(boxId);
+  let tm=null;
+  inp.addEventListener("input",()=>{
+    onPick(null);
+    clearTimeout(tm);
+    if(inp.value.trim().length<3){ box.style.display="none"; return; }
+    tm=setTimeout(async ()=>{
+      try{
+        const c=CITIES[city].center;
+        const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(inp.value.trim())}&lat=${c[1]}&lon=${c[0]}&limit=5`);
+        const j=await r.json(); const res=(j.features||[]).filter(f=>f.geometry);
+        if(!res.length){ box.style.display="none"; return; }
+        box.innerHTML=res.map((f,i)=>{const p=f.properties||{};const sub=[p.street,p.city||p.county].filter(Boolean).join(", ");
+          return `<div class="sr-item" data-i="${i}"><b>${esc(p.name||inp.value)}</b><span>${esc(sub)}</span></div>`;}).join("");
+        box.style.display="block";
+        box.querySelectorAll(".sr-item").forEach(el=>el.addEventListener("click",()=>{
+          const f=res[+el.dataset.i], p=f.properties||{};
+          inp.value=p.name||inp.value;
+          onPick({name:inp.value, lat:f.geometry.coordinates[1], lng:f.geometry.coordinates[0]});
+          box.style.display="none";
+        }));
+      }catch(e){ box.style.display="none"; }
+    },400);
+  });
+}
 function openTripForm(){
   const tr = (TRIP && TRIP.city===city) ? TRIP : {};
+  tripPick={hotel:tr.hotel&&tr.hotel.lat!=null?tr.hotel:null, point:tr.point||null};
   openMenu(`<h3>${ic("event",18)} ${t("tripSetup")} · ${CITIES[city].name}</h3>
     <p class="pm-disc">${t("tripArrive")}:</p>
-    <div class="pm-new"><input id="tripArrive" type="date" value="${tr.arrive||""}"></div>
+    <div class="pm-new"><input id="tripArrive" type="date" value="${tr.arrive||""}"><input id="tripArrT" type="time" value="${tr.arriveTime||""}" style="flex:0 0 110px"></div>
     <p class="pm-disc">${t("tripDepart")}:</p>
-    <div class="pm-new"><input id="tripDepart" type="date" value="${tr.depart||""}"></div>
-    <div class="pm-new" style="margin-top:8px"><input id="tripHotel" placeholder="${t("hotelPh")}" value="${esc(tr.hotel?tr.hotel.name:"")}"></div>
+    <div class="pm-new"><input id="tripDepart" type="date" value="${tr.depart||""}"><input id="tripDepT" type="time" value="${tr.departTime||""}" style="flex:0 0 110px"></div>
+    <p class="pm-disc">${t("tripModeL")}</p>
+    <div class="pm-new"><select id="tripMode" onchange="$('pointwrap').style.display=this.value==='car'?'none':'block'">
+      ${["plane","train","bus","car"].map(m=>`<option value="${m}" ${tr.mode===m?"selected":""}>${t("m_"+m)}</option>`).join("")}
+    </select></div>
+    <div id="pointwrap" style="display:${tr.mode==='car'?'none':'block'}">
+      <div class="pm-new" style="margin-top:8px"><input id="tripPoint" placeholder="${t("pointPh")}" value="${esc(tr.point?tr.point.name:"")}" autocomplete="off"></div>
+      <div class="georesults" id="pointres"></div>
+    </div>
+    <div class="pm-new" style="margin-top:8px"><input id="tripHotel" placeholder="${t("hotelPh")}" value="${esc(tr.hotel?tr.hotel.name:"")}" autocomplete="off"></div>
+    <div class="georesults" id="hotelres"></div>
+    <p class="pm-disc" style="margin-top:8px">${t("trL")}</p>
+    <div class="pm-new"><select id="tripTr">
+      ${["public","car","rent"].map(m=>`<option value="${m}" ${tr.transport===m?"selected":""}>${t("tr_"+m)}</option>`).join("")}
+    </select></div>
     <div class="pm-new" style="margin-top:8px"><input id="tripNotes" placeholder="${t("notesPh")}" value="${esc(tr.notes||"")}"></div>
     <div class="pm-disc" id="tripstatus" style="margin-top:8px"></div>
     <button class="pm-item" style="background:var(--primary-container);color:var(--on-primary-container);justify-content:center;margin-top:8px" onclick="saveTrip()">${ic("check",18)} ${t("tripSave")}</button>
     <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+  attachGeoSearch("tripHotel","hotelres", v=>tripPick.hotel=v);
+  attachGeoSearch("tripPoint","pointres", v=>tripPick.point=v);
+}
+async function geocodeFallback(name){
+  try{
+    const c=CITIES[city].center;
+    const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(name+" "+CITIES[city].name)}&lat=${c[1]}&lon=${c[0]}&limit=3`);
+    const j=await r.json();
+    const f=(j.features||[]).find(f=>haversine(c[1],c[0],f.geometry.coordinates[1],f.geometry.coordinates[0])<60000);
+    if(f) return {name, lat:f.geometry.coordinates[1], lng:f.geometry.coordinates[0]};
+  }catch(e){}
+  return {name, lat:null, lng:null};
 }
 async function saveTrip(){
-  const a=$("tripArrive").value, d=$("tripDepart").value, hn=$("tripHotel").value.trim(), notes=$("tripNotes").value.trim();
+  const a=$("tripArrive").value, d=$("tripDepart").value, notes=$("tripNotes").value.trim();
+  const at=$("tripArrT").value, dt=$("tripDepT").value;
+  const mode=$("tripMode").value, transport=$("tripTr").value;
+  const hn=$("tripHotel").value.trim(), pn=($("tripPoint")?$("tripPoint").value.trim():"");
   if(!a || !d || new Date(d) < new Date(a)){ $("tripstatus").textContent=t("tripDatesErr"); return; }
-  let hotel=null;
-  if(hn){
-    hotel={name:hn, lat:null, lng:null};
-    try{
-      const c=CITIES[city].center;
-      const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(hn+" "+CITIES[city].name)}&lat=${c[1]}&lon=${c[0]}&limit=3`);
-      const j=await r.json();
-      const f=(j.features||[]).find(f=>haversine(c[1],c[0],f.geometry.coordinates[1],f.geometry.coordinates[0])<25000);
-      if(f){ hotel.lat=f.geometry.coordinates[1]; hotel.lng=f.geometry.coordinates[0]; }
-    }catch(e){}
-  }
-  TRIP={city, arrive:a, depart:d, hotel, notes};
+  let hotel = tripPick.hotel && tripPick.hotel.name===hn ? tripPick.hotel : (hn ? await geocodeFallback(hn) : null);
+  let point = mode==="car" ? null : (tripPick.point && tripPick.point.name===pn ? tripPick.point : (pn ? await geocodeFallback(pn) : null));
+  TRIP={city, arrive:a, arriveTime:at, depart:d, departTime:dt, mode, point, hotel, transport, notes};
   store.set("tv_trip", JSON.stringify(TRIP));
   closePlanMenu(); renderPlanView(); renderMarkers();
   toast(hotel&&hotel.lat==null&&hn ? t("hotelWarn") : t("tripSaved"));
@@ -1738,11 +1797,22 @@ async function generateTripPlans(btn){
   if(btn) btn.innerHTML=`<span class="spin"></span> ${t("genning")}`;
   const known = cityPlaces().map(p=>`${p.id}|${p.en.title}|${p.lat.toFixed(4)},${p.lng.toFixed(4)}`).join("\n");
   const hotelTxt = TRIP.hotel ? `Hotel: "${TRIP.hotel.name}"${TRIP.hotel.lat?` at ${TRIP.hotel.lat.toFixed(4)},${TRIP.hotel.lng.toFixed(4)}`:""}.` : "No hotel given.";
+  /* transfer estimate: arrival point → hotel */
+  let transferMin=0;
+  if(TRIP.point && TRIP.point.lat!=null && TRIP.hotel && TRIP.hotel.lat!=null)
+    transferMin = Math.max(15, Math.round(haversine(TRIP.point.lat,TRIP.point.lng,TRIP.hotel.lat,TRIP.hotel.lng)/1000*2.2));
+  const modeTxt = TRIP.mode==="car" ? "arriving by car directly to the hotel"
+    : `arriving by ${TRIP.mode||"plane"} at "${TRIP.point?TRIP.point.name:"?"}"${transferMin?` (transfer to hotel ≈ ${transferMin} min)`:""}`;
+  const depBuffer = TRIP.mode==="plane" ? "leave the hotel ~2.5-3h before the flight (incl. transfer)"
+    : TRIP.mode==="car" ? "flexible departure by car" : "leave the hotel ~1-1.5h before departure (incl. transfer)";
+  const trTxt = TRIP.transport==="car"||TRIP.transport==="rent"
+    ? "They have a car during the stay — day clusters may be farther apart, prefer places with reasonable parking, farther highlights are OK."
+    : "They use public transport and walking — keep each day a compact, walkable cluster (metro between clusters).";
   try{
     let arr = await anthropicJSON(
-      `You are planning a ${days.length}-day visit to ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short theme in ${lang==="sr"?"Serbian":"English"}, WITHOUT the date), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: first day lighter (arrival), last day lighter (departure); group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
+      `You are planning a ${days.length}-day visit to ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short theme in ${lang==="sr"?"Serbian":"English"}, WITHOUT the date), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: DAY 1 starts realistically only after arrival time + transfer + hotel check-in (fewer stops if arrival is late; if arrival is in the evening, day 1 may be just dinner nearby). LAST DAY must end in time: ${depBuffer}. ${trTxt} Group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
 KNOWN PLACES (id | title | lat,lng):\n${known}`,
-      `Trip: arrive ${TRIP.arrive}, depart ${TRIP.depart} (${days.length} days). ${hotelTxt} Notes from the traveler: ${TRIP.notes||"none"}.`, 8000);
+      `Trip: arrive ${TRIP.arrive}${TRIP.arriveTime?" at "+TRIP.arriveTime:""}, ${modeTxt}. Depart ${TRIP.depart}${TRIP.departTime?" at "+TRIP.departTime:""}${TRIP.point?` from "${TRIP.point.name}"`:""}. (${days.length} days) ${hotelTxt} Notes from the traveler: ${TRIP.notes||"none"}.`, 8000);
     if(!Array.isArray(arr)||!arr.length) throw new Error("empty");
     for(let i=0;i<days.length && i<arr.length;i++){
       const day=arr[i]; if(!day||!Array.isArray(day.stops)) continue;
@@ -1772,12 +1842,16 @@ function renderTripCard(){
   }
   const h=TRIP.hotel;
   const hotelBtn = h&&h.lat!=null ? `<button class="pc-start ripple" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=walking','_blank')">${ic("hotel",14)} ${t("toHotel")}</button>` : "";
+  const modeIc = {plane:"plane",train:"train",bus:"bus",car:"car"}[TRIP.mode]||"plane";
+  const times = `${esc(TRIP.arrive)}${TRIP.arriveTime?" "+esc(TRIP.arriveTime):""} → ${esc(TRIP.depart)}${TRIP.departTime?" "+esc(TRIP.departTime):""}`;
   return `<div class="planbig">
-    <div class="pb-head"><h4>${ic("event",16)} ${t("tripH")}</h4><span>${esc(TRIP.arrive)} → ${esc(TRIP.depart)}</span>
+    <div class="pb-head"><h4>${ic("event",16)} ${t("tripH")}</h4><span>${times}</span>
       <button onclick="openTripForm()">${ic("settings",16)}</button>
       <button onclick="deleteTrip()">${ic("close",16)}</button></div>
+    ${TRIP.point?`<div class="stoprow"><div class="n">${ic(modeIc,13)}</div><div class="st">${esc(TRIP.point.name)}</div></div>`
+      : (TRIP.mode==="car"?`<div class="stoprow"><div class="n">${ic("car",13)}</div><div class="st">${t("m_car")}</div></div>`:"")}
     ${h?`<div class="stoprow"><div class="n">${ic("hotel",13)}</div><div class="st">${esc(h.name)}</div>${hotelBtn}</div>`:""}
-    ${TRIP.notes?`<p style="color:var(--on-surface-var);font-size:12.5px;margin-top:6px">${esc(TRIP.notes)}</p>`:""}
+    <p style="color:var(--on-surface-var);font-size:12.5px;margin-top:6px">${ic(TRIP.transport==="public"?"bus":"car",12)} ${t("tr_"+(TRIP.transport||"public"))}${TRIP.notes?` · ${esc(TRIP.notes)}`:""}</p>
     <button class="abtn primary ripple" style="width:100%;margin-top:12px" onclick="generateTripPlans(this)">${ic("magic",17)} ${t("genPlans")}</button>
   </div>`;
 }
