@@ -101,6 +101,62 @@ nav button.active .ic{background:var(--secondary-container)}
 .backbtn{display:flex;align-items:center;justify-content:center}
 .bigbtn:active{box-shadow:var(--el1)}
 .statusline{text-align:center;color:var(--on-surface-var);font-size:13.5px;padding:6px 16px 8px;min-height:20px}
+/* map search */
+#searchwrap{position:absolute;top:10px;left:12px;right:56px;z-index:30}
+#searchbox{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:28px;padding:4px 8px 4px 14px;box-shadow:var(--el2)}
+#searchbox input{flex:1;border:none;background:none;outline:none;font-size:14.5px;font-family:inherit;color:var(--on-surface);padding:9px 0;min-width:0}
+#searchic{display:flex;color:var(--on-surface-var)}
+#searchclear{background:none;border:none;color:var(--on-surface-var);font-size:15px;padding:8px;display:none}
+#searchresults{background:var(--surface);border-radius:16px;margin-top:6px;box-shadow:var(--el2);overflow:hidden;display:none;max-height:280px;overflow-y:auto}
+#searchresults.on{display:block}
+.sr-item{padding:12px 16px;border-bottom:1px solid var(--sc-high);font-size:14px}
+.sr-item:last-child{border-bottom:none}
+.sr-item b{display:block;font-weight:600}
+.sr-item span{color:var(--on-surface-var);font-size:12.5px}
+#foundcard{position:absolute;left:12px;right:12px;bottom:16px;background:var(--surface);border-radius:16px;padding:14px 16px;box-shadow:var(--el3);display:none;z-index:30}
+#foundcard.on{display:block}
+#foundcard h4{font-size:15.5px;font-weight:700}
+#foundcard p{color:var(--on-surface-var);font-size:12.5px;margin:3px 0 10px}
+#foundcard .row{display:flex;gap:8px;flex-wrap:wrap}
+#foundcard .abtn{padding:11px 10px;font-size:13px;min-width:0}
+/* plan menu (bottom sheet) */
+#planmenu{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;display:none;align-items:flex-end}
+#planmenu.on{display:flex}
+#planmenuin{background:var(--surface);border-radius:24px 24px 0 0;width:100%;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:70%;overflow-y:auto}
+#planmenuin h3{font-size:17px;font-weight:700;margin-bottom:12px}
+.pm-item{display:flex;align-items:center;gap:12px;width:100%;background:var(--sc);border:none;border-radius:14px;padding:14px 16px;font-size:14.5px;font-weight:600;font-family:inherit;color:var(--on-surface);margin-bottom:8px;text-align:left}
+.pm-item span{color:var(--on-surface-var);font-weight:400;font-size:12.5px;margin-left:auto}
+.pm-new{display:flex;gap:8px;margin-top:4px}
+.pm-new input{flex:1;background:var(--surface);border:1px solid var(--outline-var);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;font-family:inherit;min-width:0}
+.pm-txt{background:var(--sc);border-radius:14px;padding:14px 16px;font-size:14px;line-height:1.6;color:var(--on-surface);margin-bottom:10px;white-space:pre-wrap}
+.pm-disc{color:var(--on-surface-var);font-size:12px;margin:2px 4px 10px}
+/* plans + tickets list */
+#planslist{padding:2px 16px 0}
+#ticketslist{padding:2px 16px 0}
+.plancard{background:var(--sc);border-radius:14px;padding:12px 14px;margin-top:10px;display:flex;align-items:center;gap:10px}
+.plancard .pc-txt{flex:1;min-width:0}
+.plancard h4{font-size:14.5px;font-weight:700}
+.plancard span{color:var(--on-surface-var);font-size:12px}
+.plancard button{border:none;border-radius:12px;padding:9px 12px;font-weight:700;font-size:12.5px;font-family:inherit;display:flex;align-items:center;gap:4px}
+.pc-start{background:var(--primary);color:#fff}
+.pc-del{background:none;color:var(--on-surface-var)}
+/* tour */
+#tourctl{padding:4px 16px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#tourctl .abtn{flex:none;padding:10px 18px;font-size:13.5px}
+.card.selmode{cursor:pointer}
+.card.selected{outline:3px solid var(--primary);outline-offset:-3px}
+.card .selbadge{position:absolute;margin:8px;background:var(--primary);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;box-shadow:var(--el1)}
+.card{position:relative}
+#tourbar{position:fixed;left:12px;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));background:var(--inverse-surface);color:var(--inverse-on);border-radius:16px;padding:10px 12px;display:none;align-items:center;gap:10px;z-index:70;box-shadow:var(--el3)}
+#tourbar.on{display:flex}
+.tb-info{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+.tb-num{width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0}
+.tb-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-dist{font-size:12px;opacity:.8}
+.tb-btn{background:rgba(255,255,255,.12);border:none;color:#D0BCFF;border-radius:12px;padding:9px 12px;font-weight:700;font-size:12.5px;font-family:inherit;display:flex;align-items:center;gap:4px}
+.tb-btn.tb-end{color:#FFB4AB}
+.numbadge{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:2px solid #fff;box-shadow:var(--el1)}
+.numbadge.done{background:#1B6B45}
 /* AI suggestions */
 .suggblock{margin:10px 16px 0;background:var(--sc);border-radius:16px;padding:16px}
 .suggblock h3{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
@@ -156,9 +212,19 @@ nav button.active .ic{background:var(--secondary-container)}
   </div>
 </header>
 <main>
-  <div class="view active" id="view-map"><div id="map"></div></div>
+  <div class="view active" id="view-map">
+    <div id="map"></div>
+    <div id="searchwrap">
+      <div id="searchbox"><span id="searchic"></span><input id="searchinput" autocomplete="off"><button id="searchclear" onclick="clearSearch()">✕</button></div>
+      <div id="searchresults"></div>
+    </div>
+    <div id="foundcard"></div>
+  </div>
   <div class="view" id="view-list">
     <div class="chips" id="chips"></div>
+    <div id="tourctl"></div>
+    <div id="planslist"></div>
+    <div id="ticketslist"></div>
     <div class="cards" id="cards"></div>
   </div>
   <div class="view" id="view-here">
@@ -198,7 +264,9 @@ nav button.active .ic{background:var(--secondary-container)}
     <div class="actions">
       <button class="abtn primary ripple" id="listenbtn" onclick="speakCurrent()"></button>
       <button class="abtn sec ripple" id="askbtn" onclick="askAboutCurrent()"></button>
-      <button class="abtn sec ripple" id="gobtn" onclick="goCurrent()"></button>
+      <button class="abtn sec ripple" id="gobtn" onclick="openGoMenu()"></button>
+      <button class="abtn sec ripple" id="planbtn" onclick="openPlanMenu()"></button>
+      <button class="abtn sec ripple" id="ticketbtn" onclick="openTicketMenu()"></button>
     </div>
     <div class="story" id="sheetstory"></div>
     <div class="tipbox" id="sheettip"></div>
@@ -206,6 +274,18 @@ nav button.active .ic{background:var(--secondary-container)}
 </div>
 
 <div id="speakbar"><div class="t" id="speaktitle"></div><button onclick="stopSpeak()" id="speakstop"></button></div>
+
+<div id="planmenu" onclick="if(event.target===this)closePlanMenu()"><div id="planmenuin"></div></div>
+<input type="file" id="ticketfile" accept="image/*,application/pdf" style="display:none">
+
+<div id="tourbar">
+  <div class="tb-info" onclick="openNextStop()">
+    <div class="tb-num" id="tbnum"></div>
+    <div class="tb-txt"><div class="tb-name" id="tbname"></div><div class="tb-dist" id="tbdist"></div></div>
+  </div>
+  <button class="tb-btn" id="tbnext" onclick="advanceTour(true)"></button>
+  <button class="tb-btn tb-end" id="tbend" onclick="endTour()"></button>
+</div>
 
 <script>
 const PLACES = [
@@ -398,7 +478,20 @@ const UI = {
     suggPlaceholder:"Npr. „nešto sa decom, blizu, u hladu”…", suggBtn:"Daj mi predloge", suggLoading:"Vodič smišlja predloge…",
     suggErr:"Nije uspelo — proveri ključ i internet, pa probaj ponovo.", aiBadge:"AI PREDLOG", savePlace:"Sačuvaj u vodič", savedPlace:"Sačuvano ✓",
     aiCat:"Sačuvani AI predlozi", aiDisclaimer:"AI predlog — proveri radno vreme i tačnu lokaciju pre odlaska.",
-    int_history:"Istorija", int_food:"Klopa", int_kids:"Sa decom", int_nature:"Priroda", int_night:"Noćni život", int_art:"Umetnost", int_shopping:"Šoping", int_hidden:"Skrivena mesta" },
+    int_history:"Istorija", int_food:"Klopa", int_kids:"Sa decom", int_nature:"Priroda", int_night:"Noćni život", int_art:"Umetnost", int_shopping:"Šoping", int_hidden:"Skrivena mesta",
+    tourMake:"Napravi turu", tourCancel:"Otkaži", tourStart:"Kreni", tourPick:"Tapni mesta redom kojim želiš — ja ću ih poređati u najkraću rutu.",
+    tourNext:"Preskoči", tourEnd:"Završi", tourStopWord:"stanica", tourArrived:"Stigao si", tourDone:"Tura završena! Bravo. 🎉",
+    tourFollow:"Prati plavu liniju na mapi — kad stigneš do stanice, sam ću ti ispričati priču.", tourToNext:"do sledeće stanice",
+    search:"Pretraži mapu (npr. „Museo Sorolla”)…", searchNoRes:"Nema rezultata — probaj drugačije ime.",
+    aiInfo:"AI info", aiInfoLoad:"Pišem priču…", addToPlan:"U plan", addToPlanLong:"Dodaj u plan",
+    plans:"Planovi za naredne dane", planPick:"Gde da dodam ovo mesto?", curTour:"Trenutna tura",
+    newPlanName:"Ime plana (npr. Sreda ujutru)", planCreate:"Napravi", planSaveAs:"Sačuvaj kao plan",
+    planAdded:"Dodato ✓", planStart:"Kreni", planDel:"Obriši", planDelQ:"Obrisati ovaj plan?", stops:"stanica",
+    tickets:"Karte", ticketLoad:"Proveravam gde se kupuju karte…", openSite:"Otvori sajt", googleTickets:"Guglaj zvanične karte",
+    saveTicket:"Sačuvaj kupljenu kartu", myTickets:"Moje karte", ticketSaved:"Karta sačuvana ✓", ticketDelQ:"Obrisati ovu kartu?",
+    ticketOpen:"Otvori", ticketDisc:"Savet i link daje AI — pre plaćanja proveri da je sajt zvaničan.",
+    ticketNoKey:"Bez API ključa ne mogu da proverim — evo pretrage zvaničnih karata:",
+    howTo:"Kako do tamo?", walkG:"Peške (Google mape)", transitG:"Prevozom (Google mape)", askRoute:"Pitaj AI kako da dođem", routeLoad:"Gledam prevoz…" },
   en:{ map:"Map", list:"Places", here:"Here", chat:"Guide", info:"Info",
     hereTitle:"I'm here now", hereSub:"Tap the button — I'll find what's around you and tell you its story.",
     hereBtn:"I'm here now", locating:"Locating you…", locErr:"Can't locate you. Allow location access in your browser settings.",
@@ -416,7 +509,20 @@ const UI = {
     suggPlaceholder:"E.g. \"something with kids, nearby, in the shade\"…", suggBtn:"Suggest places", suggLoading:"The guide is thinking…",
     suggErr:"That didn't work — check your key and connection, then try again.", aiBadge:"AI PICK", savePlace:"Save to guide", savedPlace:"Saved ✓",
     aiCat:"Saved AI picks", aiDisclaimer:"AI suggestion — double-check opening hours and exact location before going.",
-    int_history:"History", int_food:"Food", int_kids:"With kids", int_nature:"Nature", int_night:"Nightlife", int_art:"Art", int_shopping:"Shopping", int_hidden:"Hidden gems" }
+    int_history:"History", int_food:"Food", int_kids:"With kids", int_nature:"Nature", int_night:"Nightlife", int_art:"Art", int_shopping:"Shopping", int_hidden:"Hidden gems",
+    tourMake:"Build a tour", tourCancel:"Cancel", tourStart:"Start", tourPick:"Tap the places you want — I'll order them into the shortest route.",
+    tourNext:"Skip", tourEnd:"End", tourStopWord:"stop", tourArrived:"You've arrived", tourDone:"Tour complete! Well done. 🎉",
+    tourFollow:"Follow the blue line on the map — when you reach a stop, I'll tell you its story automatically.", tourToNext:"to the next stop",
+    search:"Search the map (e.g. \"Museo Sorolla\")…", searchNoRes:"No results — try a different name.",
+    aiInfo:"AI info", aiInfoLoad:"Writing the story…", addToPlan:"To plan", addToPlanLong:"Add to a plan",
+    plans:"Plans for the days ahead", planPick:"Where should I add this place?", curTour:"Current tour",
+    newPlanName:"Plan name (e.g. Wednesday morning)", planCreate:"Create", planSaveAs:"Save as a plan",
+    planAdded:"Added ✓", planStart:"Start", planDel:"Delete", planDelQ:"Delete this plan?", stops:"stops",
+    tickets:"Tickets", ticketLoad:"Checking where tickets are sold…", openSite:"Open website", googleTickets:"Google official tickets",
+    saveTicket:"Save purchased ticket", myTickets:"My tickets", ticketSaved:"Ticket saved ✓", ticketDelQ:"Delete this ticket?",
+    ticketOpen:"Open", ticketDisc:"Advice and link come from AI — verify the site is official before paying.",
+    ticketNoKey:"Without an API key I can't check — here's a search for official tickets:",
+    howTo:"How do I get there?", walkG:"Walking (Google Maps)", transitG:"Transit (Google Maps)", askRoute:"Ask AI for the route", routeLoad:"Checking transport…" }
 };
 /* ============ Material icons (official SVG paths, 24x24) ============ */
 const MI = {
@@ -443,6 +549,13 @@ check:"M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
 info:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z",
 swap:"M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z",
 star:"M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
+search:"M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z",
+event:"M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z",
+play:"M8 5v14l11-7z",
+ticket:"M22 10V6c0-1.1-.9-2-2-2H4c-1.1 0-1.99.9-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7.5h-2v-2h2v2zm0-4.5h-2v-2h2v2zm0-4.5h-2v-2h2v2z",
+bus:"M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z",
+openext:"M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z",
+download:"M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z",
 magic:"M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"
 };
 function ic(name, size=24){ return `<svg class="mi" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${MI[name]}"/></svg>`; }
@@ -496,6 +609,7 @@ function setCity(c, fly){
   if(map && fly) map.flyTo({center:CITIES[c].center, zoom:CITIES[c].zoom});
   $("herecards").innerHTML=""; $("herestatus").textContent="";
   SUGG=[]; $("suggcards").innerHTML=""; $("suggstatus").textContent="";
+  clearSearch(); renderPlans();
 }
 
 /* ============ images via Wikipedia REST (loaded by the phone, cached in-page) ============ */
@@ -525,12 +639,16 @@ function renderChips(){
     `<button class="chip ${activeChip===c?'on':''}" onclick="setChip('${c}')">${activeChip===c?ic("check",16):(c==='all'?'':ic(CAT_ICON[c],16))}${t(c)}</button>`).join("");
 }
 function setChip(c){ activeChip=c; renderChips(); renderCards(); }
-function cardHTML(p, dist, saveBtn){
+function cardHTML(p, dist, saveBtn, selectable){
   const L = p[lang];
   const badge = p.ai ? ` <span class="aibadge">${ic("magic",11)} ${t("aiBadge")}</span>` : "";
   const save = saveBtn ? `<div><button class="savebtn" onclick="event.stopPropagation();savePlace('${p.id}',this)">${ic("star",14)} ${t("savePlace")}</button></div>` : "";
-  return `<div class="card" onclick="openSheet('${p.id}')">
-    <div class="thumb" id="th-${p.id}"></div>
+  const sel = selectable && selMode;
+  const selIdx = sel ? tourSel.indexOf(p.id) : -1;
+  const selBadge = selIdx>=0 ? `<div class="selbadge">${selIdx+1}</div>` : "";
+  const click = sel ? `toggleSel('${p.id}')` : `openSheet('${p.id}')`;
+  return `<div class="card${sel?' selmode':''}${selIdx>=0?' selected':''}" onclick="${click}">
+    ${selBadge}<div class="thumb" id="th-${p.id}"></div>
     <div class="cbody"><div class="cat">${ic(CAT_ICON[p.cat],13)} ${t(p.cat)}${badge}</div>
     <h3>${L.title}</h3>
     ${dist!=null?`<div class="dist">${ic("place",13)} ${fmtDist(dist)}</div>`:""}
@@ -538,7 +656,7 @@ function cardHTML(p, dist, saveBtn){
 }
 function renderCards(){
   const list = cityPlaces().filter(p=>activeChip==="all"||p.cat===activeChip);
-  $("cards").innerHTML = list.map(p=>cardHTML(p)).join("");
+  $("cards").innerHTML = list.map(p=>cardHTML(p,null,false,true)).join("");
   list.forEach(p=>applyThumb($("th-"+p.id),p));
 }
 
@@ -581,7 +699,9 @@ function openSheet(id){
   $("sheettip").innerHTML = ic("bulb",20) + `<span>${esc(L.tip)}${curPlace.ai?`<br><span style="font-size:12px;opacity:.75">${ic("magic",12)} ${t("aiDisclaimer")}</span>`:""}</span>`;
   $("listenbtn").innerHTML = ic("volume",19) + `<span>${t("listen")}</span>`;
   $("askbtn").innerHTML = ic("chat",18) + `<span>${t("ask")}</span>`;
-  $("gobtn").innerHTML = ic("walk",19) + `<span>${t("nav")}</span>`;
+  $("gobtn").innerHTML = ic("bus",19) + `<span>${t("howTo")}</span>`;
+  $("planbtn").innerHTML = ic("event",18) + `<span>${t("addToPlan")}</span>`;
+  $("ticketbtn").innerHTML = ic("ticket",18) + `<span>${t("tickets")}</span>`;
   const hero = $("sheethero");
   hero.style.backgroundImage="none";
   hero.style.background=`linear-gradient(135deg,${CAT_COLOR[curPlace.cat]}55,${CAT_COLOR[curPlace.cat]}22)`;
@@ -717,6 +837,381 @@ function savePlace(id, btn){
   renderCards(); renderMarkers();
 }
 
+/* ============ MAP SEARCH (Photon/OSM geocoder, free, no key) ============ */
+let searchTimer=null, searchMarker=null, foundPlace=null;
+function initSearch(){
+  $("searchic").innerHTML = ic("search",20);
+  const inp=$("searchinput");
+  inp.addEventListener("input",()=>{
+    $("searchclear").style.display = inp.value ? "block":"none";
+    clearTimeout(searchTimer);
+    if(inp.value.trim().length<3){ $("searchresults").classList.remove("on"); return; }
+    searchTimer=setTimeout(()=>doSearch(inp.value.trim()),400);
+  });
+}
+async function doSearch(q){
+  const c=CITIES[city].center;
+  try{
+    const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lat=${c[1]}&lon=${c[0]}&lang=en`);
+    const j=await r.json();
+    const res=(j.features||[]).filter(f=>f.geometry&&f.geometry.coordinates);
+    const box=$("searchresults");
+    if(!res.length){ box.innerHTML=`<div class="sr-item"><span>${t("searchNoRes")}</span></div>`; box.classList.add("on"); return; }
+    box.innerHTML=res.map((f,i)=>{
+      const p=f.properties||{};
+      const sub=[p.street,p.district,p.city||p.county].filter(Boolean).join(", ");
+      return `<div class="sr-item" onclick="pickResult(${i})"><b>${esc(p.name||q)}</b><span>${esc(sub)}</span></div>`;
+    }).join("");
+    box.classList.add("on");
+    window._searchRes=res;
+  }catch(e){ /* offline — ignore */ }
+}
+function pickResult(i){
+  const f=window._searchRes[i]; if(!f) return;
+  const p=f.properties||{}, [lng,lat]=f.geometry.coordinates;
+  $("searchresults").classList.remove("on");
+  foundPlace={name:p.name||$("searchinput").value.trim(), sub:[p.street,p.city||p.county].filter(Boolean).join(", "), lat, lng, osm:p.osm_value||""};
+  if(searchMarker) searchMarker.remove();
+  if(map){
+    const el=document.createElement("div");
+    el.className="marker"; el.style.background="#B3261E";
+    el.innerHTML=`<span>${ic("search",15)}</span>`;
+    searchMarker=new maplibregl.Marker({element:el,anchor:"bottom"}).setLngLat([lng,lat]).addTo(map);
+    map.flyTo({center:[lng,lat],zoom:16});
+  }
+  $("foundcard").innerHTML=`<h4>${esc(foundPlace.name)}</h4><p>${esc(foundPlace.sub)}</p>
+    <div class="row">
+      <button class="abtn primary ripple" onclick="enrichFound(this)">${ic("magic",16)} ${t("aiInfo")}</button>
+      <button class="abtn sec ripple" onclick="foundToPlace().then(p=>openPlanMenu(p.id))">${ic("event",16)} ${t("addToPlan")}</button>
+      <button class="abtn sec ripple" onclick="clearSearch()">✕</button>
+    </div>`;
+  $("foundcard").classList.add("on");
+}
+function clearSearch(){
+  $("searchinput").value=""; $("searchclear").style.display="none";
+  $("searchresults").classList.remove("on"); $("foundcard").classList.remove("on");
+  if(searchMarker){ searchMarker.remove(); searchMarker=null; }
+  foundPlace=null;
+}
+/* turn the found search result into a full AI place (with or without an AI story) */
+let foundCache={};
+async function foundToPlace(withAI, btn){
+  const key = foundPlace.lat+","+foundPlace.lng;
+  if(foundCache[key]) return foundCache[key];
+  let cat="landmark", story=foundPlace.sub||foundPlace.name, tip="";
+  if(withAI){
+    try{
+      const arr = await anthropicJSON(
+        `You are a local expert for ${CITIES[city].name}, Spain. Respond ONLY with a JSON array containing exactly one object: {"cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "story": string (70-100 words, vivid tour-guide story in ${lang==="sr"?"Serbian":"English"} about this exact place), "tip": string (one practical tip, same language)}.`,
+        `Place: "${foundPlace.name}" (${foundPlace.sub}), OSM type: ${foundPlace.osm}, coordinates ${foundPlace.lat},${foundPlace.lng} in ${CITIES[city].name}.`, 800);
+      const o=arr[0]||{};
+      cat=CAT_ICON[o.cat]?o.cat:"landmark"; story=String(o.story||story); tip=String(o.tip||"");
+    }catch(e){ if(btn) btn.innerHTML=ic("magic",16)+" "+t("suggErr"); }
+  }
+  const lb={title:foundPlace.name, story, tip};
+  const place={ id:"ai-find-"+Date.now(), ai:true, city, cat, lat:foundPlace.lat, lng:foundPlace.lng, wiki:null, sr:lb, en:lb };
+  foundCache[key]=place;
+  SUGG.push(place);
+  return place;
+}
+async function enrichFound(btn){
+  if(!store.get("tv_key")){ openSheetForFound(await foundToPlace(false)); return; }
+  btn.innerHTML=`<span class="spin"></span> ${t("aiInfoLoad")}`;
+  const p=await foundToPlace(true, btn);
+  openSheetForFound(p);
+}
+function openSheetForFound(p){ $("foundcard").classList.remove("on"); openSheet(p.id); }
+
+/* ============ TICKETS (AI find + in-app wallet via IndexedDB) ============ */
+const idb = {
+  _db:null,
+  open(){ return this._db ? Promise.resolve(this._db) : new Promise((res,rej)=>{
+    const r=indexedDB.open("traveler",1);
+    r.onupgradeneeded=()=>r.result.createObjectStore("tickets",{keyPath:"id"});
+    r.onsuccess=()=>{this._db=r.result;res(this._db)}; r.onerror=()=>rej(r.error);
+  })},
+  async put(tk){ const db=await this.open(); return new Promise((res,rej)=>{ const tx=db.transaction("tickets","readwrite"); tx.objectStore("tickets").put(tk); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); })},
+  async all(){ const db=await this.open(); return new Promise((res,rej)=>{ const rq=db.transaction("tickets").objectStore("tickets").getAll(); rq.onsuccess=()=>res(rq.result||[]); rq.onerror=()=>rej(rq.error); })},
+  async del(id){ const db=await this.open(); return new Promise((res,rej)=>{ const tx=db.transaction("tickets","readwrite"); tx.objectStore("tickets").delete(id); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); })}
+};
+let ticketFor = null;
+function openMenu(html){ $("planmenuin").innerHTML=html; $("planmenu").classList.add("on"); }
+
+async function openTicketMenu(){
+  if(!curPlace) return;
+  ticketFor = curPlace[lang].title;
+  const q = encodeURIComponent(`${curPlace.en.title} ${CITIES[curPlace.city].name} tickets official site`);
+  const commonBtns = `
+    <button class="pm-item" onclick="window.open('https://www.google.com/search?q=${q}','_blank')">${ic("search",18)} ${t("googleTickets")}</button>
+    <button class="pm-item" onclick="$('ticketfile').click()">${ic("download",18)} ${t("saveTicket")}</button>
+    <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`;
+  if(!store.get("tv_key")){
+    openMenu(`<h3>${ic("ticket",18)} ${t("tickets")}</h3><div class="pm-txt">${t("ticketNoKey")}</div>${commonBtns}`);
+    return;
+  }
+  openMenu(`<h3>${ic("ticket",18)} ${t("tickets")}</h3><div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("ticketLoad")}</div>${commonBtns}`);
+  try{
+    const arr = await anthropicJSON(
+      `You are a travel assistant. Respond ONLY with a JSON array with exactly one object: {"advice": string (2-3 sentences in ${lang==="sr"?"Serbian":"English"}: is entry free or ticketed, roughly how much, whether advance booking is smart, and WHERE tickets are sold), "url": string or null (the OFFICIAL ticket/website URL if you are confident it is correct, else null)}.`,
+      `Place: "${curPlace.en.title}" in ${CITIES[curPlace.city].name}, Spain.`, 600);
+    const o=arr[0]||{};
+    const site = (o.url && /^https?:\/\//.test(o.url)) ? `<button class="pm-item" onclick="window.open('${o.url.replace(/'/g,"")}','_blank')">${ic("openext",18)} ${t("openSite")}</button>` : "";
+    openMenu(`<h3>${ic("ticket",18)} ${t("tickets")} · ${esc(ticketFor)}</h3>
+      <div class="pm-txt">${esc(String(o.advice||""))}</div>
+      <p class="pm-disc">${t("ticketDisc")}</p>
+      ${site}${commonBtns}`);
+  }catch(e){
+    openMenu(`<h3>${ic("ticket",18)} ${t("tickets")}</h3><div class="pm-txt">${t("suggErr")}</div>${commonBtns}`);
+  }
+}
+async function saveTicketFile(file){
+  if(!file) return;
+  const buf = await file.arrayBuffer();
+  await idb.put({ id:"tk-"+Date.now(), name:file.name, place:ticketFor||"", mime:file.type, added:new Date().toISOString().slice(0,10), data:buf });
+  closePlanMenu(); renderTickets();
+  $("speaktitle").innerHTML=ic("check",16)+`<span>${t("ticketSaved")}</span>`;
+  $("speakstop").textContent="OK";
+  $("speakbar").classList.add("on"); setTimeout(()=>$("speakbar").classList.remove("on"),1800);
+}
+async function renderTickets(){
+  let list=[]; try{ list=await idb.all() }catch(e){}
+  $("ticketslist").innerHTML = !list.length ? "" :
+    `<p style="color:var(--on-surface-var);font-size:12.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:12px">${t("myTickets")}</p>`+
+    list.map(tk=>`<div class="plancard">
+      <div class="pc-txt"><h4>${ic("ticket",14)} ${esc(tk.place||tk.name)}</h4><span>${esc(tk.name)} · ${tk.added}</span></div>
+      <button class="pc-start ripple" onclick="openTicket('${tk.id}')">${ic("openext",14)} ${t("ticketOpen")}</button>
+      <button class="pc-del" onclick="deleteTicket('${tk.id}')">${ic("close",16)}</button>
+    </div>`).join("");
+}
+async function openTicket(id){
+  const list=await idb.all(); const tk=list.find(x=>x.id===id); if(!tk) return;
+  const url=URL.createObjectURL(new Blob([tk.data],{type:tk.mime||"application/octet-stream"}));
+  const a=document.createElement("a"); a.href=url; a.target="_blank"; a.rel="noopener";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+async function deleteTicket(id){ if(!confirm(t("ticketDelQ"))) return; await idb.del(id); renderTickets(); }
+
+/* ============ TRANSPORT (how do I get there) ============ */
+function openGoMenu(){
+  if(!curPlace) return;
+  const dest = curPlace.ai ? encodeURIComponent(curPlace[lang].title+", "+CITIES[curPlace.city].name+", Spain") : `${curPlace.lat},${curPlace.lng}`;
+  const ai = store.get("tv_key") ? `<button class="pm-item" onclick="askAIRoute()">${ic("magic",18)} ${t("askRoute")}</button>` : "";
+  openMenu(`<h3>${ic("bus",18)} ${t("howTo")}</h3>
+    <button class="pm-item" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=walking','_blank')">${ic("walk",18)} ${t("walkG")}</button>
+    <button class="pm-item" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=transit','_blank')">${ic("bus",18)} ${t("transitG")}</button>
+    ${ai}
+    <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+}
+async function askAIRoute(){
+  const from = userPos ? `from GPS ${userPos.lat.toFixed(4)},${userPos.lng.toFixed(4)}` : `from the city center`;
+  $("planmenuin").querySelectorAll(".pm-txt").forEach(e=>e.remove());
+  $("planmenuin").insertAdjacentHTML("afterbegin", `<div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("routeLoad")}</div>`);
+  try{
+    const key=store.get("tv_key");
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",
+      headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:store.get("tv_model")||"claude-haiku-4-5",max_tokens:500,
+        system:`You are a local transport expert for ${CITIES[city].name}, Spain. Answer in ${lang==="sr"?"Serbian":"English"}, 3-5 sentences: best way (walk/metro/bus/taxi) with concrete line names/numbers if you know them, rough time and price. Be honest if schedules may have changed and suggest checking Google Maps.`,
+        messages:[{role:"user",content:`How do I get ${from} to "${curPlace.en.title}" (${curPlace.lat},${curPlace.lng}) in ${CITIES[curPlace.city].name}?`}]})});
+    const j=await r.json();
+    const txt=(j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+    $("planmenuin").querySelector(".pm-txt").innerHTML = esc(txt);
+  }catch(e){ $("planmenuin").querySelector(".pm-txt").textContent = t("suggErr"); }
+}
+
+/* ============ PLANS (routes for the days ahead) ============ */
+let PLANS=[]; try{ PLANS=JSON.parse(store.get("tv_plans")||"[]") }catch(e){ PLANS=[] }
+function savePlans(){ store.set("tv_plans", JSON.stringify(PLANS)); }
+function persistIfAI(id){
+  const p=SUGG.find(x=>x.id===id);
+  if(p && !SAVED.find(x=>x.id===id)){ SAVED.push(p); store.set("tv_saved", JSON.stringify(SAVED)); }
+}
+let planMenuFor=null;
+function openPlanMenu(placeId){
+  planMenuFor = placeId || (curPlace && curPlace.id);
+  if(!planMenuFor) return;
+  let html=`<h3>${ic("event",18)} ${t("planPick")}</h3>`;
+  if(TOUR.active) html+=`<button class="pm-item" onclick="addToTour()">${ic("walk",18)} ${t("curTour")}<span>${TOUR.stops.length} ${t("stops")}</span></button>`;
+  PLANS.forEach(pl=>{ html+=`<button class="pm-item" onclick="addToPlan('${pl.id}')">${ic("event",18)} ${esc(pl.name)}<span>${pl.stops.length} ${t("stops")}</span></button>`; });
+  html+=`<div class="pm-new"><input id="newplanname" placeholder="${t("newPlanName")}"><button class="abtn primary" onclick="createPlanAndAdd()">${t("planCreate")}</button></div>
+    <button class="pm-item" style="margin-top:10px;justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`;
+  $("planmenuin").innerHTML=html;
+  $("planmenu").classList.add("on");
+}
+function closePlanMenu(){ $("planmenu").classList.remove("on"); }
+function addToTour(){
+  if(!TOUR.stops.includes(planMenuFor)){ persistIfAI(planMenuFor); TOUR.stops.push(planMenuFor); saveTour(); drawTour(); renderTourBar(); }
+  finishAdd();
+}
+function addToPlan(planId){
+  const pl=PLANS.find(x=>x.id===planId);
+  if(pl && !pl.stops.includes(planMenuFor)){ persistIfAI(planMenuFor); pl.stops.push(planMenuFor); savePlans(); }
+  finishAdd();
+}
+function createPlanAndAdd(){
+  const name=$("newplanname").value.trim(); if(!name) return;
+  persistIfAI(planMenuFor);
+  PLANS.push({id:"plan-"+Date.now(), name, city, stops:[planMenuFor]});
+  savePlans(); finishAdd();
+}
+function finishAdd(){
+  closePlanMenu(); renderPlans(); renderCards(); renderMarkers();
+  $("herestatus").textContent="";
+  const bar=$("speakbar"); // quick toast via snackbar
+  $("speaktitle").innerHTML=ic("check",16)+`<span>${t("planAdded")}</span>`;
+  $("speakstop").textContent="OK";
+  bar.classList.add("on"); setTimeout(()=>bar.classList.remove("on"),1800);
+}
+function renderPlans(){
+  const myPlans=PLANS.filter(p=>!p.city||p.city===city);
+  $("planslist").innerHTML = !myPlans.length ? "" :
+    `<p style="color:var(--on-surface-var);font-size:12.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:12px">${t("plans")}</p>`+
+    myPlans.map(pl=>`<div class="plancard">
+      <div class="pc-txt"><h4>${esc(pl.name)}</h4><span>${pl.stops.map(id=>{const p=findPlace(id);return p?p[lang].title:""}).filter(Boolean).join(" → ")||"—"}</span></div>
+      <button class="pc-start ripple" onclick="startPlan('${pl.id}')">${ic("play",15)} ${t("planStart")}</button>
+      <button class="pc-del" onclick="deletePlan('${pl.id}')">${ic("close",16)}</button>
+    </div>`).join("");
+}
+function startPlan(planId){
+  const pl=PLANS.find(x=>x.id===planId); if(!pl||pl.stops.length<1) return;
+  tourSel = pl.stops.slice();
+  if(tourSel.length===1){ tourSel=tourSel; } // single stop tour is fine
+  startTour();
+}
+function deletePlan(planId){
+  if(!confirm(t("planDelQ"))) return;
+  PLANS=PLANS.filter(x=>x.id!==planId); savePlans(); renderPlans();
+}
+
+/* ============ TOUR MODE ============ */
+let TOUR = {active:false, stops:[], idx:0};
+try{ const s=JSON.parse(store.get("tv_tour")||"null"); if(s && s.active) TOUR=s; }catch(e){}
+let selMode = false, tourSel = [], tourWatch = null, tourBadges = [];
+const ARRIVE_M = 60;
+
+function saveTour(){ store.set("tv_tour", JSON.stringify(TOUR)); }
+function renderTourCtl(){
+  if(!selMode){
+    $("tourctl").innerHTML = `<button class="abtn sec ripple" onclick="enterSelMode()">${ic("walk",17)} ${t("tourMake")}</button>`;
+  } else {
+    $("tourctl").innerHTML =
+      `<button class="abtn primary ripple" onclick="startTour()" ${tourSel.length<2?"disabled style='opacity:.5'":""}>${ic("walk",17)} ${t("tourStart")} (${tourSel.length})</button>
+       <button class="abtn sec ripple" onclick="exitSelMode()">${t("tourCancel")}</button>
+       <p style="flex-basis:100%;color:var(--on-surface-var);font-size:12.5px;margin:2px 4px">${t("tourPick")}</p>`;
+  }
+}
+function enterSelMode(){ selMode=true; tourSel=[]; renderTourCtl(); renderCards(); }
+function exitSelMode(){ selMode=false; tourSel=[]; renderTourCtl(); renderCards(); }
+function toggleSel(id){
+  const i = tourSel.indexOf(id);
+  i>=0 ? tourSel.splice(i,1) : tourSel.push(id);
+  renderTourCtl(); renderCards();
+}
+function orderStops(ids, from){
+  const rest = ids.map(id=>findPlace(id)).filter(Boolean);
+  const route = [];
+  let cur = from || {lat:rest[0].lat, lng:rest[0].lng};
+  while(rest.length){
+    let bi=0, bd=Infinity;
+    rest.forEach((p,i)=>{ const d=haversine(cur.lat,cur.lng,p.lat,p.lng); if(d<bd){bd=d;bi=i;} });
+    const p = rest.splice(bi,1)[0];
+    route.push(p.id); cur=p;
+  }
+  return route;
+}
+function startTour(){
+  if(tourSel.length<1) return;
+  // grab a fresh position first so the route starts from where the user actually is
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos=>{ userPos={lat:pos.coords.latitude,lng:pos.coords.longitude}; beginTour(); },
+      ()=>beginTour(), {timeout:4000, maximumAge:60000});
+  } else beginTour();
+}
+function beginTour(){
+  TOUR = {active:true, stops:orderStops(tourSel, userPos), idx:0};
+  saveTour();
+  selMode=false; tourSel=[];
+  renderTourCtl(); renderCards();
+  showView("map");
+  drawTour(); renderTourBar(); startTourWatch();
+  const first = findPlace(TOUR.stops[0]);
+  if(map && first){
+    if(userPos) map.fitBounds([[Math.min(userPos.lng,first.lng),Math.min(userPos.lat,first.lat)],[Math.max(userPos.lng,first.lng),Math.max(userPos.lat,first.lat)]],{padding:80});
+    else map.flyTo({center:[first.lng,first.lat], zoom:15});
+  }
+  speak(t("tourFollow"), lang);
+}
+function tourCoords(){ return TOUR.stops.map(id=>findPlace(id)).filter(Boolean).map(p=>[p.lng,p.lat]); }
+function drawTour(){
+  if(!map || !TOUR.active) return;
+  const draw = () => {
+    clearTourLayers();
+    map.addSource("tour",{type:"geojson",data:{type:"Feature",geometry:{type:"LineString",coordinates:tourCoords()}}});
+    map.addLayer({id:"tour-line",type:"line",source:"tour",paint:{"line-color":"#6750A4","line-width":4,"line-dasharray":[1.5,1.5],"line-opacity":.85}});
+    TOUR.stops.forEach((id,i)=>{
+      const p=findPlace(id); if(!p) return;
+      const el=document.createElement("div");
+      el.className="numbadge"+(i<TOUR.idx?" done":"");
+      el.textContent = i<TOUR.idx ? "✓" : (i+1);
+      el.addEventListener("click",e=>{e.stopPropagation();openSheet(id)});
+      tourBadges.push(new maplibregl.Marker({element:el,anchor:"center",offset:[16,-16]}).setLngLat([p.lng,p.lat]).addTo(map));
+    });
+  };
+  map.isStyleLoaded() ? draw() : map.once("load",draw);
+}
+function clearTourLayers(){
+  tourBadges.forEach(b=>b.remove()); tourBadges=[];
+  if(map && map.getLayer && map.getLayer("tour-line")) map.removeLayer("tour-line");
+  if(map && map.getSource && map.getSource("tour")) map.removeSource("tour");
+}
+function renderTourBar(){
+  const bar=$("tourbar");
+  if(!TOUR.active || TOUR.idx>=TOUR.stops.length){ bar.classList.remove("on"); return; }
+  const p=findPlace(TOUR.stops[TOUR.idx]);
+  $("tbnum").textContent = (TOUR.idx+1);
+  $("tbname").textContent = p ? p[lang].title : "";
+  $("tbdist").textContent = (userPos&&p) ? fmtDist(haversine(userPos.lat,userPos.lng,p.lat,p.lng))+" · "+(TOUR.idx+1)+"/"+TOUR.stops.length : (TOUR.idx+1)+"/"+TOUR.stops.length;
+  $("tbnext").innerHTML = ic("send",14)+t("tourNext");
+  $("tbend").innerHTML = ic("close",14)+t("tourEnd");
+  bar.classList.add("on");
+}
+function openNextStop(){ if(TOUR.active && TOUR.stops[TOUR.idx]) openSheet(TOUR.stops[TOUR.idx]); }
+function startTourWatch(){
+  if(tourWatch!=null || !navigator.geolocation) return;
+  tourWatch = navigator.geolocation.watchPosition(pos=>{
+    userPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    if(!TOUR.active) return;
+    renderTourBar();
+    const p=findPlace(TOUR.stops[TOUR.idx]);
+    if(p && haversine(userPos.lat,userPos.lng,p.lat,p.lng) <= ARRIVE_M) arriveAtStop();
+  }, e=>{}, {enableHighAccuracy:true, maximumAge:5000, timeout:15000});
+}
+function stopTourWatch(){ if(tourWatch!=null){ navigator.geolocation.clearWatch(tourWatch); tourWatch=null; } }
+function arriveAtStop(){
+  const p=findPlace(TOUR.stops[TOUR.idx]); if(!p) return;
+  try{ navigator.vibrate && navigator.vibrate([200,100,200]) }catch(e){}
+  openSheet(p.id);
+  speak(t("tourArrived")+": "+p[lang].title+". "+p[lang].story+" … "+p[lang].tip, lang, p[lang].title);
+  advanceTour(false);
+}
+function advanceTour(manual){
+  TOUR.idx++;
+  if(TOUR.idx>=TOUR.stops.length){
+    if(manual) speak(t("tourDone"), lang);
+    endTour(true);
+    return;
+  }
+  saveTour(); drawTour(); renderTourBar();
+  if(manual){ const p=findPlace(TOUR.stops[TOUR.idx]); if(map&&p) map.flyTo({center:[p.lng,p.lat],zoom:15.5}); }
+}
+function endTour(done){
+  TOUR={active:false,stops:[],idx:0}; saveTour();
+  stopTourWatch(); clearTourLayers(); renderTourBar();
+  if(done===true) $("herestatus").textContent = t("tourDone");
+}
+
 /* ============ chat (Anthropic API, key stays on device) ============ */
 function sysPrompt(){
   const near = userPos ? ALL_PLACES.map(p=>({p,d:haversine(userPos.lat,userPos.lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d).slice(0,3).map(x=>`${x.p.en.title} (${Math.round(x.d)}m)`).join(", ") : "unknown";
@@ -790,7 +1285,9 @@ function saveKey(btn){
 
 /* ============ render all ============ */
 function renderAll(){
-  renderNav(); renderChips(); renderCards(); renderInfo();
+  renderNav(); renderChips(); renderTourCtl(); renderPlans(); renderTickets(); renderCards(); renderInfo();
+  renderTourBar();
+  $("searchinput").placeholder = t("search");
   $("logoic").innerHTML = ic("explore",24);
   $("citybtn").innerHTML = ic("swap",15) + CITIES[city].name;
   $("hereic").innerHTML = ic("myloc",22);
@@ -812,9 +1309,13 @@ function renderAll(){
 }
 $("langbtn").textContent = lang.toUpperCase();
 $("chatinput").addEventListener("keydown",e=>{ if(e.key==="Enter") sendChat(); });
+$("ticketfile").addEventListener("change", e=>{ saveTicketFile(e.target.files[0]); e.target.value=""; });
 renderAll();
 initMap();
+initSearch();
 showView("map");
+/* resume an active tour after reload */
+if(TOUR.active){ drawTour(); renderTourBar(); startTourWatch(); }
 
 </script>
 <script>
