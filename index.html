@@ -598,13 +598,13 @@ const UI = {
     hereBtn:"Sada sam ovde", locating:"Tražim te…", locErr:"Ne mogu da te lociram. Dozvoli pristup lokaciji u podešavanjima browsera.",
     nearYou:"U tvojoj blizini", listen:"Slušaj", stop:"Zaustavi", ask:"Pitaj vodiča", nav:"Vodi me",
     all:"Sve", landmark:"Znamenitosti", museum:"Muzeji", park:"Parkovi", quarter:"Kvartovi", food:"Hrana", drink:"Piće",
-    chatHello:"Zdravo! Ja sam tvoj vodič kroz Madrid. Pitaj me bilo šta — o mestima, istoriji, hrani, ili gde da odeš. Na bilo kom jeziku.",
+    chatHello:"Zdravo! Ja sam tvoj vodič kroz {city}. Pitaj me bilo šta — o mestima, istoriji, hrani, ili gde da odeš. Na bilo kom jeziku.",
     chatPlaceholder:"Pitaj vodiča…", noKey:"Za razgovor sa AI vodičem unesi API ključ u Info tabu. Priče i slušanje rade i bez ključa!",
     speaking:"Vodič priča…", askAbout:"Ispričaj mi više o: ", m:"m od tebe", km:"km od tebe",
     thinking:"Vodič razmišlja…", chatErr:"Greška u komunikaciji sa AI servisom. Proveri ključ i internet.",
     infoTitle:"Podešavanja", keyLabel:"Anthropic API ključ (za AI chat)", keyHint:"Ključ se čuva samo na tvom telefonu i šalje isključivo Anthropic servisu. Napravi ga na console.anthropic.com.",
     save:"Sačuvaj", saved:"Sačuvano ✓", about:"O aplikaciji",
-    aboutTxt:"Traveler · prototip za Madrid. 38 kuriranih mesta sa pričama na srpskom i engleskom. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
+    aboutTxt:"Traveler · AI turistički vodič (prototip). Trenutni grad: {city} — {n} mesta u vodiču. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku, pravi ture, planove i predloge. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Napomena: čitanje naglas koristi glasove tvog telefona. Ako srpski glas nije instaliran, priča se čita na engleskom.",
     suggTitle:"AI predlozi", suggSub:"Vodič može da predloži i mesta kojih nema u vodiču — izaberi šta te zanima ili upiši svojim rečima.",
     suggPlaceholder:"Npr. „nešto sa decom, blizu, u hladu”…", suggBtn:"Daj mi predloge", suggLoading:"Vodič smišlja predloge…",
@@ -614,7 +614,7 @@ const UI = {
     tourMake:"Napravi turu", tourCancel:"Otkaži", tourStart:"Kreni", tourPick:"Tapni mesta redom kojim želiš — ja ću ih poređati u najkraću rutu.",
     tourNext:"Preskoči", tourEnd:"Završi", tourStopWord:"stanica", tourArrived:"Stigao si", tourDone:"Tura završena! Bravo. 🎉",
     tourFollow:"Prati plavu liniju na mapi — kad stigneš do stanice, sam ću ti ispričati priču.", tourToNext:"do sledeće stanice",
-    search:"Pretraži mapu (npr. „Museo Sorolla”)…", searchNoRes:"Nema rezultata — probaj drugačije ime.",
+    search:"Pretraži mapu — muzej, restoran, ulica…", searchNoRes:"Nema rezultata — probaj drugačije ime.",
     aiInfo:"AI info", aiInfoLoad:"Pišem priču…", addToPlan:"U plan", addToPlanLong:"Dodaj u plan",
     plans:"Planovi za naredne dane", planPick:"Gde da dodam ovo mesto?", curTour:"Trenutna tura",
     newPlanName:"Ime plana (npr. Sreda ujutru)", planCreate:"Napravi", planSaveAs:"Sačuvaj kao plan",
@@ -624,12 +624,12 @@ const UI = {
     ticketOpen:"Otvori", ticketDisc:"Savet i link daje AI — pre plaćanja proveri da je sajt zvaničan.",
     ticketNoKey:"Bez API ključa ne mogu da proverim — evo pretrage zvaničnih karata:",
     howTo:"Kako do tamo?", walkG:"Peške (Google mape)", transitG:"Prevozom (Google mape)", askRoute:"Pitaj AI kako da dođem", routeLoad:"Gledam prevoz…",
-    obTitle:"Traveler", obSub:"Tvoj lični AI vodič kroz Madrid i Alikante — priče, ture i saveti, na tvom jeziku.",
+    obTitle:"Traveler", obSub:"Tvoj lični AI vodič za gradove Evrope — priče, ture i saveti, na tvom jeziku.",
     obF1t:"Sada sam ovde", obF1s:"App te locira i priča ti o mestu na kom stojiš — tekstom ili naglas.",
     obF2t:"Ture i planovi", obF2s:"Izaberi mesta, app pravi rutu i sam priča kad stigneš na stanicu.",
     obF3t:"Pitaj bilo šta", obF3s:"AI vodič odgovara na potpitanja, predlaže mesta, karte i prevoz.",
     obStart:"Kreni", feedback:"Pošalji utiske", feedbackSub:"Ovo je prototip — svaki komentar pomaže da napravimo pravu aplikaciju.",
-    shareApp:"Podeli aplikaciju", sharePlace:"Podeli", copied:"Link kopiran ✓", shareTxt:"Pogledaj Traveler — AI vodič za Madrid i Alikante:" },
+    shareApp:"Podeli aplikaciju", sharePlace:"Podeli", copied:"Link kopiran ✓", shareTxt:"Pogledaj Traveler — AI turistički vodič:" },
   en:{ map:"Map", list:"Places", here:"Here", plan:"Trip", chat:"Guide", info:"Info",
     myTrip:"My trip", plansH:"Plans", plansEmptyT:"No plans yet",
     plansEmptyS:"Open any place and tap \"To plan\" — or tap \"Build a tour\" in the Places tab. Name plans by day: \"Friday — center\", \"Saturday — Prado\".",
@@ -653,13 +653,13 @@ const UI = {
     hereBtn:"I'm here now", locating:"Locating you…", locErr:"Can't locate you. Allow location access in your browser settings.",
     nearYou:"Near you", listen:"Listen", stop:"Stop", ask:"Ask the guide", nav:"Take me there",
     all:"All", landmark:"Landmarks", museum:"Museums", park:"Parks", quarter:"Quarters", food:"Food", drink:"Drinks",
-    chatHello:"Hi! I'm your Madrid guide. Ask me anything — places, history, food, where to go. In any language.",
+    chatHello:"Hi! I'm your {city} guide. Ask me anything — places, history, food, where to go. In any language.",
     chatPlaceholder:"Ask the guide…", noKey:"To chat with the AI guide, add an API key in the Info tab. Stories and listening work without a key!",
     speaking:"Guide is speaking…", askAbout:"Tell me more about: ", m:"m from you", km:"km from you",
     thinking:"Guide is thinking…", chatErr:"Error talking to the AI service. Check your key and connection.",
     infoTitle:"Settings", keyLabel:"Anthropic API key (for AI chat)", keyHint:"The key is stored only on your phone and sent only to Anthropic. Create one at console.anthropic.com.",
     save:"Save", saved:"Saved ✓", about:"About",
-    aboutTxt:"Traveler · Madrid prototype. 38 curated places with stories in Serbian and English. The \"I'm here now\" button locates you and tells you about your surroundings; the AI guide answers follow-up questions in any language. Images: Wikimedia. Map: OpenFreeMap © OpenStreetMap.",
+    aboutTxt:"Traveler · AI travel guide (prototype). Current city: {city} — {n} places in the guide. The \"I'm here now\" button locates you and tells you about your surroundings; the AI guide answers follow-ups in any language, builds tours, plans and suggestions. Images: Wikimedia. Map: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Note: read-aloud uses your phone's voices. If a Serbian voice isn't installed, stories are read in English.",
     suggTitle:"AI suggestions", suggSub:"The guide can also suggest places that aren't in this app — pick what interests you or type it in your own words.",
     suggPlaceholder:"E.g. \"something with kids, nearby, in the shade\"…", suggBtn:"Suggest places", suggLoading:"The guide is thinking…",
@@ -669,7 +669,7 @@ const UI = {
     tourMake:"Build a tour", tourCancel:"Cancel", tourStart:"Start", tourPick:"Tap the places you want — I'll order them into the shortest route.",
     tourNext:"Skip", tourEnd:"End", tourStopWord:"stop", tourArrived:"You've arrived", tourDone:"Tour complete! Well done. 🎉",
     tourFollow:"Follow the blue line on the map — when you reach a stop, I'll tell you its story automatically.", tourToNext:"to the next stop",
-    search:"Search the map (e.g. \"Museo Sorolla\")…", searchNoRes:"No results — try a different name.",
+    search:"Search the map — museum, restaurant, street…", searchNoRes:"No results — try a different name.",
     aiInfo:"AI info", aiInfoLoad:"Writing the story…", addToPlan:"To plan", addToPlanLong:"Add to a plan",
     plans:"Plans for the days ahead", planPick:"Where should I add this place?", curTour:"Current tour",
     newPlanName:"Plan name (e.g. Wednesday morning)", planCreate:"Create", planSaveAs:"Save as a plan",
@@ -679,12 +679,12 @@ const UI = {
     ticketOpen:"Open", ticketDisc:"Advice and link come from AI — verify the site is official before paying.",
     ticketNoKey:"Without an API key I can't check — here's a search for official tickets:",
     howTo:"How do I get there?", walkG:"Walking (Google Maps)", transitG:"Transit (Google Maps)", askRoute:"Ask AI for the route", routeLoad:"Checking transport…",
-    obTitle:"Traveler", obSub:"Your personal AI guide to Madrid and Alicante — stories, tours and tips, in your language.",
+    obTitle:"Traveler", obSub:"Your personal AI guide to Europe's cities — stories, tours and tips, in your language.",
     obF1t:"I'm here now", obF1s:"The app locates you and tells you about the place you're standing at — in text or out loud.",
     obF2t:"Tours & plans", obF2s:"Pick places, the app builds a route and speaks up when you reach each stop.",
     obF3t:"Ask anything", obF3s:"The AI guide answers follow-ups, suggests places, tickets and transport.",
     obStart:"Let's go", feedback:"Send feedback", feedbackSub:"This is a prototype — every comment helps us build the real app.",
-    shareApp:"Share the app", sharePlace:"Share", copied:"Link copied ✓", shareTxt:"Check out Traveler — an AI guide for Madrid and Alicante:" }
+    shareApp:"Share the app", sharePlace:"Share", copied:"Link copied ✓", shareTxt:"Check out Traveler — an AI travel guide:" }
 };
 /* ============ Material icons (official SVG paths, 24x24) ============ */
 const MI = {
@@ -762,6 +762,7 @@ function findPlace(id){
 }
 const $ = id => document.getElementById(id);
 const t = k => UI[lang][k];
+const tc = k => t(k).replace(/\{city\}/g, CITIES[city].name).replace(/\{n\}/g, cityPlaces().length);
 
 /* ============ nav ============ */
 const TABS = [["list","book"],["here","myloc"],["map","map"],["plan","event"],["chat","chat"]];
@@ -799,7 +800,9 @@ function setCity(c, fly){
   if(map && fly) map.flyTo({center:CITIES[c].center, zoom:CITIES[c].zoom});
   $("herecards").innerHTML=""; $("herestatus").textContent="";
   SUGG=[]; $("suggcards").innerHTML=""; $("suggstatus").textContent="";
-  clearSearch(); renderPlanView();
+  clearSearch(); renderPlanView(); renderInfo();
+  /* fresh chat greeting for the new city (only if no conversation has started) */
+  if(chatHistory.length===0){ $("chatlog").innerHTML=""; addMsg("bot", esc(tc("chatHello"))); }
   /* Euro city without a guide yet → offer to build one */
   if(!hasGuide(c) && CITIES[c] && CITIES[c].euro){
     openMenu(`<h3>${ic("place",18)} ${esc(CITIES[c].name)}</h3>
@@ -1189,7 +1192,8 @@ async function generateGuideFor(key){
     CITY_PLACES[key]=places;
     store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
     closePlanMenu();
-    renderChips(); renderCards(); renderMarkers();
+    renderChips(); renderCards(); renderMarkers(); renderInfo();
+    if(chatHistory.length===0){ $("chatlog").innerHTML=""; addMsg("bot", esc(tc("chatHello"))); }
     toast(t("cityAdded")+" · "+c.name);
   }catch(e){ openMenu(`<h3>${esc(c.name)}</h3><div class="pm-txt">${t("suggErr")}</div><button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">OK</button>`); }
 }
@@ -1735,7 +1739,7 @@ function esc(s){ const d=document.createElement("div"); d.textContent=s; return 
 
 /* ============ info ============ */
 function renderInfo(){
-  const catPill = c => `<span class="pill">${ic(CAT_ICON[c],13)} ${ALL_PLACES.filter(p=>p.cat===c).length}</span>`;
+  const catPill = c => `<span class="pill">${ic(CAT_ICON[c],13)} ${cityPlaces().filter(p=>p.cat===c).length}</span>`;
   $("infobox").innerHTML = `
     <h2>${ic("settings",19)} ${t("infoTitle")}</h2>
     <p>${t("keyLabel")}</p>
@@ -1756,9 +1760,9 @@ function renderInfo(){
       <button class="abtn sec" style="margin-top:0" onclick="shareApp()">${ic("share",17)} ${t("shareApp")}</button>
     </div>
     <h2>${ic("info",19)} ${t("about")}</h2>
-    <p>${t("aboutTxt")}</p>
+    <p>${tc("aboutTxt")}</p>
     <p style="font-size:12.5px">${t("voiceNote")}</p>
-    <p>${ALL_PLACES.length} ${ic("place",14)} · ${["landmark","museum","park","quarter","food","drink"].map(catPill).join("")}</p>`;
+    <p>${CITIES[city].name}: ${cityPlaces().length} ${ic("place",14)} · ${["landmark","museum","park","quarter","food","drink"].map(catPill).join("")}</p>`;
 }
 function saveKey(btn){
   store.set("tv_key", $("keyinput").value.trim());
@@ -1786,7 +1790,7 @@ function renderAll(){
   $("suggbtn").textContent = t("suggBtn");
   renderIntChips();
   $("chatinput").placeholder = t("chatPlaceholder");
-  if($("chatlog").children.length===0) addMsg("bot", esc(t("chatHello")));
+  if($("chatlog").children.length===0) addMsg("bot", esc(tc("chatHello")));
   const active = document.querySelector(".view.active");
   const id = active ? active.id.replace("view-","") : "map";
   $("tab-"+id) && $("tab-"+id).classList.add("active");
