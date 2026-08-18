@@ -91,7 +91,12 @@ nav button{overflow:visible}
 .backbtn{position:absolute;top:calc(env(safe-area-inset-top) + 12px);left:14px;background:rgba(255,255,255,.92);border:none;color:var(--on-surface);width:40px;height:40px;border-radius:50%;font-size:17px;z-index:2;box-shadow:var(--el1)}
 .sbody{padding:0 20px 130px;margin-top:-34px;position:relative}
 .sbody .cat{font-size:12px;color:var(--primary);text-transform:uppercase;letter-spacing:1px;font-weight:700;display:flex;align-items:center;gap:6px}
-.sbody h2{font-size:26px;font-weight:700;margin:6px 0 16px;line-height:1.2;letter-spacing:-.2px}
+.sbody h2{font-size:26px;font-weight:700;margin:6px 0 8px;line-height:1.2;letter-spacing:-.2px}
+#sheetrating{min-height:22px;margin-bottom:12px;font-size:13.5px;color:var(--on-surface-var)}
+#sheetrating .stars{color:#E8A13C;display:inline-flex;vertical-align:-3px}
+#sheetrating .rnum{font-weight:800;color:var(--on-surface);margin:0 4px}
+#sheetrating .aibadge{font-size:9.5px;vertical-align:2px}
+#sheetrating .rline{display:block;margin-top:3px;font-style:italic}
 .sbody .story{font-size:15.5px;line-height:1.7;color:var(--on-surface);white-space:pre-wrap}
 .tipbox{margin-top:18px;background:var(--tertiary-container);color:var(--on-tertiary-container);border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.55;display:flex;gap:10px;align-items:flex-start}
 .tipbox .mi{margin-top:2px}
@@ -210,7 +215,9 @@ nav button{overflow:visible}
 /* chat */
 #view-chat{display:none;flex-direction:column}
 #view-chat.active{display:flex}
-#chatlog{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+#chattop{display:flex;justify-content:flex-end;padding:8px 14px 0}
+#chatclear{background:none;border:1px solid var(--outline-var);color:var(--on-surface-var);border-radius:16px;padding:6px 12px;font-size:12px;font-weight:600;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+#chatlog{flex:1;overflow-y:auto;padding:10px 16px 16px;display:flex;flex-direction:column;gap:10px}
 .msg{max-width:86%;padding:12px 16px;border-radius:20px;font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
 .msg.user{align-self:flex-end;background:var(--primary);color:var(--on-primary);border-bottom-right-radius:6px}
 .msg.bot{align-self:flex-start;background:var(--sc-high);color:var(--on-surface);border-bottom-left-radius:6px}
@@ -296,6 +303,7 @@ nav button{overflow:visible}
     </div>
   </div>
   <div class="view" id="view-chat">
+    <div id="chattop"><button id="chatclear" onclick="clearChat()"></button></div>
     <div id="chatlog"></div>
     <div id="chatbar">
       <button id="chatcam" class="cbtn ripple" onclick="$('camfile').click()"></button>
@@ -316,6 +324,7 @@ nav button{overflow:visible}
   <div class="sbody">
     <div class="cat" id="sheetcat"></div>
     <h2 id="sheettitle"></h2>
+    <div id="sheetrating"></div>
     <div class="actions">
       <button class="abtn primary ripple" id="listenbtn" onclick="speakCurrent()"></button>
       <button class="abtn sec ripple" id="askbtn" onclick="askAboutCurrent()"></button>
@@ -610,6 +619,15 @@ const UI = {
     chatPlaceholder:"Pitaj vodiča ili traži turu…", noKey:"Za razgovor sa AI vodičem unesi API ključ u Info tabu. Priče i slušanje rade i bez ključa!",
     openPlanB:"Otvori plan", openListB:"Pogledaj mesta",
     whatThis:"Šta je ovo?", camSub:"Slikaj zgradu, statuu, jelo — vodič ti kaže šta gledaš.",
+    newChat:"Nova konverzacija", gRatings:"Ocene na Google-u",
+    aiEst:"AI PROCENA", repUnknown:"Nemam pouzdane recenzije za ovo mesto — proveri na Google-u.", repLoad:"Proveravam reputaciju…",
+    tripH:"Moj put", tripSetup:"Postavi put", tripArrive:"Dolazak", tripDepart:"Odlazak",
+    hotelPh:"Hotel — ime ili adresa", notesPh:"Napomene: s kim putuješ, tempo, želje…",
+    tripSave:"Sačuvaj put", tripSaved:"Put sačuvan ✓", hotelWarn:"Hotel nije nađen na mapi — sačuvan je samo naziv.",
+    genPlans:"Generiši planove po danima", genning:"Pravim planove po danima… traje do minut.",
+    plansMade:"Planovi napravljeni ✓ — slobodno ih menjaj.", toHotel:"Do hotela", delTripQ:"Obrisati podatke o putu?",
+    tripDatesErr:"Proveri datume dolaska i odlaska.",
+    dayNames:["Ned","Pon","Uto","Sre","Čet","Pet","Sub"],
     camAsk:"Upravo sam ovo slikao. Reci mi šta je i ispričaj mi o tome kao vodič — istorija, zanimljivosti, saveti.",
     micErr:"Nisam te razumeo — probaj ponovo.",
     speaking:"Vodič priča…", askAbout:"Ispričaj mi više o: ", m:"m od tebe", km:"km od tebe",
@@ -669,6 +687,15 @@ const UI = {
     chatPlaceholder:"Ask the guide or request a tour…", noKey:"To chat with the AI guide, add an API key in the Info tab. Stories and listening work without a key!",
     openPlanB:"Open plan", openListB:"See places",
     whatThis:"What is this?", camSub:"Snap a building, statue or dish — the guide tells you what you're looking at.",
+    newChat:"New conversation", gRatings:"Ratings on Google",
+    aiEst:"AI ESTIMATE", repUnknown:"No reliable reviews known for this place — check Google.", repLoad:"Checking reputation…",
+    tripH:"My trip", tripSetup:"Set up trip", tripArrive:"Arrival", tripDepart:"Departure",
+    hotelPh:"Hotel — name or address", notesPh:"Notes: who you travel with, pace, wishes…",
+    tripSave:"Save trip", tripSaved:"Trip saved ✓", hotelWarn:"Hotel not found on the map — only the name was saved.",
+    genPlans:"Generate day-by-day plans", genning:"Building day plans… up to a minute.",
+    plansMade:"Plans created ✓ — edit them freely.", toHotel:"To the hotel", delTripQ:"Delete trip details?",
+    tripDatesErr:"Check the arrival and departure dates.",
+    dayNames:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
     camAsk:"I just took this photo. Tell me what it is and talk about it like a guide — history, curiosities, tips.",
     micErr:"Didn't catch that — try again.",
     speaking:"Guide is speaking…", askAbout:"Tell me more about: ", m:"m from you", km:"km from you",
@@ -736,6 +763,9 @@ openext:"M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-
 download:"M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z",
 camera:"M12 15.2c1.77 0 3.2-1.43 3.2-3.2S13.77 8.8 12 8.8 8.8 10.23 8.8 12s1.43 3.2 3.2 3.2zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z",
 mic:"M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z",
+hotel:"M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z",
+starfull:"M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
+refresh:"M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
 share:"M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z",
 mail:"M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z",
 magic:"M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"
@@ -833,15 +863,32 @@ function setCity(c, fly){
 /* ============ images via Wikipedia REST (loaded by the phone, cached in-page) ============ */
 const imgCache = {};
 async function placeImage(p){
-  if(!p.wiki) return null;
   if(imgCache[p.id]!==undefined) return imgCache[p.id];
-  try{
-    const r = await fetch(`https://${p.wl||"en"}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.wiki)}`);
-    if(!r.ok) throw 0;
-    const j = await r.json();
-    imgCache[p.id] = (j.thumbnail && j.thumbnail.source) ? j.thumbnail.source.replace(/\/\d+px-/, "/640px-") : null;
-  }catch(e){ imgCache[p.id]=null }
-  return imgCache[p.id];
+  let url = null;
+  /* 1) Wikipedia article image (curated places) */
+  if(p.wiki){
+    try{
+      const r = await fetch(`https://${p.wl||"en"}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(p.wiki)}`);
+      if(r.ok){
+        const j = await r.json();
+        if(j.thumbnail && j.thumbnail.source) url = j.thumbnail.source.replace(/\/\d+px-/, "/640px-");
+      }
+    }catch(e){}
+  }
+  /* 2) fallback for AI places: a real photo taken at these coordinates (Wikimedia Commons geosearch) */
+  if(!url && isFinite(+p.lat) && isFinite(+p.lng)){
+    try{
+      const r = await fetch(`https://commons.wikimedia.org/w/api.php?action=query&generator=geosearch&ggscoord=${p.lat}%7C${p.lng}&ggsradius=150&ggslimit=1&ggsnamespace=6&prop=imageinfo&iiprop=url&iiurlwidth=640&format=json&origin=*`);
+      if(r.ok){
+        const j = await r.json();
+        const pages = j.query && j.query.pages ? Object.values(j.query.pages) : [];
+        const ii = pages[0] && pages[0].imageinfo && pages[0].imageinfo[0];
+        if(ii && (ii.thumburl||ii.url)) url = ii.thumburl || ii.url;
+      }
+    }catch(e){}
+  }
+  imgCache[p.id] = url;
+  return url;
 }
 function applyThumb(el,p){
   el.style.background = `linear-gradient(135deg,${CAT_COLOR[p.cat]}44,${CAT_COLOR[p.cat]}22)`;
@@ -904,6 +951,13 @@ function renderMarkers(){
     el.addEventListener("click",e=>{e.stopPropagation();openSheet(p.id)});
     markers.push(new maplibregl.Marker({element:el,anchor:"bottom"}).setLngLat([p.lng,p.lat]).addTo(map));
   });
+  /* hotel marker */
+  if(TRIP && TRIP.city===city && TRIP.hotel && TRIP.hotel.lat!=null){
+    const el=document.createElement("div");
+    el.className="marker"; el.style.background="#00639B";
+    el.innerHTML=`<span>${ic("hotel",15)}</span>`;
+    markers.push(new maplibregl.Marker({element:el,anchor:"bottom"}).setLngLat([TRIP.hotel.lng,TRIP.hotel.lat]).addTo(map));
+  }
 }
 
 /* ============ detail sheet ============ */
@@ -911,7 +965,9 @@ function openSheet(id){
   curPlace = findPlace(id);
   if(!curPlace) return;
   const L = curPlace[lang];
-  $("sheetcat").innerHTML = `${ic(CAT_ICON[curPlace.cat],14)} ${t(curPlace.cat)}`;
+  const gq = encodeURIComponent(curPlace.en.title + ", " + CITIES[curPlace.city].name);
+  $("sheetcat").innerHTML = `${ic(CAT_ICON[curPlace.cat],14)} ${t(curPlace.cat)}
+    <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${gq}','_blank')" style="margin-left:auto;background:none;border:1px solid var(--outline-var);color:var(--on-surface-var);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:700;font-family:inherit;display:inline-flex;align-items:center;gap:4px;letter-spacing:.3px">${ic("starfull",12)} ${t("gRatings")}</button>`;
   $("sheettitle").textContent = L.title;
   $("sheetstory").textContent = L.story;
   $("sheettip").innerHTML = ic("bulb",20) + `<span>${esc(L.tip)}${curPlace.ai?`<br><span style="font-size:12px;opacity:.75">${ic("magic",12)} ${t("aiDisclaimer")}</span>`:""}</span>`;
@@ -931,8 +987,41 @@ function openSheet(id){
   placeImage(curPlace).then(u=>{ if(u && curPlace && $("sheet").classList.contains("open")){ hero.style.backgroundImage=`url('${u}')`; hi.innerHTML=""; }});
   $("sheet").classList.add("open");
   $("sheet").scrollTop=0;
+  loadRating(curPlace);
 }
 function closeSheet(){ $("sheet").classList.remove("open"); stopSpeak(); }
+
+/* ============ reputation (AI estimate from public reviews, cached per place) ============ */
+let RATINGS={}; try{ RATINGS=JSON.parse(store.get("tv_ratings")||"{}") }catch(e){ RATINGS={} }
+function starsHTML(r){
+  let s="";
+  for(let i=1;i<=5;i++) s+=`<svg class="mi" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="opacity:${r>=i-0.25?1:.25}"><path d="${MI.starfull}"/></svg>`;
+  return `<span class="stars">${s}</span>`;
+}
+function renderRating(pid){
+  const el=$("sheetrating"); if(!el || !curPlace || curPlace.id!==pid) return;
+  const c=RATINGS[pid];
+  if(!c){ el.innerHTML=""; return; }
+  el.innerHTML = c.known
+    ? `${starsHTML(c.r)}<span class="rnum">${c.r.toFixed(1)}</span><span class="aibadge">${ic("magic",9)} ${t("aiEst")}</span><span class="rline">„${esc(c.line)}”</span>`
+    : `<span class="rline">${t("repUnknown")}</span>`;
+}
+async function loadRating(p){
+  const pid=p.id;
+  if(RATINGS[pid]){ renderRating(pid); return; }
+  const key=store.get("tv_key");
+  if(!key){ $("sheetrating").innerHTML=""; return; }
+  $("sheetrating").innerHTML=`<span class="rline">${t("repLoad")}</span>`;
+  try{
+    const arr=await anthropicJSON(
+      `You honestly summarize public reviews of places. Respond ONLY with a JSON array containing exactly one object: {"known": boolean, "rating": number (1.0-5.0, one decimal — your best estimate of this place's typical public review score, e.g. on Google/TripAdvisor, from your training knowledge) or null, "line": string (max 14 words in ${lang==="sr"?"Serbian":"English"}: what reviewers praise and/or complain about)}. CRITICAL: set known=true ONLY if you genuinely recall public reception of THIS EXACT place. If unsure or the place is obscure — known:false. NEVER invent a rating.`,
+      `Place: "${p.en.title}" (${t(p.cat)}) in ${CITIES[p.city].name}.`, 300);
+    const o=arr[0]||{};
+    RATINGS[pid]={ known:!!o.known && isFinite(+o.rating), r:Math.max(1,Math.min(5,+o.rating||0)), line:String(o.line||"").slice(0,120) };
+    store.set("tv_ratings", JSON.stringify(RATINGS));
+  }catch(e){ RATINGS[pid]={known:false,r:0,line:""}; }
+  renderRating(pid);
+}
 function goCurrent(){
   if(!curPlace) return;
   // AI-suggested places: navigate by name (safer than AI-estimated coordinates)
@@ -1493,6 +1582,103 @@ async function askAIRoute(){
   }catch(e){ $("planmenuin").querySelector(".pm-txt").textContent = t("suggErr"); }
 }
 
+/* ============ MY TRIP (arrival, hotel, AI day-by-day plans) ============ */
+let TRIP=null; try{ TRIP=JSON.parse(store.get("tv_trip")||"null") }catch(e){}
+function openTripForm(){
+  const tr = (TRIP && TRIP.city===city) ? TRIP : {};
+  openMenu(`<h3>${ic("event",18)} ${t("tripSetup")} · ${CITIES[city].name}</h3>
+    <p class="pm-disc">${t("tripArrive")}:</p>
+    <div class="pm-new"><input id="tripArrive" type="date" value="${tr.arrive||""}"></div>
+    <p class="pm-disc">${t("tripDepart")}:</p>
+    <div class="pm-new"><input id="tripDepart" type="date" value="${tr.depart||""}"></div>
+    <div class="pm-new" style="margin-top:8px"><input id="tripHotel" placeholder="${t("hotelPh")}" value="${esc(tr.hotel?tr.hotel.name:"")}"></div>
+    <div class="pm-new" style="margin-top:8px"><input id="tripNotes" placeholder="${t("notesPh")}" value="${esc(tr.notes||"")}"></div>
+    <div class="pm-disc" id="tripstatus" style="margin-top:8px"></div>
+    <button class="pm-item" style="background:var(--primary-container);color:var(--on-primary-container);justify-content:center;margin-top:8px" onclick="saveTrip()">${ic("check",18)} ${t("tripSave")}</button>
+    <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+}
+async function saveTrip(){
+  const a=$("tripArrive").value, d=$("tripDepart").value, hn=$("tripHotel").value.trim(), notes=$("tripNotes").value.trim();
+  if(!a || !d || new Date(d) < new Date(a)){ $("tripstatus").textContent=t("tripDatesErr"); return; }
+  let hotel=null;
+  if(hn){
+    hotel={name:hn, lat:null, lng:null};
+    try{
+      const c=CITIES[city].center;
+      const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(hn+" "+CITIES[city].name)}&lat=${c[1]}&lon=${c[0]}&limit=3`);
+      const j=await r.json();
+      const f=(j.features||[]).find(f=>haversine(c[1],c[0],f.geometry.coordinates[1],f.geometry.coordinates[0])<25000);
+      if(f){ hotel.lat=f.geometry.coordinates[1]; hotel.lng=f.geometry.coordinates[0]; }
+    }catch(e){}
+  }
+  TRIP={city, arrive:a, depart:d, hotel, notes};
+  store.set("tv_trip", JSON.stringify(TRIP));
+  closePlanMenu(); renderPlanView(); renderMarkers();
+  toast(hotel&&hotel.lat==null&&hn ? t("hotelWarn") : t("tripSaved"));
+}
+function deleteTrip(){ if(!confirm(t("delTripQ"))) return; TRIP=null; store.set("tv_trip","null"); renderPlanView(); renderMarkers(); }
+function tripDays(){
+  const out=[]; if(!TRIP) return out;
+  let d=new Date(TRIP.arrive+"T12:00:00"); const end=new Date(TRIP.depart+"T12:00:00");
+  let guard=0;
+  while(d<=end && guard++<10){
+    out.push({label:`${t("dayNames")[d.getDay()]} ${d.getDate()}.${d.getMonth()+1}.`, first:out.length===0, last:+d===+end});
+    d=new Date(+d+86400000);
+  }
+  if(out.length) out[out.length-1].last=true;
+  return out;
+}
+async function generateTripPlans(btn){
+  if(!TRIP || TRIP.city!==city) return;
+  if(!store.get("tv_key")){ toast(t("cityNeedKey")); showView("info"); return; }
+  const days=tripDays(); if(!days.length){ toast(t("tripDatesErr")); return; }
+  if(btn) btn.innerHTML=`<span class="spin"></span> ${t("genning")}`;
+  const known = cityPlaces().map(p=>`${p.id}|${p.en.title}|${p.lat.toFixed(4)},${p.lng.toFixed(4)}`).join("\n");
+  const hotelTxt = TRIP.hotel ? `Hotel: "${TRIP.hotel.name}"${TRIP.hotel.lat?` at ${TRIP.hotel.lat.toFixed(4)},${TRIP.hotel.lng.toFixed(4)}`:""}.` : "No hotel given.";
+  try{
+    let arr = await anthropicJSON(
+      `You are planning a ${days.length}-day visit to ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short theme in ${lang==="sr"?"Serbian":"English"}, WITHOUT the date), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: first day lighter (arrival), last day lighter (departure); group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
+KNOWN PLACES (id | title | lat,lng):\n${known}`,
+      `Trip: arrive ${TRIP.arrive}, depart ${TRIP.depart} (${days.length} days). ${hotelTxt} Notes from the traveler: ${TRIP.notes||"none"}.`, 8000);
+    if(!Array.isArray(arr)||!arr.length) throw new Error("empty");
+    for(let i=0;i<days.length && i<arr.length;i++){
+      const day=arr[i]; if(!day||!Array.isArray(day.stops)) continue;
+      const rawNew=day.stops.filter(s=>!(s.id&&findPlace(s.id))&&s&&s.name);
+      const verifiedNew=await verifyPlaces(rawNew, CITIES[city].center);
+      const okNames=new Set(verifiedNew.map(v=>v.name));
+      const ids=[];
+      day.stops.forEach((s,j)=>{
+        const ex=s.id&&findPlace(s.id);
+        if(ex){ if(!ids.includes(ex.id)) ids.push(ex.id); return; }
+        if(!s||!s.name||!okNames.has(s.name)) return;
+        const v=verifiedNew.find(x=>x.name===s.name);
+        const lb={title:String(s.name), story:String(s.story||s.name), tip:String(s.tip||"")};
+        const p={ id:"ai-trip-"+Date.now()+"-"+i+"-"+j, ai:true, city, cat:(CAT_ICON[s.cat]?s.cat:"landmark"), lat:+v.lat, lng:+v.lng, wiki:null, sr:lb, en:lb };
+        SAVED.push(p); ids.push(p.id);
+      });
+      if(ids.length) PLANS.push({id:"plan-"+Date.now()+"-"+i, name:`${days[i].label} — ${String(day.title||"")}`.trim(), city, stops:ids});
+    }
+    store.set("tv_saved", JSON.stringify(SAVED));
+    savePlans(); renderPlanView(); renderMarkers();
+    toast(t("plansMade"));
+  }catch(e){ toast(t("suggErr")); renderPlanView(); }
+}
+function renderTripCard(){
+  if(!(TRIP && TRIP.city===city)){
+    return `<button class="pm-item" style="background:var(--primary-container);color:var(--on-primary-container);justify-content:center" onclick="openTripForm()">${ic("event",18)} ${t("tripSetup")}</button>`;
+  }
+  const h=TRIP.hotel;
+  const hotelBtn = h&&h.lat!=null ? `<button class="pc-start ripple" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=walking','_blank')">${ic("hotel",14)} ${t("toHotel")}</button>` : "";
+  return `<div class="planbig">
+    <div class="pb-head"><h4>${ic("event",16)} ${t("tripH")}</h4><span>${esc(TRIP.arrive)} → ${esc(TRIP.depart)}</span>
+      <button onclick="openTripForm()">${ic("settings",16)}</button>
+      <button onclick="deleteTrip()">${ic("close",16)}</button></div>
+    ${h?`<div class="stoprow"><div class="n">${ic("hotel",13)}</div><div class="st">${esc(h.name)}</div>${hotelBtn}</div>`:""}
+    ${TRIP.notes?`<p style="color:var(--on-surface-var);font-size:12.5px;margin-top:6px">${esc(TRIP.notes)}</p>`:""}
+    <button class="abtn primary ripple" style="width:100%;margin-top:12px" onclick="generateTripPlans(this)">${ic("magic",17)} ${t("genPlans")}</button>
+  </div>`;
+}
+
 /* ============ PLANS (routes for the days ahead) ============ */
 let PLANS=[]; try{ PLANS=JSON.parse(store.get("tv_plans")||"[]") }catch(e){ PLANS=[] }
 function savePlans(){ store.set("tv_plans", JSON.stringify(PLANS)); }
@@ -1545,7 +1731,7 @@ function renderPlanView(){
       <button style="background:var(--primary);color:#fff" onclick="showView('map')">${t("resumeT")}</button>
       <button style="background:none;color:var(--on-primary-container)" onclick="endTour();renderPlanView()">${t("tourEnd")}</button></div>`;
   }
-  $("tourbanner").innerHTML = banner;
+  $("tourbanner").innerHTML = banner + renderTripCard();
   renderPlans(); renderTickets();
 }
 function renderPlans(){
@@ -1858,6 +2044,37 @@ function askAboutCurrent(){
   $("chatinput").value = t("askAbout") + curPlace[lang].title;
   $("chatinput").focus();
 }
+/* ============ chat history persistence ============ */
+function saveChat(){
+  try{
+    const slim = chatHistory.slice(-40).map(m=>{
+      if(typeof m.content==="string") return m;
+      return {role:m.role, content:m.content.map(b=> b.type==="image" ? {type:"text",text:"[photo the user sent earlier]"} : b)};
+    });
+    store.set("tv_chat", JSON.stringify(slim));
+  }catch(e){}
+}
+function restoreChat(){
+  try{ chatHistory = JSON.parse(store.get("tv_chat")||"[]") }catch(e){ chatHistory=[] }
+  chatHistory.forEach(m=>{
+    if(m.role==="user"){
+      if(typeof m.content==="string") addMsg("user", esc(m.content));
+      else{
+        const txt = m.content.filter(b=>b.type==="text").map(b=>b.text).join(" ");
+        if(txt && !m.content.some(b=>b.type==="tool_result")) addMsg("user", esc(txt));
+      }
+    } else {
+      const txt = typeof m.content==="string" ? m.content : m.content.filter(b=>b.type==="text").map(b=>b.text).join(" ");
+      if(txt) addMsg("bot", esc(txt));
+    }
+  });
+}
+function clearChat(){
+  chatHistory=[]; store.set("tv_chat","[]");
+  $("chatlog").innerHTML="";
+  addMsg("bot", esc(tc("chatHello")));
+}
+
 /* strip image blocks from all but the newest message (keeps API cost sane) */
 function buildMsgs(){
   const msgs = chatHistory.slice(-14);
@@ -1913,6 +2130,7 @@ async function runChatTurn(tw, key){
     tw.className="msg sys"; tw.textContent = t("chatErr") + " (" + e.message.slice(0,120) + ")";
     chatHistory.pop();
   }
+  saveChat();
   $("chatlog").scrollTop=$("chatlog").scrollHeight;
 }
 function speakLast(btn){ const tmp=document.createElement("div"); tmp.innerHTML=btn.dataset.txt; speak(tmp.textContent, lang); }
@@ -2027,6 +2245,7 @@ function renderAll(){
   $("suggbtn").textContent = t("suggBtn");
   renderIntChips();
   $("chatinput").placeholder = t("chatPlaceholder");
+  $("chatclear").innerHTML = ic("refresh",14) + " " + t("newChat");
   if($("chatlog").children.length===0) addMsg("bot", esc(tc("chatHello")));
   const active = document.querySelector(".view.active");
   const id = active ? active.id.replace("view-","") : "map";
@@ -2036,6 +2255,7 @@ $("langbtn").textContent = lang.toUpperCase();
 $("chatinput").addEventListener("keydown",e=>{ if(e.key==="Enter") sendChat(); });
 $("ticketfile").addEventListener("change", e=>{ saveTicketFile(e.target.files[0]); e.target.value=""; });
 $("camfile").addEventListener("change", e=>{ analyzePhoto(e.target.files[0]); e.target.value=""; });
+restoreChat();
 renderAll();
 initMap();
 initSearch();
