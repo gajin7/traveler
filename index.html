@@ -597,7 +597,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.18-1724";
+const APP_VERSION = "2026.08.18-1731";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -780,6 +780,23 @@ const UI = {
     obF3t:"Pregunta lo que sea", obF3s:"La guía IA responde, sugiere lugares, entradas y transporte.", obStart:"Empezar",
     updAvail:"¡Hay una nueva versión!", updBtn:"Actualizar", cityDetect:"Parece que estás en: {city}", citySwitch:"Cambiar",
     citiesT:"Ciudades", savePlace:"Guardar en la guía", savedPlace:"Guardado ✓", aiBadge:"ELECCIÓN IA", suggTitle:"Sugerencias IA", suggBtn:"Sugerir lugares" },
+  de:{ map:"Karte", list:"Orte", here:"Hier", plan:"Reise", chat:"Guide", info:"Info",
+    hereTitle:"Ich bin jetzt hier", hereSub:"Tippe auf den Knopf — ich finde, was dich umgibt, und erzähle dir die Geschichte.", hereBtn:"Ich bin jetzt hier",
+    locating:"Standort wird ermittelt…", locErr:"Standort nicht verfügbar. Erlaube den Zugriff auf deinen Standort.", nearYou:"In deiner Nähe",
+    listen:"Anhören", stop:"Stopp", ask:"Frag den Guide", howTo:"Wie komme ich hin?", addToPlan:"Zum Plan", tickets:"Tickets", sharePlace:"Teilen",
+    all:"Alle", landmark:"Sehenswürdigkeiten", museum:"Museen", park:"Parks", quarter:"Viertel", food:"Essen", drink:"Trinken",
+    chatHello:"Hallo! Ich bin dein Guide für {city}. Frag mich alles — oder sag mir, ich soll dir eine Tour bauen: „mach mir eine Tour für morgen, Altstadt, eine Stunde, 5 Stopps“.",
+    chatPlaceholder:"Frag den Guide…", speaking:"Der Guide spricht…", m:"m von dir", km:"km von dir",
+    tourMake:"Tour erstellen", tourStart:"Los", tourCancel:"Abbrechen", tourNext:"Überspringen", tourEnd:"Ende", tourArrived:"Du bist da", tourDone:"Tour abgeschlossen! 🎉",
+    tourFollow:"Folge der blauen Linie — an jedem Stopp erzähle ich dir die Geschichte.", tourPick:"Tippe die Orte an, die du willst — ich ordne sie zur kürzesten Route.",
+    sortRate:"Nach Bewertung", openNow:"Jetzt geöffnet", openB:"Geöffnet", closedB:"Jetzt geschlossen", lmMore:"Mehr laden",
+    plansH:"Pläne", myTickets:"Meine Tickets", myTrip:"Meine Reise", tripSetup:"Reise einrichten", startPlanBtn:"Plan starten", planStart:"Los", planDel:"Löschen",
+    whatThis:"Was ist das?", newChat:"Neues Gespräch", gRatings:"Bewertungen auf Google", aiEst:"KI-SCHÄTZUNG",
+    obTitle:"Traveler", obSub:"Dein KI-Guide für Europas Städte — Geschichten, Touren und Tipps, in deiner Sprache.",
+    obF1t:"Ich bin jetzt hier", obF1s:"Die App ortet dich und erzählt dir vom Ort, an dem du stehst.", obF2t:"Touren & Pläne", obF2s:"Wähle Orte — die App baut die Route und spricht an jedem Stopp.",
+    obF3t:"Frag alles", obF3s:"Der KI-Guide antwortet, schlägt Orte, Tickets und Verkehrsmittel vor.", obStart:"Los geht's",
+    updAvail:"Eine neue Version ist verfügbar!", updBtn:"Aktualisieren", cityDetect:"Du scheinst in {city} zu sein", citySwitch:"Wechseln",
+    citiesT:"Städte", savePlace:"Im Guide speichern", savedPlace:"Gespeichert ✓", aiBadge:"KI-TIPP", suggTitle:"KI-Vorschläge", suggBtn:"Orte vorschlagen" },
   fr:{ map:"Carte", list:"Lieux", here:"Ici", plan:"Voyage", chat:"Guide", info:"Infos",
     hereTitle:"Je suis ici", hereSub:"Appuie sur le bouton — je trouve ce qui t'entoure et je te raconte son histoire.", hereBtn:"Je suis ici",
     locating:"Localisation…", locErr:"Impossible de te localiser. Autorise l'accès à la position.", nearYou:"Près de toi",
@@ -881,22 +898,24 @@ const CAT_COLOR = {landmark:"#e8a13c", museum:"#7e6bd4", park:"#4caf7d", quarter
 let lang = store.get("tv_lang") || "sr";
 let city = store.get("tv_city") || "madrid";
 const BUILT_CITIES = {
-  madrid:{name:"Madrid", center:[-3.7038,40.4168], zoom:13.4},
-  alicante:{name:"Alicante", center:[-0.4810,38.3455], zoom:14.2},
-  lisbon:{name:"Lisabon", center:[-9.1393,38.7223], zoom:13.2}
+  madrid:{name:"Madrid", country:"Spain", center:[-3.7038,40.4168], zoom:13.4},
+  alicante:{name:"Alicante", country:"Spain", center:[-0.4810,38.3455], zoom:14.2},
+  lisbon:{name:"Lisabon", country:"Portugal", center:[-9.1393,38.7223], zoom:13.2}
 };
+/* "City, Country" for prompts/geocoding — empty country when unknown */
+function cityFull(k){ const c=CITIES[k||city]; return c ? (c.country ? `${c.name}, ${c.country}` : c.name) : ""; }
 /* top European destinations — selectable out of the box, AI guide generated on first use */
 const EURO_CITIES = {
-  "e-paris":{name:"Pariz",center:[2.3522,48.8566],zoom:13,euro:true}, "e-london":{name:"London",center:[-0.1276,51.5072],zoom:13,euro:true},
-  "e-rome":{name:"Rim",center:[12.4964,41.9028],zoom:13,euro:true}, "e-barcelona":{name:"Barselona",center:[2.1734,41.3851],zoom:13,euro:true},
-  "e-amsterdam":{name:"Amsterdam",center:[4.9041,52.3676],zoom:13,euro:true}, "e-berlin":{name:"Berlin",center:[13.4050,52.5200],zoom:13,euro:true},
-  "e-vienna":{name:"Beč",center:[16.3738,48.2082],zoom:13,euro:true}, "e-prague":{name:"Prag",center:[14.4378,50.0755],zoom:13,euro:true},
-  "e-budapest":{name:"Budimpešta",center:[19.0402,47.4979],zoom:13,euro:true}, "e-athens":{name:"Atina",center:[23.7275,37.9838],zoom:13,euro:true},
-  "e-venice":{name:"Venecija",center:[12.3155,45.4408],zoom:13.5,euro:true}, "e-florence":{name:"Firenca",center:[11.2558,43.7696],zoom:13.5,euro:true},
-  "e-munich":{name:"Minhen",center:[11.5820,48.1351],zoom:13,euro:true}, "e-istanbul":{name:"Istanbul",center:[28.9784,41.0082],zoom:12.5,euro:true},
-  "e-porto":{name:"Porto",center:[-8.6291,41.1579],zoom:13.5,euro:true}, "e-seville":{name:"Sevilja",center:[-5.9845,37.3891],zoom:13.5,euro:true},
-  "e-dubrovnik":{name:"Dubrovnik",center:[18.0944,42.6507],zoom:14,euro:true}, "e-belgrade":{name:"Beograd",center:[20.4573,44.8176],zoom:13,euro:true},
-  "e-krakow":{name:"Krakov",center:[19.9450,50.0647],zoom:13.5,euro:true}, "e-copenhagen":{name:"Kopenhagen",center:[12.5683,55.6761],zoom:13,euro:true}
+  "e-paris":{name:"Pariz",country:"France",center:[2.3522,48.8566],zoom:13,euro:true}, "e-london":{name:"London",country:"UK",center:[-0.1276,51.5072],zoom:13,euro:true},
+  "e-rome":{name:"Rim",country:"Italy",center:[12.4964,41.9028],zoom:13,euro:true}, "e-barcelona":{name:"Barselona",country:"Spain",center:[2.1734,41.3851],zoom:13,euro:true},
+  "e-amsterdam":{name:"Amsterdam",country:"Netherlands",center:[4.9041,52.3676],zoom:13,euro:true}, "e-berlin":{name:"Berlin",country:"Germany",center:[13.4050,52.5200],zoom:13,euro:true},
+  "e-vienna":{name:"Beč",country:"Austria",center:[16.3738,48.2082],zoom:13,euro:true}, "e-prague":{name:"Prag",country:"Czechia",center:[14.4378,50.0755],zoom:13,euro:true},
+  "e-budapest":{name:"Budimpešta",country:"Hungary",center:[19.0402,47.4979],zoom:13,euro:true}, "e-athens":{name:"Atina",country:"Greece",center:[23.7275,37.9838],zoom:13,euro:true},
+  "e-venice":{name:"Venecija",country:"Italy",center:[12.3155,45.4408],zoom:13.5,euro:true}, "e-florence":{name:"Firenca",country:"Italy",center:[11.2558,43.7696],zoom:13.5,euro:true},
+  "e-munich":{name:"Minhen",country:"Germany",center:[11.5820,48.1351],zoom:13,euro:true}, "e-istanbul":{name:"Istanbul",country:"Turkey",center:[28.9784,41.0082],zoom:12.5,euro:true},
+  "e-porto":{name:"Porto",country:"Portugal",center:[-8.6291,41.1579],zoom:13.5,euro:true}, "e-seville":{name:"Sevilja",country:"Spain",center:[-5.9845,37.3891],zoom:13.5,euro:true},
+  "e-dubrovnik":{name:"Dubrovnik",country:"Croatia",center:[18.0944,42.6507],zoom:14,euro:true}, "e-belgrade":{name:"Beograd",country:"Serbia",center:[20.4573,44.8176],zoom:13,euro:true},
+  "e-krakow":{name:"Krakov",country:"Poland",center:[19.9450,50.0647],zoom:13.5,euro:true}, "e-copenhagen":{name:"Kopenhagen",country:"Denmark",center:[12.5683,55.6761],zoom:13,euro:true}
 };
 let CUSTOM_CITIES={}; try{ CUSTOM_CITIES=JSON.parse(store.get("tv_cities")||"{}") }catch(e){ CUSTOM_CITIES={} }
 let CITY_PLACES={}; try{ CITY_PLACES=JSON.parse(store.get("tv_cityplaces")||"{}") }catch(e){ CITY_PLACES={} }
@@ -915,9 +934,9 @@ function findPlace(id){
 const $ = id => document.getElementById(id);
 /* structural merge: English keys that live only in the fr block are copied into en (fr keeps them as its own en-fallback) */
 (()=>{ Object.keys(UI.fr).forEach(k=>{ if(UI.en[k]===undefined) UI.en[k]=UI.fr[k]; }); })();
-const LANGS = {sr:"🇷🇸 Srpski", en:"🇬🇧 English", it:"🇮🇹 Italiano", es:"🇪🇸 Español", fr:"🇫🇷 Français"};
-const LANG_NAME = {sr:"Serbian", en:"English", it:"Italian", es:"Spanish", fr:"French"};
-const SPEECH_LANG = {sr:"sr-RS", en:"en-US", it:"it-IT", es:"es-ES", fr:"fr-FR"};
+const LANGS = {sr:"🇷🇸 Srpski", en:"🇬🇧 English", de:"🇩🇪 Deutsch", it:"🇮🇹 Italiano", es:"🇪🇸 Español", fr:"🇫🇷 Français"};
+const LANG_NAME = {sr:"Serbian", en:"English", de:"German", it:"Italian", es:"Spanish", fr:"French"};
+const SPEECH_LANG = {sr:"sr-RS", en:"en-US", de:"de-DE", it:"it-IT", es:"es-ES", fr:"fr-FR"};
 const t = k => (UI[lang]&&UI[lang][k]) || UI.en[k] || UI.sr[k] || k;
 /* place text in current language, with graceful fallback (curated stories exist in sr+en) */
 const Lp = p => p[lang] || p.en || p.sr;
@@ -1067,7 +1086,7 @@ async function loadMorePlaces(btn){
   const cuField = cat==="food" ? `,"cu": one of ${Object.keys(CUISINE_EN).filter(k=>k!=="any").map(k=>`"${k}"`).join("|")} (dominant cuisine)` : "";
   try{
     let arr = await anthropicJSON(
-      `You are a local expert for ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of 8 objects: {"name":string,"lat":number,"lng":number,"story":string (35-55 words in ${LANG_NAME[lang]} — the essence: what it is, why it's worth it, what to order/see),"tip":string (short practical tip)${cuField}}. Real, currently-existing ${what}. NEVER include: ${existing||"—"}.`,
+      `You are a local expert for ${cityFull(city)}. ${STRICT} Respond ONLY with a JSON array of 8 objects: {"name":string,"lat":number,"lng":number,"story":string (35-55 words in ${LANG_NAME[lang]} — the essence: what it is, why it's worth it, what to order/see),"tip":string (short practical tip)${cuField}}. Real, currently-existing ${what}. NEVER include: ${existing||"—"}.`,
       `8 more real ${what} in ${CITIES[city].name}. Be fast and concise.`, 3000);
     const raw = arr.filter(x=>x&&x.name);
     const verified = await verifyPlaces(raw, CITIES[city].center);
@@ -1214,7 +1233,7 @@ async function ensureCityRatings(){
   try{
     const listTxt=missing.map((p,i)=>`${i}|${p.en.title} (${p.cat})`).join("\n");
     const arr=await anthropicJSON(
-      `You honestly summarize public reception of places in ${CITIES[city].name}. For EACH input line respond with one object in a JSON array: {"i": number (the input index), "known": boolean, "rating": number (1.0-5.0, one decimal, typical public review score from your training knowledge) or null, "line": string (max 10 words in ${LANG_NAME[lang]}: what reviewers say)}. CRITICAL: known=true ONLY if you genuinely recall public reception of that EXACT place; obscure or uncertain → known:false, rating:null. NEVER invent ratings. Respond ONLY with the JSON array.`,
+      `You honestly summarize public reception of places in ${cityFull(city)}. For EACH input line respond with one object in a JSON array: {"i": number (the input index), "known": boolean, "rating": number (1.0-5.0, one decimal, typical public review score from your training knowledge) or null, "line": string (max 10 words in ${LANG_NAME[lang]}: what reviewers say)}. CRITICAL: known=true ONLY if you genuinely recall public reception of that EXACT place; obscure or uncertain → known:false, rating:null. NEVER invent ratings. Respond ONLY with the JSON array.`,
       `Places:\n${listTxt}`, 3000);
     (arr||[]).forEach(o=>{
       const p=missing[+o.i]; if(!p) return;
@@ -1240,7 +1259,7 @@ async function ensureCityHours(){
   try{
     const listTxt=missing.map((p,i)=>`${i}|${p.en.title} (${p.cat})`).join("\n");
     const arr=await anthropicJSON(
-      `You estimate TYPICAL opening hours of places in ${CITIES[city].name}. For EACH input line return one object in a JSON array: {"i":number,"known":boolean,"o":"HH:MM" (typical opening),"c":"HH:MM" (typical closing; may be past midnight like "02:00"),"closed":[array of weekday numbers 0=Sunday..6=Saturday when CLOSED all day, usually empty]}. Streets, squares, quarters, parks and viewpoints that are always accessible → known:true,"o":"00:00","c":"23:59",closed:[]. known=true only if you genuinely know the typical schedule; unsure → known:false. NEVER invent precise schedules you don't know. ONLY the JSON array.`,
+      `You estimate TYPICAL opening hours of places in ${cityFull(city)}. For EACH input line return one object in a JSON array: {"i":number,"known":boolean,"o":"HH:MM" (typical opening),"c":"HH:MM" (typical closing; may be past midnight like "02:00"),"closed":[array of weekday numbers 0=Sunday..6=Saturday when CLOSED all day, usually empty]}. Streets, squares, quarters, parks and viewpoints that are always accessible → known:true,"o":"00:00","c":"23:59",closed:[]. known=true only if you genuinely know the typical schedule; unsure → known:false. NEVER invent precise schedules you don't know. ONLY the JSON array.`,
       `Places:\n${listTxt}`, 3500);
     (arr||[]).forEach(x=>{
       const p=missing[+x.i]; if(!p) return;
@@ -1284,7 +1303,7 @@ async function loadRating(p){
 function goCurrent(){
   if(!curPlace) return;
   // AI-suggested places: navigate by name (safer than AI-estimated coordinates)
-  const dest = curPlace.ai ? encodeURIComponent(Lp(curPlace).title + ", " + CITIES[curPlace.city].name + ", Spain")
+  const dest = curPlace.ai ? encodeURIComponent(Lp(curPlace).title + ", " + cityFull(curPlace.city))
                            : `${curPlace.lat},${curPlace.lng}`;
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=walking`,"_blank");
 }
@@ -1297,7 +1316,7 @@ function pickVoice(langCode){
   /* user-chosen voice first */
   const saved = store.get("tv_voice_"+langCode);
   if(saved){ const v=voices.find(v=>v.voiceURI===saved); if(v) return v; }
-  const FAM = {sr:["sr","hr","bs"], en:["en"], it:["it"], es:["es"], fr:["fr"]};
+  const FAM = {sr:["sr","hr","bs"], en:["en"], de:["de"], it:["it"], es:["es"], fr:["fr"]};
   for(const p of (FAM[langCode]||["en"])){
     /* prefer Google/enhanced voices — they sound far more natural than defaults */
     const cands = voices.filter(v=>v.lang.toLowerCase().startsWith(p));
@@ -1433,8 +1452,8 @@ async function getSuggestions(){
   const free = $("sugginput").value.trim();
   const curated = cityPlaces().map(p=>p.en.title).join("; ");
   const loc = userPos ? `User's GPS: ${userPos.lat.toFixed(4)},${userPos.lng.toFixed(4)}.` : `User is somewhere in central ${CITIES[city].name}.`;
-  const system = `You are a local expert for ${CITIES[city].name}. ${STRICT} Suggest REAL, currently-existing places a tourist can visit. Respond with ONLY a JSON array, no prose, no markdown. 4-6 items. Each item: {"name": string, "cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "lat": number, "lng": number, "story": string (60-90 words, vivid, in ${LANG_NAME[lang]}), "tip": string (one practical local tip, same language)}. Use your best knowledge of real coordinates. NEVER suggest places already in this list: ${curated}.`;
-  const user = `${loc} Interests: ${ints}. ${free?("Extra wish: "+free):""} Suggest places in ${CITIES[city].name} beyond the list.`;
+  const system = `You are a local expert for ${cityFull(city)}. ${STRICT} Suggest REAL, currently-existing places a tourist can visit. Respond with ONLY a JSON array, no prose, no markdown. 4-6 items. Each item: {"name": string, "cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "lat": number, "lng": number, "story": string (60-90 words, vivid, in ${LANG_NAME[lang]}), "tip": string (one practical local tip, same language)}. Use your best knowledge of real coordinates. NEVER suggest places already in this list: ${curated}.`;
+  const user = `${loc} Interests: ${ints}. ${free?("Extra wish: "+free):""} Suggest places in ${cityFull(city)} beyond the list.`;
   try{
     let arr = await anthropicJSON(system, user, 2500);
     arr = await verifyPlaces(arr.filter(x=>x&&x.name), CITIES[city].center);
@@ -1526,7 +1545,7 @@ async function foundToPlace(withAI, btn){
   if(withAI){
     try{
       const arr = await anthropicJSON(
-        `You are a local expert for ${CITIES[city].name}, Spain. Respond ONLY with a JSON array containing exactly one object: {"cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "story": string (70-100 words, vivid tour-guide story in ${LANG_NAME[lang]} about this exact place), "tip": string (one practical tip, same language)}.`,
+        `You are a local expert for ${cityFull(city)}. Respond ONLY with a JSON array containing exactly one object: {"cat": one of "landmark"|"museum"|"park"|"quarter"|"food"|"drink", "story": string (70-100 words, vivid tour-guide story in ${LANG_NAME[lang]} about this exact place), "tip": string (one practical tip, same language)}.`,
         `Place: "${foundPlace.name}" (${foundPlace.sub}), OSM type: ${foundPlace.osm}, coordinates ${foundPlace.lat},${foundPlace.lng} in ${CITIES[city].name}.`, 800);
       const o=arr[0]||{};
       cat=CAT_ICON[o.cat]?o.cat:"landmark"; story=String(o.story||story); tip=String(o.tip||"");
@@ -1605,7 +1624,7 @@ async function generateGuideFor(key){
   openMenu(`<h3>${ic("magic",18)} ${esc(c.name)}</h3><div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("cityGen")}: ${esc(c.name)}… ${t("cityGenNote")}</div>`);
   try{
     let arr = await anthropicJSON(
-      `You are building a city guide for ${c.name} (center: ${c.center[1]},${c.center[0]}). ${STRICT} Respond ONLY with a JSON array of 10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${LANG_NAME[lang]}),"tip":string (one practical local tip, same language)}. Mix categories: top sights, a quarter or two, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
+      `You are building a city guide for ${c.country?c.name+", "+c.country:c.name} (center: ${c.center[1]},${c.center[0]}). ${STRICT} Respond ONLY with a JSON array of 10-12 objects: {"name":string,"cat":"landmark"|"museum"|"park"|"quarter"|"food"|"drink","lat":number,"lng":number,"story":string (60-90 words, vivid tour-guide story in ${LANG_NAME[lang]}),"tip":string (one practical local tip, same language)}. Mix categories: top sights, a quarter or two, real well-known food/drink spots. Use your best knowledge of real coordinates.`,
       `Build the guide for ${c.name}. Only places that truly exist in ${c.name}.`, 7000);
     arr = await verifyPlaces(arr.filter(x=>x&&x.name), c.center);
     const places=arr.filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
@@ -1663,7 +1682,7 @@ Mix categories: top sights, one or two quarters, real well-known food/drink spot
       const lb={title:String(x.name), story:String(x.story||""), tip:String(x.tip||"")};
       return { id:key+"-"+i, ai:true, city:key, cat:(CAT_ICON[x.cat]?x.cat:"landmark"), lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
     });
-    CUSTOM_CITIES[key]={name:String(o.city.name||raw), center, zoom:13, custom:true};
+    CUSTOM_CITIES[key]={name:String(o.city.name||raw), country:String(o.city.country||""), center, zoom:13, custom:true};
     CITIES=Object.assign({}, BUILT_CITIES, EURO_CITIES, CUSTOM_CITIES);
     CITY_PLACES[key]=places;
     store.set("tv_cities", JSON.stringify(CUSTOM_CITIES));
@@ -1769,7 +1788,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1724"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1731"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -1845,7 +1864,7 @@ async function openTicketMenu(){
   try{
     const arr = await anthropicJSON(
       `You are a travel assistant. Respond ONLY with a JSON array with exactly one object: {"advice": string (2-3 sentences in ${LANG_NAME[lang]}: is entry free or ticketed, roughly how much, whether advance booking is smart, and WHERE tickets are sold), "url": string or null (the OFFICIAL ticket/website URL if you are confident it is correct, else null)}.`,
-      `Place: "${curPlace.en.title}" in ${CITIES[curPlace.city].name}, Spain.`, 600);
+      `Place: "${curPlace.en.title}" in ${cityFull(curPlace.city)}.`, 600);
     const o=arr[0]||{};
     const site = (o.url && /^https?:\/\//.test(o.url)) ? `<button class="pm-item" onclick="window.open('${o.url.replace(/'/g,"")}','_blank')">${ic("openext",18)} ${t("openSite")}</button>` : "";
     openMenu(`<h3>${ic("ticket",18)} ${t("tickets")} · ${esc(ticketFor)}</h3>
@@ -1892,7 +1911,7 @@ async function deleteTicket(id){ if(!confirm(t("ticketDelQ"))) return; await idb
 /* ============ TRANSPORT (how do I get there) ============ */
 function openGoMenu(){
   if(!curPlace) return;
-  const dest = curPlace.ai ? encodeURIComponent(Lp(curPlace).title+", "+CITIES[curPlace.city].name+", Spain") : `${curPlace.lat},${curPlace.lng}`;
+  const dest = curPlace.ai ? encodeURIComponent(Lp(curPlace).title+", "+cityFull(curPlace.city)) : `${curPlace.lat},${curPlace.lng}`;
   const ai = store.get("tv_key") ? `<button class="pm-item" onclick="askAIRoute()">${ic("magic",18)} ${t("askRoute")}</button>` : "";
   openMenu(`<h3>${ic("bus",18)} ${t("howTo")}</h3>
     <button class="pm-item" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=walking','_blank')">${ic("walk",18)} ${t("walkG")}</button>
@@ -1909,7 +1928,7 @@ async function askAIRoute(){
     const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",
       headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
       body:JSON.stringify({model:store.get("tv_model")||"claude-haiku-4-5",max_tokens:500,
-        system:`You are a local transport expert for ${CITIES[city].name}, Spain. Answer in ${LANG_NAME[lang]}, 3-5 sentences: best way (walk/metro/bus/taxi) with concrete line names/numbers if you know them, rough time and price. Be honest if schedules may have changed and suggest checking Google Maps.`,
+        system:`You are a local transport expert for ${cityFull(city)}. Answer in ${LANG_NAME[lang]}, 3-5 sentences: best way (walk/metro/bus/taxi) with concrete line names/numbers if you know them, rough time and price. Be honest if schedules may have changed and suggest checking Google Maps.`,
         messages:[{role:"user",content:`How do I get ${from} to "${curPlace.en.title}" (${curPlace.lat},${curPlace.lng}) in ${CITIES[curPlace.city].name}?`}]})});
     const j=await r.json();
     const txt=(j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
@@ -2031,7 +2050,7 @@ async function generateTripPlans(btn){
     : "They use public transport and walking — keep each day a compact, walkable cluster (metro between clusters).";
   try{
     let arr = await anthropicJSON(
-      `You are planning a ${days.length}-day visit to ${CITIES[city].name}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short theme in ${LANG_NAME[lang]}, WITHOUT the date), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: DAY 1 starts realistically only after arrival time + transfer + hotel check-in (fewer stops if arrival is late; if arrival is in the evening, day 1 may be just dinner nearby). LAST DAY must end in time: ${depBuffer}. ${trTxt} Group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
+      `You are planning a ${days.length}-day visit to ${cityFull(city)}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short theme in ${LANG_NAME[lang]}, WITHOUT the date), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: DAY 1 starts realistically only after arrival time + transfer + hotel check-in (fewer stops if arrival is late; if arrival is in the evening, day 1 may be just dinner nearby). LAST DAY must end in time: ${depBuffer}. ${trTxt} Group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
 KNOWN PLACES (id | title | lat,lng):\n${known}`,
       `Trip: arrive ${TRIP.arrive}${TRIP.arriveTime?" at "+TRIP.arriveTime:""}, ${modeTxt}. Depart ${TRIP.depart}${TRIP.departTime?" at "+TRIP.departTime:""}${TRIP.point?` from "${TRIP.point.name}"`:""}. (${days.length} days) ${hotelTxt} Notes from the traveler: ${TRIP.notes||"none"}.`, 8000);
     if(!Array.isArray(arr)||!arr.length) throw new Error("empty");
@@ -2086,7 +2105,7 @@ async function openTransitTickets(){
     <div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("transitLoad")}</div>`);
   try{
     const arr = await anthropicJSON(
-      `You are a public-transport ticketing expert for ${CITIES[city].name}. Recommend ONLY real, currently-existing ticket products (travel cards, multi-ride tickets, tourist passes, airport supplements). Respond ONLY with a JSON array of 2-4 objects: {"name": string (official product name), "desc": string (25-45 words in ${LANG_NAME[lang]}: what it covers, rough price, why it fits THIS trip), "where": string (short, same language: where/how to buy — machines, app, online), "url": string (official purchase/info URL ONLY if you are confident it is correct, else null), "online": boolean (can it be bought online?)}. Never invent products or prices you don't know — fewer correct items beat more invented ones.`,
+      `You are a public-transport ticketing expert for ${cityFull(city)}. Recommend ONLY real, currently-existing ticket products (travel cards, multi-ride tickets, tourist passes, airport supplements). Respond ONLY with a JSON array of 2-4 objects: {"name": string (official product name), "desc": string (25-45 words in ${LANG_NAME[lang]}: what it covers, rough price, why it fits THIS trip), "where": string (short, same language: where/how to buy — machines, app, online), "url": string (official purchase/info URL ONLY if you are confident it is correct, else null), "online": boolean (can it be bought online?)}. Never invent products or prices you don't know — fewer correct items beat more invented ones.`,
       `Trip: ${days} days in ${CITIES[city].name}${TRIP&&TRIP.mode==="plane"?", arriving by plane at "+(TRIP.point?TRIP.point.name:"the airport")+" (consider airport supplement/transfer ticket!)":""}${TRIP&&TRIP.mode==="train"?", arriving by train":""}${TRIP&&TRIP.mode==="bus"?", arriving by bus":""}. Travelers' notes: ${TRIP&&TRIP.notes?TRIP.notes:"none"}. They will use metro/bus + walking daily.`, 1800);
     const items=(arr||[]).filter(x=>x&&x.name);
     if(!items.length) throw new Error("empty");
@@ -2640,7 +2659,7 @@ function renderInfo(){
     <h2>${ic("volume",19)} ${t("voiceH")}</h2>
     <div class="pm-new" style="margin:6px 0"><select id="voicesel" onchange="store.set('tv_voice_'+lang,this.value)">
       <option value="">${t("voiceAuto")}</option>
-      ${voices.filter(v=>{const FAM={sr:["sr","hr","bs"],en:["en"],it:["it"],es:["es"],fr:["fr"]}; return (FAM[lang]||["en"]).some(p=>v.lang.toLowerCase().startsWith(p));}).map(v=>
+      ${voices.filter(v=>{const FAM={sr:["sr","hr","bs"],en:["en"],de:["de"],it:["it"],es:["es"],fr:["fr"]}; return (FAM[lang]||["en"]).some(p=>v.lang.toLowerCase().startsWith(p));}).map(v=>
         `<option value="${esc(v.voiceURI)}" ${store.get("tv_voice_"+lang)===v.voiceURI?"selected":""}>${esc(v.name)} (${esc(v.lang)})</option>`).join("")}
     </select></div>
     <p style="font-size:12.5px">${t("voiceBetter")}</p>
