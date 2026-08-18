@@ -598,8 +598,9 @@ const UI = {
     hereBtn:"Sada sam ovde", locating:"Tražim te…", locErr:"Ne mogu da te lociram. Dozvoli pristup lokaciji u podešavanjima browsera.",
     nearYou:"U tvojoj blizini", listen:"Slušaj", stop:"Zaustavi", ask:"Pitaj vodiča", nav:"Vodi me",
     all:"Sve", landmark:"Znamenitosti", museum:"Muzeji", park:"Parkovi", quarter:"Kvartovi", food:"Hrana", drink:"Piće",
-    chatHello:"Zdravo! Ja sam tvoj vodič kroz {city}. Pitaj me bilo šta — o mestima, istoriji, hrani, ili gde da odeš. Na bilo kom jeziku.",
-    chatPlaceholder:"Pitaj vodiča…", noKey:"Za razgovor sa AI vodičem unesi API ključ u Info tabu. Priče i slušanje rade i bez ključa!",
+    chatHello:"Zdravo! Ja sam tvoj vodič kroz {city}. Pitaj me bilo šta — o mestima, istoriji, hrani. A mogu i da ti napravim turu: reci npr. „napravi mi turu za sutra, uži centar, sat vremena, 5 mesta”.",
+    chatPlaceholder:"Pitaj vodiča ili traži turu…", noKey:"Za razgovor sa AI vodičem unesi API ključ u Info tabu. Priče i slušanje rade i bez ključa!",
+    openPlanB:"Otvori plan", openListB:"Pogledaj mesta",
     speaking:"Vodič priča…", askAbout:"Ispričaj mi više o: ", m:"m od tebe", km:"km od tebe",
     thinking:"Vodič razmišlja…", chatErr:"Greška u komunikaciji sa AI servisom. Proveri ključ i internet.",
     infoTitle:"Podešavanja", keyLabel:"Anthropic API ključ (za AI chat)", keyHint:"Ključ se čuva samo na tvom telefonu i šalje isključivo Anthropic servisu. Napravi ga na console.anthropic.com.",
@@ -653,8 +654,9 @@ const UI = {
     hereBtn:"I'm here now", locating:"Locating you…", locErr:"Can't locate you. Allow location access in your browser settings.",
     nearYou:"Near you", listen:"Listen", stop:"Stop", ask:"Ask the guide", nav:"Take me there",
     all:"All", landmark:"Landmarks", museum:"Museums", park:"Parks", quarter:"Quarters", food:"Food", drink:"Drinks",
-    chatHello:"Hi! I'm your {city} guide. Ask me anything — places, history, food, where to go. In any language.",
-    chatPlaceholder:"Ask the guide…", noKey:"To chat with the AI guide, add an API key in the Info tab. Stories and listening work without a key!",
+    chatHello:"Hi! I'm your {city} guide. Ask me anything — places, history, food. I can also build you a tour: say e.g. \"make me a tour for tomorrow, old center, one hour, 5 stops\".",
+    chatPlaceholder:"Ask the guide or request a tour…", noKey:"To chat with the AI guide, add an API key in the Info tab. Stories and listening work without a key!",
+    openPlanB:"Open plan", openListB:"See places",
     speaking:"Guide is speaking…", askAbout:"Tell me more about: ", m:"m from you", km:"km from you",
     thinking:"Guide is thinking…", chatErr:"Error talking to the AI service. Check your key and connection.",
     infoTitle:"Settings", keyLabel:"Anthropic API key (for AI chat)", keyHint:"The key is stored only on your phone and sent only to Anthropic. Create one at console.anthropic.com.",
@@ -1689,13 +1691,103 @@ function endTour(done){
 /* ============ chat (Anthropic API, key stays on device) ============ */
 function sysPrompt(){
   const near = userPos ? ALL_PLACES.map(p=>({p,d:haversine(userPos.lat,userPos.lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d).slice(0,3).map(x=>`${x.p.en.title} (${Math.round(x.d)}m)`).join(", ") : "unknown";
+  const known = cityPlaces().map(p=>`${p.id}|${p.en.title}|${p.lat.toFixed(4)},${p.lng.toFixed(4)}`).join("\n");
   return `You are "Traveler", a warm, knowledgeable local tour guide. The user is currently exploring: ${CITIES[city].name}. Today: a live conversation with a visitor walking the city.
 RULES:
 - ALWAYS reply in the same language the user writes in (Serbian, English, Spanish, or any other). Default: ${lang==="sr"?"Serbian":"English"}.
 - Be vivid but concise: 2-6 sentences unless asked for more. You are speaking to someone standing in the street.
 - Tell stories, legends, local tips. Recommend real food/drink spots. If asked about practical details you are not sure of (current opening hours, exact prices, train schedules), say so honestly and suggest checking online.
 - User's nearest known places right now: ${near}.
-- The app's curated places include: ${ALL_PLACES.map(p=>p.en.title).join("; ")}.`;
+- When the user asks you to CREATE / BUILD a tour, plan, itinerary or route (for now, tomorrow, or any day) — you MUST call the create_tour tool. Respect their wishes: the area (e.g. "old center"), duration (count ≈ 10-15 min per stop plus walking between), number of stops, interests. Order stops as a sensible walking route. Prefer KNOWN PLACES via their "id"; for stops not on the list use real places with real coordinates and write "story" and "tip" in the user's language. After the tool result, confirm briefly what you created.
+- When the user asks you to ADD places to a guide ("add X to Madrid", "add 10 restaurants in Lisbon", "5 local taverns in Thessaloniki") — you MUST call the add_places tool. Only REAL, existing places with real coordinates; write story and tip in the user's language; match their criteria (authentic, local, cheap...). The target city may differ from the current one — pass its proper name and center coordinates. Never invent cities or places; if the request is nonsense or offensive, refuse without calling the tool.
+KNOWN PLACES in ${CITIES[city].name} (id | title | lat,lng):
+${known}`;
+}
+const TOUR_TOOL = {
+  name:"create_tour",
+  description:"Create a walking tour/plan inside the app. Call this whenever the user asks you to build a tour, plan, itinerary or route.",
+  input_schema:{type:"object",properties:{
+    name:{type:"string",description:"Short plan name in the user's language, e.g. 'Sutra — uži centar (1h)'"},
+    start_now:{type:"boolean",description:"true = user wants to walk now (tour starts immediately); false = save as a plan for later"},
+    stops:{type:"array",description:"Stops in walking order",items:{type:"object",properties:{
+      id:{type:"string",description:"EXACT id from KNOWN PLACES if this stop is one of them; omit otherwise"},
+      name:{type:"string"}, lat:{type:"number"}, lng:{type:"number"},
+      cat:{type:"string",enum:["landmark","museum","park","quarter","food","drink"]},
+      story:{type:"string",description:"60-90 word tour-guide story in user's language (only for stops WITHOUT an id)"},
+      tip:{type:"string",description:"one practical tip (only for stops WITHOUT an id)"}
+    },required:["name","lat","lng"]}}
+  },required:["name","stops","start_now"]}
+};
+const ADD_TOOL = {
+  name:"add_places",
+  description:"Add new places to a city guide in the app (the current city or another one). Call whenever the user asks to add places — restaurants, taverns, sights, bars — to a city.",
+  input_schema:{type:"object",properties:{
+    city_name:{type:"string",description:"Proper city name, e.g. 'Madrid', 'Solun', 'Thessaloniki'"},
+    city_lat:{type:"number",description:"City center latitude (required in case the city is not in the app yet)"},
+    city_lng:{type:"number",description:"City center longitude"},
+    places:{type:"array",items:{type:"object",properties:{
+      name:{type:"string"}, lat:{type:"number"}, lng:{type:"number"},
+      cat:{type:"string",enum:["landmark","museum","park","quarter","food","drink"]},
+      story:{type:"string",description:"60-90 word story in the user's language"},
+      tip:{type:"string",description:"one practical tip, same language"}
+    },required:["name","lat","lng","cat","story"]}}
+  },required:["city_name","places"]}
+};
+function resolveCityKey(name, lat, lng){
+  const q=String(name||"").trim().toLowerCase();
+  if(!q) return null;
+  const hit=Object.keys(CITIES).find(k=>CITIES[k].name.toLowerCase()===q);
+  if(hit) return hit;
+  if(!isFinite(+lat)||!isFinite(+lng)) return null;
+  if(Object.keys(CUSTOM_CITIES).length>=10) return null;
+  const key="c-"+q.replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  CUSTOM_CITIES[key]={name:String(name).trim(), center:[+lng,+lat], zoom:13, custom:true};
+  CITIES=Object.assign({}, BUILT_CITIES, EURO_CITIES, CUSTOM_CITIES);
+  store.set("tv_cities", JSON.stringify(CUSTOM_CITIES));
+  return key;
+}
+function addPlacesFromAI(inp){
+  try{
+    const key=resolveCityKey(inp.city_name, inp.city_lat, inp.city_lng);
+    if(!key) return "ERROR: could not resolve the city (missing center coordinates or city limit reached)";
+    const added=(inp.places||[]).filter(x=>x&&x.name&&isFinite(+x.lat)&&isFinite(+x.lng)).map((x,i)=>{
+      const lb={title:String(x.name), story:String(x.story||x.name), tip:String(x.tip||"")};
+      return { id:"ai-add-"+Date.now()+"-"+i, ai:true, city:key, cat:(CAT_ICON[x.cat]?x.cat:"landmark"), lat:+x.lat, lng:+x.lng, wiki:null, sr:lb, en:lb };
+    });
+    if(!added.length) return "ERROR: no valid places";
+    CITY_PLACES[key]=(CITY_PLACES[key]||[]).concat(added);
+    store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
+    window._lastAddKey=key;
+    if(key===city){ renderChips(); renderCards(); renderMarkers(); renderInfo(); }
+    return `OK: added ${added.length} places to ${CITIES[key].name}${key!==city?" (user can switch city via the top button)":""}.`;
+  }catch(e){ return "ERROR: "+e.message; }
+}
+function openAddedList(){
+  const k=window._lastAddKey;
+  if(k && k!==city) setCity(k,true);
+  showView("list");
+}
+function createTourFromAI(inp){
+  try{
+    const stopIds=[];
+    (inp.stops||[]).forEach((s,i)=>{
+      const existing = s.id && findPlace(s.id);
+      if(existing){ stopIds.push(existing.id); return; }
+      if(!s.name || !isFinite(+s.lat) || !isFinite(+s.lng)) return;
+      const lb={title:String(s.name), story:String(s.story||s.name), tip:String(s.tip||"")};
+      const p={ id:"ai-chat-"+Date.now()+"-"+i, ai:true, city, cat:(CAT_ICON[s.cat]?s.cat:"landmark"), lat:+s.lat, lng:+s.lng, wiki:null, sr:lb, en:lb };
+      SAVED.push(p); stopIds.push(p.id);
+    });
+    store.set("tv_saved", JSON.stringify(SAVED));
+    if(!stopIds.length) return "ERROR: no valid stops";
+    if(inp.start_now){
+      launchTour(stopIds);
+      return `OK: tour "${inp.name}" started now with ${stopIds.length} stops. The user is now on the map view.`;
+    }
+    PLANS.push({id:"plan-"+Date.now(), name:String(inp.name||"Tura"), city, stops:stopIds});
+    savePlans(); renderPlanView(); renderCards(); renderMarkers();
+    return `OK: plan "${inp.name}" saved with ${stopIds.length} stops. The user can open it in the "${t("plan")}" tab and press "${t("startPlanBtn")}".`;
+  }catch(e){ return "ERROR: "+e.message; }
 }
 function addMsg(cls,html){
   const d=document.createElement("div"); d.className="msg "+cls; d.innerHTML=html;
@@ -1716,18 +1808,36 @@ async function sendChat(){
   chatHistory.push({role:"user",content:text});
   const tw = addMsg("bot",'<div class="typing"><i></i><i></i><i></i></div>');
   try{
-    const r = await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{ "content-type":"application/json", "x-api-key":key,
-        "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
-      body:JSON.stringify({ model: store.get("tv_model")||"claude-haiku-4-5",
-        max_tokens:700, system: sysPrompt(), messages: chatHistory.slice(-12) })
-    });
-    if(!r.ok){ const e=await r.text(); throw new Error(e.slice(0,200)); }
-    const j = await r.json();
-    const reply = j.content.filter(b=>b.type==="text").map(b=>b.text).join("");
-    chatHistory.push({role:"assistant",content:reply});
-    tw.innerHTML = esc(reply) + `<div style="margin-top:8px"><button onclick="speakLast(this)" data-txt="${esc(reply).replace(/"/g,'&quot;')}" style="background:none;border:1px solid var(--outline-var);color:var(--on-surface-var);border-radius:16px;padding:6px 12px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;font-family:inherit">${ic("volume",14)} ${t("listen")}</button></div>`;
+    let madePlan=false, madeAdd=false, guard=0, reply="";
+    while(guard++ < 4){
+      const r = await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{ "content-type":"application/json", "x-api-key":key,
+          "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
+        body:JSON.stringify({ model: store.get("tv_model")||"claude-haiku-4-5",
+          max_tokens:4000, system: sysPrompt(), tools:[TOUR_TOOL, ADD_TOOL], messages: chatHistory.slice(-14) })
+      });
+      if(!r.ok){ const e=await r.text(); throw new Error(e.slice(0,200)); }
+      const j = await r.json();
+      const toolUses = (j.content||[]).filter(b=>b.type==="tool_use");
+      if(j.stop_reason==="tool_use" && toolUses.length){
+        chatHistory.push({role:"assistant",content:j.content});
+        const results = toolUses.map(tu=>{
+          let res="ERROR: unknown tool";
+          if(tu.name==="create_tour"){ res=createTourFromAI(tu.input||{}); if(String(res).startsWith("OK")) madePlan=true; }
+          if(tu.name==="add_places"){ res=addPlacesFromAI(tu.input||{}); if(String(res).startsWith("OK")) madeAdd=true; }
+          return {type:"tool_result", tool_use_id:tu.id, content:String(res)};
+        });
+        chatHistory.push({role:"user",content:results});
+        continue;
+      }
+      reply = (j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+      chatHistory.push({role:"assistant",content:reply});
+      break;
+    }
+    const planBtn = madePlan ? `<button onclick="showView('plan')" style="background:var(--primary);border:none;color:#fff;border-radius:16px;padding:6px 12px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;font-family:inherit;margin-right:6px">${ic("event",14)} ${t("openPlanB")}</button>` :
+      (madeAdd ? `<button onclick="openAddedList()" style="background:var(--primary);border:none;color:#fff;border-radius:16px;padding:6px 12px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;font-family:inherit;margin-right:6px">${ic("book",14)} ${t("openListB")}</button>` : "");
+    tw.innerHTML = esc(reply) + `<div style="margin-top:8px">${planBtn}<button onclick="speakLast(this)" data-txt="${esc(reply).replace(/"/g,'&quot;')}" style="background:none;border:1px solid var(--outline-var);color:var(--on-surface-var);border-radius:16px;padding:6px 12px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;font-family:inherit">${ic("volume",14)} ${t("listen")}</button></div>`;
   }catch(e){
     tw.className="msg sys"; tw.textContent = t("chatErr") + " (" + e.message.slice(0,120) + ")";
     chatHistory.pop();
