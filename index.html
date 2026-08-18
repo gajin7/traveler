@@ -59,6 +59,7 @@ nav button .ic{display:flex;align-items:center;justify-content:center;padding:4p
 nav button.active{color:var(--on-surface);font-weight:700}
 nav button.active .ic{background:var(--secondary-container)}
 /* elevated center map tab */
+nav button.maptab{overflow:visible !important}
 nav button.maptab .ic{width:56px;height:56px;padding:0;border-radius:50%;background:var(--primary);color:#fff;margin-top:-30px;box-shadow:var(--el3);border:4px solid var(--surface)}
 nav button.maptab.active{color:var(--primary)}
 nav button.maptab.active .ic{background:var(--primary);color:#fff}
@@ -267,9 +268,9 @@ nav button{overflow:visible}
 .typing i{width:7px;height:7px;border-radius:50%;background:var(--on-surface-var);animation:ty 1.2s infinite}
 .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
 @keyframes ty{0%,60%,100%{opacity:.3}30%{opacity:1}}
-/* ============ dark theme (auto, follows system) ============ */
+/* ============ dark theme — auto (system) unless user forces light/dark ============ */
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --primary:#D0BCFF; --on-primary:#381E72;
     --primary-container:#4F378B; --on-primary-container:#EADDFF;
     --secondary-container:#4A4458; --on-secondary-container:#E8DEF8;
@@ -281,15 +282,33 @@ nav button{overflow:visible}
     --inverse-surface:#E6E0E9; --inverse-on:#322F35;
     --green:#6CD9A2;
   }
-  .backbtn{background:rgba(30,27,34,.85);color:#fff}
-  .openb{background:#12362a;color:#6CD9A2}
-  .openb.cl{background:#4a1f1c;color:#F2B8B5}
-  .cardrate{color:#E8C26B}
-  #speakbar button{color:#4F378B}
-  .tb-num{color:#381E72}
-  #citybar button{color:#381E72}
-  .hero .shade{background:linear-gradient(to top,var(--surface) 0%,transparent 40%)}
+  :root:not([data-theme="light"]) .backbtn{background:rgba(30,27,34,.85);color:#fff}
+  :root:not([data-theme="light"]) .openb{background:#12362a;color:#6CD9A2}
+  :root:not([data-theme="light"]) .openb.cl{background:#4a1f1c;color:#F2B8B5}
+  :root:not([data-theme="light"]) .cardrate{color:#E8C26B}
+  :root:not([data-theme="light"]) #speakbar button{color:#4F378B}
+  :root:not([data-theme="light"]) .tb-num{color:#381E72}
+  :root:not([data-theme="light"]) #citybar button{color:#381E72}
 }
+:root[data-theme="dark"]{
+  --primary:#D0BCFF; --on-primary:#381E72;
+  --primary-container:#4F378B; --on-primary-container:#EADDFF;
+  --secondary-container:#4A4458; --on-secondary-container:#E8DEF8;
+  --tertiary-container:#633B48; --on-tertiary-container:#FFD8E4;
+  --surface:#141218; --surface-dim:#141218;
+  --sc:#1D1B20; --sc-high:#211F26; --sc-highest:#2B2930;
+  --on-surface:#E6E0E9; --on-surface-var:#CAC4D0;
+  --outline:#938F99; --outline-var:#49454F;
+  --inverse-surface:#E6E0E9; --inverse-on:#322F35;
+  --green:#6CD9A2;
+}
+:root[data-theme="dark"] .backbtn{background:rgba(30,27,34,.85);color:#fff}
+:root[data-theme="dark"] .openb{background:#12362a;color:#6CD9A2}
+:root[data-theme="dark"] .openb.cl{background:#4a1f1c;color:#F2B8B5}
+:root[data-theme="dark"] .cardrate{color:#E8C26B}
+:root[data-theme="dark"] #speakbar button{color:#4F378B}
+:root[data-theme="dark"] .tb-num{color:#381E72}
+:root[data-theme="dark"] #citybar button{color:#381E72}
 </style>
 </head>
 <body>
@@ -622,7 +641,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.18-1835";
+const APP_VERSION = "2026.08.18-1848";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -692,6 +711,7 @@ const UI = {
     save:"Sačuvaj", saved:"Sačuvano ✓", about:"O aplikaciji",
     aboutTxt:"Cicerone · AI turistički vodič (prototip). Trenutni grad: {city} — {n} mesta u vodiču. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku, pravi ture, planove i predloge. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Napomena: čitanje naglas koristi glasove tvog telefona. Ako srpski glas nije instaliran, priča se čita na engleskom.",
+    themeH:"Tema", th_auto:"Automatski", th_light:"Svetla", th_dark:"Tamna",
     planShareTxt:"Cicerone plan", planGotT:"Primljen plan", planGotAdd:"Dodaj u moje planove", planGotOk:"Plan dodat ✓",
     nearNext:"do sledeće stanice",
     localBtn:"Lokalac mod", localNow:"Sada", localToday:"Danas", localEtq:"Bonton", localTraps:"Zamke",
@@ -737,6 +757,7 @@ const UI = {
     codePh:"Unlock code (e.g. madrid26)", makeLink:"Create share link", linkReady:"Link copied — send it ✓",
     needKeyFirst:"First enter and save your API key above.", codeShort:"The code needs at least 4 characters.",
     unlockT:"Enter access code", unlockS:"You've received an access link. Enter the code the owner gave you.", unlockB:"Unlock", wrongCode:"Wrong code — try again.", unlocked:"Access unlocked ✓",
+    themeH:"Theme", th_auto:"Automatic", th_light:"Light", th_dark:"Dark",
     planShareTxt:"Cicerone plan", planGotT:"Plan received", planGotAdd:"Add to my plans", planGotOk:"Plan added ✓",
     nearNext:"to the next stop",
     localBtn:"Local mode", localNow:"Now", localToday:"Today", localEtq:"Etiquette", localTraps:"Traps",
@@ -977,6 +998,29 @@ const t = k => (UI[lang]&&UI[lang][k]) || UI.en[k] || UI.sr[k] || k;
 const Lp = p => p[lang] || p.en || p.sr;
 const tc = k => t(k).replace(/\{city\}/g, CITIES[city].name).replace(/\{n\}/g, cityPlaces().length);
 
+/* ============ theme (auto / light / dark) ============ */
+let theme = store.get("tv_theme") || "auto";
+function effDark(){
+  if(theme==="dark") return true;
+  if(theme==="light") return false;
+  return !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+}
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme", theme);
+  if(map){
+    const url = effDark() ? "https://tiles.openfreemap.org/styles/dark" : "https://tiles.openfreemap.org/styles/liberty";
+    try{
+      map.setStyle(url);
+      map.once("styledata", ()=>{ if(TOUR.active) setTimeout(drawTour, 300); });
+    }catch(e){}
+  }
+}
+function setTheme(th){ theme=th; store.set("tv_theme", th); applyTheme(); renderInfo(); }
+document.documentElement.setAttribute("data-theme", theme);
+if(window.matchMedia){
+  try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>{ if(theme==="auto") applyTheme(); }); }catch(e){}
+}
+
 /* ============ nav ============ */
 const TABS = [["list","book"],["here","myloc"],["map","map"],["plan","event"],["chat","chat"]];
 function renderNav(){
@@ -1177,10 +1221,9 @@ function initMap(){
     $("map").innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--on-surface-var);font-size:14px;padding:30px;text-align:center">Map unavailable offline — use the Places / Mesta tab.</div>';
     return;
   }
-  const darkMap = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches;
   map = new maplibregl.Map({
     container:"map",
-    style: darkMap ? "https://tiles.openfreemap.org/styles/dark" : "https://tiles.openfreemap.org/styles/liberty",
+    style: effDark() ? "https://tiles.openfreemap.org/styles/dark" : "https://tiles.openfreemap.org/styles/liberty",
     center:CITIES[city].center, zoom:CITIES[city].zoom, attributionControl:{compact:true}
   });
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),"top-right");
@@ -1844,7 +1887,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1835"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1848"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -2882,6 +2925,10 @@ function renderInfo(){
       <button class="abtn primary" style="margin:0;flex:none;padding:12px 16px" onclick="makeShareLink()">${ic("share",16)} ${t("makeLink")}</button>
     </div>
     <p id="sharestatus" style="font-size:12.5px;margin-top:6px;word-break:break-all"></p>
+    <h2>${ic("settings",19)} ${t("themeH")}</h2>
+    <div class="chips" style="padding:6px 0 0">
+      ${["auto","light","dark"].map(th=>`<button class="chip ${theme===th?'on':''}" onclick="setTheme('${th}')">${theme===th?ic("check",14):""}${t("th_"+th)}</button>`).join("")}
+    </div>
     <h2>${ic("volume",19)} ${t("voiceH")}</h2>
     <div class="pm-new" style="margin:6px 0"><select id="voicesel" onchange="store.set('tv_voice_'+lang,this.value)">
       <option value="">${t("voiceAuto")}</option>
@@ -2969,6 +3016,7 @@ if(store.get("tv_seen")) setTimeout(autoDetectCity, 1500);
 document.addEventListener("pointerdown", e => {
   const el = e.target.closest(".ripple, .card, .chip, nav button");
   if(!el) return;
+  if(el.classList.contains("maptab")) return; // FAB must keep overflow visible — ripple would clip it
   el.classList.contains("ripple") || el.classList.add("ripple");
   const r = el.getBoundingClientRect();
   const s = document.createElement("span");
