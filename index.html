@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#FDF8FD">
+<meta name="theme-color" content="#FDF8FD" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141218" media="(prefers-color-scheme: dark)">
 <title>Cicerone</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%236750A4'/><text x='50' y='68' font-size='60' text-anchor='middle'>🧭</text></svg>">
@@ -266,6 +267,29 @@ nav button{overflow:visible}
 .typing i{width:7px;height:7px;border-radius:50%;background:var(--on-surface-var);animation:ty 1.2s infinite}
 .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
 @keyframes ty{0%,60%,100%{opacity:.3}30%{opacity:1}}
+/* ============ dark theme (auto, follows system) ============ */
+@media (prefers-color-scheme: dark){
+  :root{
+    --primary:#D0BCFF; --on-primary:#381E72;
+    --primary-container:#4F378B; --on-primary-container:#EADDFF;
+    --secondary-container:#4A4458; --on-secondary-container:#E8DEF8;
+    --tertiary-container:#633B48; --on-tertiary-container:#FFD8E4;
+    --surface:#141218; --surface-dim:#141218;
+    --sc:#1D1B20; --sc-high:#211F26; --sc-highest:#2B2930;
+    --on-surface:#E6E0E9; --on-surface-var:#CAC4D0;
+    --outline:#938F99; --outline-var:#49454F;
+    --inverse-surface:#E6E0E9; --inverse-on:#322F35;
+    --green:#6CD9A2;
+  }
+  .backbtn{background:rgba(30,27,34,.85);color:#fff}
+  .openb{background:#12362a;color:#6CD9A2}
+  .openb.cl{background:#4a1f1c;color:#F2B8B5}
+  .cardrate{color:#E8C26B}
+  #speakbar button{color:#4F378B}
+  .tb-num{color:#381E72}
+  #citybar button{color:#381E72}
+  .hero .shade{background:linear-gradient(to top,var(--surface) 0%,transparent 40%)}
+}
 </style>
 </head>
 <body>
@@ -598,7 +622,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.18-1749";
+const APP_VERSION = "2026.08.18-1835";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -668,6 +692,8 @@ const UI = {
     save:"Sačuvaj", saved:"Sačuvano ✓", about:"O aplikaciji",
     aboutTxt:"Cicerone · AI turistički vodič (prototip). Trenutni grad: {city} — {n} mesta u vodiču. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku, pravi ture, planove i predloge. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Napomena: čitanje naglas koristi glasove tvog telefona. Ako srpski glas nije instaliran, priča se čita na engleskom.",
+    planShareTxt:"Cicerone plan", planGotT:"Primljen plan", planGotAdd:"Dodaj u moje planove", planGotOk:"Plan dodat ✓",
+    nearNext:"do sledeće stanice",
     localBtn:"Lokalac mod", localNow:"Sada", localToday:"Danas", localEtq:"Bonton", localTraps:"Zamke",
     localLoad:"Pitam lokalca…", localRefresh:"Osveži", phrasesH:"Fraze za preživljavanje", sayIt:"Izgovori",
     localDisc:"Saveti su AI znanje o lokalnim običajima — sjajan kompas, ali nije zamena za oči i uši.",
@@ -711,6 +737,8 @@ const UI = {
     codePh:"Unlock code (e.g. madrid26)", makeLink:"Create share link", linkReady:"Link copied — send it ✓",
     needKeyFirst:"First enter and save your API key above.", codeShort:"The code needs at least 4 characters.",
     unlockT:"Enter access code", unlockS:"You've received an access link. Enter the code the owner gave you.", unlockB:"Unlock", wrongCode:"Wrong code — try again.", unlocked:"Access unlocked ✓",
+    planShareTxt:"Cicerone plan", planGotT:"Plan received", planGotAdd:"Add to my plans", planGotOk:"Plan added ✓",
+    nearNext:"to the next stop",
     localBtn:"Local mode", localNow:"Now", localToday:"Today", localEtq:"Etiquette", localTraps:"Traps",
     localLoad:"Asking a local…", localRefresh:"Refresh", phrasesH:"Survival phrases", sayIt:"Say it",
     localDisc:"Tips are AI knowledge of local customs — a great compass, not a substitute for your own eyes and ears.",
@@ -1149,9 +1177,10 @@ function initMap(){
     $("map").innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--on-surface-var);font-size:14px;padding:30px;text-align:center">Map unavailable offline — use the Places / Mesta tab.</div>';
     return;
   }
+  const darkMap = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches;
   map = new maplibregl.Map({
     container:"map",
-    style:"https://tiles.openfreemap.org/styles/liberty",
+    style: darkMap ? "https://tiles.openfreemap.org/styles/dark" : "https://tiles.openfreemap.org/styles/liberty",
     center:CITIES[city].center, zoom:CITIES[city].zoom, attributionControl:{compact:true}
   });
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),"top-right");
@@ -1755,6 +1784,11 @@ function checkSharedLink(){
     store.set("tv_locked", decodeURIComponent(m[1]));
     history.replaceState(null,"",location.pathname+location.search);
   }
+  const pm = location.hash.match(/[#&]pl=([^&]+)/);
+  if(pm){
+    history.replaceState(null,"",location.pathname+location.search);
+    setTimeout(()=>importSharedPlan(decodeURIComponent(pm[1])), 600);
+  }
   if(store.get("tv_locked") && !store.get("tv_key")) openUnlockMenu();
 }
 function openUnlockMenu(msg){
@@ -1810,7 +1844,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1749"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1835"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -2286,6 +2320,7 @@ function renderPlans(){
   } else {
     html+=myPlans.map(pl=>`<div class="planbig">
       <div class="pb-head"><h4>${esc(pl.name)}</h4><span>${pl.stops.length} ${t("stops")}</span>
+        <button onclick="sharePlan('${pl.id}')">${ic("share",17)}</button>
         <button onclick="deletePlan('${pl.id}')">${ic("close",18)}</button></div>
       ${pl.stops.map((id,i)=>{const p=findPlace(id); if(!p) return "";
         return `<div class="stoprow"><div class="n">${i+1}</div>
@@ -2295,6 +2330,52 @@ function renderPlans(){
     </div>`).join("");
   }
   el.innerHTML=html;
+}
+/* ---- share a plan as a link (#pl=...) ---- */
+const b64u = s => btoa(unescape(encodeURIComponent(s)));
+const b64ud = s => decodeURIComponent(escape(atob(s)));
+async function sharePlan(planId){
+  const pl=PLANS.find(x=>x.id===planId); if(!pl) return;
+  const c=CITIES[pl.city]||CITIES[city];
+  const payload={n:pl.name, ck:pl.city, cn:c.name, cc:c.country||"", cx:c.center,
+    s:pl.stops.map(id=>{
+      const p=findPlace(id); if(!p) return null;
+      return p.ai ? {n:Lp(p).title, la:+p.lat.toFixed(5), lo:+p.lng.toFixed(5), ca:p.cat,
+        st:String(Lp(p).story||"").slice(0,280), ti:String(Lp(p).tip||"").slice(0,140)} : {id};
+    }).filter(Boolean)};
+  const url=location.origin+location.pathname+"#pl="+encodeURIComponent(b64u(JSON.stringify(payload)));
+  if(navigator.share){ try{ await navigator.share({title:t("planShareTxt"), text:pl.name, url}); return; }catch(e){} }
+  try{ await navigator.clipboard.writeText(url); toast(t("copied")); }catch(e){}
+}
+function importSharedPlan(b64){
+  let o; try{ o=JSON.parse(b64ud(b64)) }catch(e){ return; }
+  if(!o||!o.n||!Array.isArray(o.s)) return;
+  openMenu(`<h3>${ic("event",18)} ${t("planGotT")}</h3>
+    <div class="pm-txt"><b>${esc(o.n)}</b><br>${esc(o.cn||"")} · ${o.s.length} ${t("stops")}</div>
+    <button class="pm-item" style="background:var(--primary-container);color:var(--on-primary-container);justify-content:center" onclick='acceptSharedPlan(${JSON.stringify(JSON.stringify(o)).replace(/'/g,"&#39;")})'>${ic("check",18)} ${t("planGotAdd")}</button>
+    <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+}
+function acceptSharedPlan(json){
+  const o=JSON.parse(json);
+  let key=o.ck;
+  if(!CITIES[key]){
+    if(Array.isArray(o.cx)&&isFinite(+o.cx[0])){
+      CUSTOM_CITIES[key]={name:String(o.cn||key), country:String(o.cc||""), center:[+o.cx[0],+o.cx[1]], zoom:13, custom:true};
+      CITIES=Object.assign({}, BUILT_CITIES, EURO_CITIES, CUSTOM_CITIES);
+      store.set("tv_cities", JSON.stringify(CUSTOM_CITIES));
+    } else key=city;
+  }
+  const ids=[];
+  o.s.forEach((s,i)=>{
+    if(s.id && findPlace(s.id)){ ids.push(s.id); return; }
+    if(!s.n||!isFinite(+s.la)) return;
+    const lb={title:String(s.n), story:String(s.st||s.n), tip:String(s.ti||"")};
+    const p={id:"ai-shared-"+Date.now()+"-"+i, ai:true, city:key, cat:(CAT_ICON[s.ca]?s.ca:"landmark"), lat:+s.la, lng:+s.lo, wiki:null, sr:lb, en:lb};
+    CITY_PLACES[key]=(CITY_PLACES[key]||[]).concat([p]); ids.push(p.id);
+  });
+  store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
+  if(ids.length){ PLANS.push({id:"plan-"+Date.now(), name:String(o.n), city:key, stops:ids}); savePlans(); }
+  closePlanMenu(); setCity(key,true); showView("plan"); toast(t("planGotOk"));
 }
 function removeStop(planId, stopId){
   const pl=PLANS.find(x=>x.id===planId); if(!pl) return;
@@ -2434,6 +2515,7 @@ function renderTourBar(){
   bar.classList.add("on");
 }
 function openNextStop(){ if(TOUR.active && TOUR.stops[TOUR.idx]) openSheet(TOUR.stops[TOUR.idx]); }
+let annSet=new Set(), lastCenter=0;
 function startTourWatch(){
   if(tourWatch!=null || !navigator.geolocation) return;
   tourWatch = navigator.geolocation.watchPosition(pos=>{
@@ -2441,12 +2523,33 @@ function startTourWatch(){
     if(!TOUR.active) return;
     renderTourBar();
     const p=findPlace(TOUR.stops[TOUR.idx]);
-    if(p && haversine(userPos.lat,userPos.lng,p.lat,p.lng) <= ARRIVE_M) arriveAtStop();
+    if(!p) return;
+    const d=haversine(userPos.lat,userPos.lng,p.lat,p.lng);
+    /* auto-center the map on the walker (throttled) */
+    if(map && Date.now()-lastCenter>6000 && $("view-map").classList.contains("active")){
+      lastCenter=Date.now(); map.easeTo({center:[userPos.lng,userPos.lat], duration:800});
+    }
+    /* one-time voice heads-up when the next stop is close */
+    if(d<=250 && d>ARRIVE_M && !annSet.has(TOUR.idx)){
+      annSet.add(TOUR.idx);
+      speak(`${Math.round(d)} m ${t("nearNext")}: ${Lp(p).title}`, lang);
+    }
+    if(d <= ARRIVE_M) arriveAtStop();
   }, e=>{}, {enableHighAccuracy:true, maximumAge:5000, timeout:15000});
+}
+function ding(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext; const ctx=new AC();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sine"; o.frequency.value=880; g.gain.setValueAtTime(.25,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.6);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+.6);
+  }catch(e){}
 }
 function stopTourWatch(){ if(tourWatch!=null){ navigator.geolocation.clearWatch(tourWatch); tourWatch=null; } }
 function arriveAtStop(){
   const p=findPlace(TOUR.stops[TOUR.idx]); if(!p) return;
+  ding();
   try{ navigator.vibrate && navigator.vibrate([200,100,200]) }catch(e){}
   openSheet(p.id);
   speak(t("tourArrived")+": "+Lp(p).title+". "+Lp(p).story+" … "+Lp(p).tip, lang, Lp(p).title);
@@ -2640,19 +2743,49 @@ async function sendChat(){
   const tw = addMsg("bot",'<div class="typing"><i></i><i></i><i></i></div>');
   await runChatTurn(tw, key);
 }
+/* SSE streaming call — live text into the bubble, tool_use blocks accumulated for the agent loop */
+async function streamAnthropic(payload, key, onText){
+  const r = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{ "content-type":"application/json", "x-api-key":key,
+      "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
+    body:JSON.stringify(Object.assign({stream:true}, payload))
+  });
+  if(!r.ok){ const e=await r.text(); throw new Error(e.slice(0,200)); }
+  const reader=r.body.getReader(), dec=new TextDecoder();
+  let buf="", blocks=[], stop_reason=null, liveText="";
+  while(true){
+    const {done,value}=await reader.read();
+    if(done) break;
+    buf+=dec.decode(value,{stream:true});
+    const parts=buf.split("\n\n"); buf=parts.pop();
+    for(const part of parts){
+      const dl=part.split("\n").find(l=>l.startsWith("data:")); if(!dl) continue;
+      let ev; try{ ev=JSON.parse(dl.slice(5).trim()) }catch(e){ continue; }
+      if(ev.type==="content_block_start"){ blocks[ev.index]=Object.assign({_json:""}, ev.content_block); if(ev.content_block.type==="text") blocks[ev.index].text=ev.content_block.text||""; }
+      else if(ev.type==="content_block_delta"){
+        const b=blocks[ev.index]; if(!b) continue;
+        if(ev.delta.type==="text_delta"){ b.text=(b.text||"")+ev.delta.text; liveText=blocks.filter(x=>x&&x.type==="text").map(x=>x.text).join(""); if(onText) onText(liveText); }
+        else if(ev.delta.type==="input_json_delta"){ b._json+=ev.delta.partial_json||""; }
+      }
+      else if(ev.type==="message_delta" && ev.delta && ev.delta.stop_reason) stop_reason=ev.delta.stop_reason;
+    }
+  }
+  const content=blocks.filter(Boolean).map(b=>{
+    if(b.type==="tool_use"){ let input={}; try{ input=b._json?JSON.parse(b._json):(b.input||{}) }catch(e){}
+      return {type:"tool_use", id:b.id, name:b.name, input}; }
+    return {type:"text", text:b.text||""};
+  });
+  return {content, stop_reason};
+}
 async function runChatTurn(tw, key){
   try{
     let madePlan=false, madeAdd=false, guard=0, reply="";
     while(guard++ < 4){
-      const r = await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",
-        headers:{ "content-type":"application/json", "x-api-key":key,
-          "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
-        body:JSON.stringify({ model: store.get("tv_model")||"claude-haiku-4-5",
-          max_tokens:4000, system: sysPrompt(), tools:[TOUR_TOOL, ADD_TOOL], messages: buildMsgs() })
-      });
-      if(!r.ok){ const e=await r.text(); throw new Error(e.slice(0,200)); }
-      const j = await r.json();
+      const j = await streamAnthropic({ model: store.get("tv_model")||"claude-haiku-4-5",
+          max_tokens:4000, system: sysPrompt(), tools:[TOUR_TOOL, ADD_TOOL], messages: buildMsgs() },
+        key,
+        txt=>{ tw.innerHTML = esc(txt)+`<span style="opacity:.5">▌</span>`; $("chatlog").scrollTop=$("chatlog").scrollHeight; });
       const toolUses = (j.content||[]).filter(b=>b.type==="tool_use");
       if(j.stop_reason==="tool_use" && toolUses.length){
         chatHistory.push({role:"assistant",content:j.content});
@@ -2819,6 +2952,10 @@ initSearch();
 showView("map");
 /* resume an active tour after reload */
 if(TOUR.active){ drawTour(); renderTourBar(); startTourWatch(); }
+/* offline: register the service worker (needs https; no-op on file://) */
+if("serviceWorker" in navigator && location.protocol==="https:"){
+  try{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }catch(e){}
+}
 /* first launch → onboarding */
 if(!store.get("tv_seen")) showOnboard();
 /* shared-access link (#k=...) → unlock dialog */
