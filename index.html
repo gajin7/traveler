@@ -244,6 +244,10 @@ nav button{overflow:visible}
 /* snackbar (speaking) */
 #speakbar{position:fixed;left:14px;right:14px;bottom:calc(86px + env(safe-area-inset-bottom));background:var(--inverse-surface);color:var(--inverse-on);border:none;border-radius:8px;padding:12px 16px;display:none;align-items:center;gap:12px;z-index:60;box-shadow:var(--el3)}
 #speakbar.on{display:flex}
+#updbar{position:fixed;left:14px;right:14px;top:calc(env(safe-area-inset-top) + 64px);background:var(--primary);color:#fff;border-radius:14px;padding:12px 16px;display:none;align-items:center;gap:12px;z-index:120;box-shadow:var(--el3)}
+#updbar.on{display:flex}
+#updbar .t{flex:1;font-size:13.5px;font-weight:600}
+#updbar button{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:10px;padding:9px 16px;font-weight:800;font-size:13px;font-family:inherit}
 #speakbar .t{flex:1;font-size:13.5px}
 #speakbar button{background:none;border:none;color:#D0BCFF;border-radius:8px;padding:8px 12px;font-weight:700;font-size:13.5px;font-family:inherit}
 .maplibregl-ctrl-attrib{font-size:9px}
@@ -343,6 +347,8 @@ nav button{overflow:visible}
 </div>
 
 <div id="speakbar"><div class="t" id="speaktitle"></div><button onclick="stopSpeak()" id="speakstop"></button></div>
+
+<div id="updbar"><div class="t" id="updtxt"></div><button onclick="applyUpdate()" id="updgo"></button></div>
 
 <div id="planmenu" onclick="if(event.target===this)closePlanMenu()"><div id="planmenuin"></div></div>
 
@@ -587,6 +593,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
+const APP_VERSION = "2026.08.18-1444";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -635,6 +642,10 @@ const UI = {
     tripModeL:"Kako dolaziš?", m_plane:"Avionom", m_train:"Vozom", m_bus:"Autobusom", m_car:"Autom — direktno do hotela",
     pointPh:"Aerodrom / stanica — pretraži po imenu…", trL:"Prevoz tokom boravka",
     tr_public:"Javni prevoz + pešačenje", tr_car:"Svoj auto", tr_rent:"Rent-a-car",
+    transitBtn:"Koje karte za prevoz da kupim?", transitT:"Karte za prevoz", transitLoad:"Gledam koje karte odgovaraju tvom putu…",
+    onlineBadge:"ONLINE", transitDisc:"Cene i linkove daje AI — proveri na zvaničnom sajtu pre kupovine.",
+    updAvail:"Stigla je nova verzija aplikacije!", updBtn:"Osveži", updLatest:"Imaš najnoviju verziju ✓",
+    updCheck:"Proveri ažuriranje", versionL:"Verzija",
     hotelPh:"Hotel — ime ili adresa", notesPh:"Napomene: s kim putuješ, tempo, želje…",
     tripSave:"Sačuvaj put", tripSaved:"Put sačuvan ✓", hotelWarn:"Hotel nije nađen na mapi — sačuvan je samo naziv.",
     genPlans:"Generiši planove po danima", genning:"Pravim planove po danima… traje do minut.",
@@ -712,6 +723,10 @@ const UI = {
     tripModeL:"How do you arrive?", m_plane:"By plane", m_train:"By train", m_bus:"By bus", m_car:"By car — straight to the hotel",
     pointPh:"Airport / station — search by name…", trL:"Getting around during the stay",
     tr_public:"Public transport + walking", tr_car:"Own car", tr_rent:"Rental car",
+    transitBtn:"Which transit tickets should I buy?", transitT:"Transit tickets", transitLoad:"Checking which tickets fit your trip…",
+    onlineBadge:"ONLINE", transitDisc:"Prices and links come from AI — verify on the official site before buying.",
+    updAvail:"A new version of the app is available!", updBtn:"Refresh", updLatest:"You're on the latest version ✓",
+    updCheck:"Check for updates", versionL:"Version",
     hotelPh:"Hotel — name or address", notesPh:"Notes: who you travel with, pace, wishes…",
     tripSave:"Save trip", tripSaved:"Trip saved ✓", hotelWarn:"Hotel not found on the map — only the name was saved.",
     genPlans:"Generate day-by-day plans", genning:"Building day plans… up to a minute.",
@@ -1562,6 +1577,27 @@ async function tryUnlock(){
   }catch(e){ openUnlockMenu(t("wrongCode")); }
 }
 
+/* ============ UPDATE CHECK (cache-busting new-version detection) ============ */
+async function checkUpdate(manual){
+  if(!/^https?:/.test(location.protocol)) { if(manual) toast(t("updLatest")); return; }
+  try{
+    const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
+    const txt = await r.text();
+    const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1444"){
+      $("updtxt").textContent = t("updAvail");
+      $("updgo").textContent = t("updBtn");
+      $("updbar").classList.add("on");
+    } else if(manual) toast(t("updLatest"));
+  }catch(e){ if(manual) toast(t("suggErr")); }
+}
+function applyUpdate(){
+  /* query param busts every HTTP cache layer; localStorage/IndexedDB data survives */
+  location.replace(location.pathname + "?u=" + Date.now());
+}
+setTimeout(()=>checkUpdate(false), 4000);
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible") checkUpdate(false); });
+
 /* ============ ONBOARDING + SHARE + FEEDBACK ============ */
 function renderOnboard(){
   $("oblogo").innerHTML = ic("explore",40);
@@ -1853,7 +1889,40 @@ function renderTripCard(){
     ${h?`<div class="stoprow"><div class="n">${ic("hotel",13)}</div><div class="st">${esc(h.name)}</div>${hotelBtn}</div>`:""}
     <p style="color:var(--on-surface-var);font-size:12.5px;margin-top:6px">${ic(TRIP.transport==="public"?"bus":"car",12)} ${t("tr_"+(TRIP.transport||"public"))}${TRIP.notes?` · ${esc(TRIP.notes)}`:""}</p>
     <button class="abtn primary ripple" style="width:100%;margin-top:12px" onclick="generateTripPlans(this)">${ic("magic",17)} ${t("genPlans")}</button>
+    ${TRIP.transport==="public"?`<button class="abtn sec ripple" style="width:100%;margin-top:8px" onclick="openTransitTickets()">${ic("ticket",17)} ${t("transitBtn")}</button>`:""}
   </div>`;
+}
+
+/* ============ transit tickets advisor (public-transport trips) ============ */
+async function openTransitTickets(){
+  if(!store.get("tv_key")){ toast(t("cityNeedKey")); showView("info"); return; }
+  const days=tripDays().length||1;
+  openMenu(`<h3>${ic("ticket",18)} ${t("transitT")} · ${CITIES[city].name}</h3>
+    <div class="pm-txt"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--primary)"></span> ${t("transitLoad")}</div>`);
+  try{
+    const arr = await anthropicJSON(
+      `You are a public-transport ticketing expert for ${CITIES[city].name}. Recommend ONLY real, currently-existing ticket products (travel cards, multi-ride tickets, tourist passes, airport supplements). Respond ONLY with a JSON array of 2-4 objects: {"name": string (official product name), "desc": string (25-45 words in ${lang==="sr"?"Serbian":"English"}: what it covers, rough price, why it fits THIS trip), "where": string (short, same language: where/how to buy — machines, app, online), "url": string (official purchase/info URL ONLY if you are confident it is correct, else null), "online": boolean (can it be bought online?)}. Never invent products or prices you don't know — fewer correct items beat more invented ones.`,
+      `Trip: ${days} days in ${CITIES[city].name}${TRIP&&TRIP.mode==="plane"?", arriving by plane at "+(TRIP.point?TRIP.point.name:"the airport")+" (consider airport supplement/transfer ticket!)":""}${TRIP&&TRIP.mode==="train"?", arriving by train":""}${TRIP&&TRIP.mode==="bus"?", arriving by bus":""}. Travelers' notes: ${TRIP&&TRIP.notes?TRIP.notes:"none"}. They will use metro/bus + walking daily.`, 1800);
+    const items=(arr||[]).filter(x=>x&&x.name);
+    if(!items.length) throw new Error("empty");
+    let html=`<h3>${ic("ticket",18)} ${t("transitT")} · ${CITIES[city].name}</h3>`;
+    items.forEach((x,i)=>{
+      const g=encodeURIComponent(`${x.name} ${CITIES[city].name} buy online official`);
+      html+=`<div class="pm-txt"><b>${esc(x.name)}</b>${x.online?` <span class="aibadge">${ic("openext",10)} ${t("onlineBadge")}</span>`:""}
+        <br>${esc(String(x.desc||""))}<br><span style="font-size:12.5px;opacity:.8">${esc(String(x.where||""))}</span>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          ${x.url&&/^https?:\/\//.test(x.url)?`<button class="abtn primary" style="min-width:0;padding:9px 12px;font-size:12.5px" onclick="window.open('${x.url.replace(/'/g,"")}','_blank')">${ic("openext",14)} ${t("openSite")}</button>`:""}
+          <button class="abtn sec" style="min-width:0;padding:9px 12px;font-size:12.5px" onclick="window.open('https://www.google.com/search?q=${g}','_blank')">${ic("search",14)} Google</button>
+          <button class="abtn sec" style="min-width:0;padding:9px 12px;font-size:12.5px" onclick="ticketFor=${JSON.stringify("Prevoz — "+String(x.name)).replace(/"/g,"&quot;")};$('ticketfile').click()">${ic("download",14)} ${t("saveTicket")}</button>
+        </div></div>`;
+    });
+    html+=`<p class="pm-disc">${t("transitDisc")}</p>
+      <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`;
+    openMenu(html);
+  }catch(e){
+    openMenu(`<h3>${t("transitT")}</h3><div class="pm-txt">${t("suggErr")}</div>
+      <button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">OK</button>`);
+  }
 }
 
 /* ============ PLANS (routes for the days ahead) ============ */
@@ -2390,6 +2459,7 @@ function renderInfo(){
     <h2>${ic("info",19)} ${t("about")}</h2>
     <p>${tc("aboutTxt")}</p>
     <p style="font-size:12.5px">${t("voiceNote")}</p>
+    <p style="font-size:12.5px">${t("versionL")}: <b>${APP_VERSION}</b> · <button onclick="checkUpdate(true)" style="background:none;border:1px solid var(--outline-var);color:var(--primary);border-radius:14px;padding:6px 12px;font-size:12px;font-weight:700;font-family:inherit">${ic("refresh",13)} ${t("updCheck")}</button></p>
     <p>${CITIES[city].name}: ${cityPlaces().length} ${ic("place",14)} · ${["landmark","museum","park","quarter","food","drink"].map(catPill).join("")}</p>`;
 }
 function saveKey(btn){
