@@ -641,7 +641,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.18-1848";
+const APP_VERSION = "2026.08.19-0702";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -1887,7 +1887,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.18-1848"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.19-0702"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -2069,12 +2069,35 @@ async function renderTickets(){
   }
   el.innerHTML=html;
 }
+let tvUrl=null;
 async function openTicket(id){
   const list=await idb.all(); const tk=list.find(x=>x.id===id); if(!tk) return;
-  const url=URL.createObjectURL(new Blob([tk.data],{type:tk.mime||"application/octet-stream"}));
-  const a=document.createElement("a"); a.href=url; a.target="_blank"; a.rel="noopener";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  const mime=tk.mime||"application/octet-stream";
+  const blob=new Blob([tk.data],{type:mime});
+  if(tvUrl){ try{URL.revokeObjectURL(tvUrl)}catch(e){} }
+  tvUrl=URL.createObjectURL(blob);
+  const isImg=mime.startsWith("image/");
+  const body=isImg ? `<img src="${tvUrl}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px">`
+    : `<iframe src="${tvUrl}" style="width:100%;height:100%;border:none;background:#fff;border-radius:8px"></iframe>`;
+  const ov=document.createElement("div");
+  ov.id="ticketview";
+  ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:flex;flex-direction:column";
+  ov.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;color:#fff">
+      <b style="flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tk.place||tk.name)}</b>
+      <button id="tvshare" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:12px;padding:9px 14px;font-weight:700;font-family:inherit;display:flex;align-items:center;gap:5px">${ic("share",15)} ${t("sharePlace")}</button>
+      <button id="tvclose" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:12px;padding:9px 12px;display:flex">${ic("close",17)}</button>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:0 10px calc(14px + env(safe-area-inset-bottom));min-height:0">${body}</div>`;
+  document.body.appendChild(ov);
+  ov.querySelector("#tvclose").onclick=()=>ov.remove();
+  ov.querySelector("#tvshare").onclick=async ()=>{
+    /* share the actual file — on the phone this opens it in any app (Files, Wallet, print…) */
+    try{
+      const f=new File([blob], tk.name||"ticket", {type:mime});
+      if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:tk.place||tk.name}); return; }
+    }catch(e){}
+    const a=document.createElement("a"); a.href=tvUrl; a.download=tk.name||"ticket"; document.body.appendChild(a); a.click(); a.remove();
+  };
 }
 async function deleteTicket(id){ if(!confirm(t("ticketDelQ"))) return; await idb.del(id); renderPlanView(); }
 
@@ -2354,23 +2377,35 @@ function renderPlanView(){
   $("tourbanner").innerHTML = banner + renderTripCard();
   renderPlans(); renderTickets();
 }
+function planCardHTML(pl, cur){
+  return `<div class="planbig" style="${cur?'outline:2px solid var(--primary-container)':''}">
+    <div class="pb-head"><h4>${esc(pl.name)}</h4><span>${pl.stops.length} ${t("stops")}</span>
+      <button onclick="sharePlan('${pl.id}')">${ic("share",17)}</button>
+      <button onclick="deletePlan('${pl.id}')">${ic("close",18)}</button></div>
+    ${pl.stops.map((id,i)=>{const p=findPlace(id); if(!p) return "";
+      return `<div class="stoprow"><div class="n">${i+1}</div>
+        <div class="st" onclick="openSheet('${id}')">${ic(CAT_ICON[p.cat],14)} ${esc(Lp(p).title)}</div>
+        <button class="sx" onclick="removeStop('${pl.id}','${id}')">${ic("close",15)}</button></div>`;}).join("")}
+    <button class="abtn primary ripple" style="width:100%;margin-top:12px" onclick="startPlan('${pl.id}')">${ic("play",17)} ${t("startPlanBtn")}</button>
+  </div>`;
+}
 function renderPlans(){
   const el=$("plansec"); if(!el) return;
-  const myPlans=PLANS.filter(p=>!p.city||p.city===city);
-  let html=`<h2>${ic("event",20)} ${t("plansH")} · ${CITIES[city].name}</h2>`;
-  if(!myPlans.length){
+  let html=`<h2>${ic("event",20)} ${t("plansH")}</h2>`;
+  if(!PLANS.length){
     html+=`<div class="emptybox"><b>${t("plansEmptyT")}</b><p>${t("plansEmptyS")}</p></div>`;
   } else {
-    html+=myPlans.map(pl=>`<div class="planbig">
-      <div class="pb-head"><h4>${esc(pl.name)}</h4><span>${pl.stops.length} ${t("stops")}</span>
-        <button onclick="sharePlan('${pl.id}')">${ic("share",17)}</button>
-        <button onclick="deletePlan('${pl.id}')">${ic("close",18)}</button></div>
-      ${pl.stops.map((id,i)=>{const p=findPlace(id); if(!p) return "";
-        return `<div class="stoprow"><div class="n">${i+1}</div>
-          <div class="st" onclick="openSheet('${id}')">${ic(CAT_ICON[p.cat],14)} ${esc(Lp(p).title)}</div>
-          <button class="sx" onclick="removeStop('${pl.id}','${id}')">${ic("close",15)}</button></div>`;}).join("")}
-      <button class="abtn primary ripple" style="width:100%;margin-top:12px" onclick="startPlan('${pl.id}')">${ic("play",17)} ${t("startPlanBtn")}</button>
-    </div>`).join("");
+    /* all plans, grouped by city — the city you're in comes first, highlighted */
+    const groups={};
+    PLANS.forEach(p=>{ const k=p.city||city; (groups[k]=groups[k]||[]).push(p); });
+    const keys=Object.keys(groups).sort((a,b)=>
+      a===city ? -1 : b===city ? 1 : (CITIES[a]?CITIES[a].name:a).localeCompare(CITIES[b]?CITIES[b].name:b));
+    keys.forEach(k=>{
+      const cur=k===city;
+      html+=`<p class="pm-disc" style="text-transform:uppercase;font-weight:800;letter-spacing:.6px;margin:14px 0 6px;font-size:${cur?'13px':'12px'};color:${cur?'var(--primary)':'var(--on-surface-var)'}">
+        ${cur?ic("myloc",13)+" ":""}${esc(CITIES[k]?CITIES[k].name:k)}</p>`;
+      html+=groups[k].map(pl=>planCardHTML(pl,cur)).join("");
+    });
   }
   el.innerHTML=html;
 }
@@ -2428,6 +2463,7 @@ function removeStop(planId, stopId){
 }
 function startPlan(planId){
   const pl=PLANS.find(x=>x.id===planId); if(!pl||pl.stops.length<1) return;
+  if(pl.city && pl.city!==city && CITIES[pl.city]) setCity(pl.city, true); // plan from another city → switch first
   const decide=()=>{
     const ordered=orderStops(pl.stops.slice(), userPos);
     const first=findPlace(ordered[0]);
