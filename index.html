@@ -641,7 +641,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.19-0702";
+const APP_VERSION = "2026.08.20-0640";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -711,6 +711,7 @@ const UI = {
     save:"Sačuvaj", saved:"Sačuvano ✓", about:"O aplikaciji",
     aboutTxt:"Cicerone · AI turistički vodič (prototip). Trenutni grad: {city} — {n} mesta u vodiču. Dugme „Sada sam ovde” te locira i priča ti o okolini; AI vodič odgovara na potpitanja na bilo kom jeziku, pravi ture, planove i predloge. Slike: Wikimedia. Mapa: OpenFreeMap © OpenStreetMap.",
     voiceNote:"Napomena: čitanje naglas koristi glasove tvog telefona. Ako srpski glas nije instaliran, priča se čita na engleskom.",
+    mustBtn:"Uvod vodiča i must-see", mustH:"Ne propušta se", mustGen:"Pišem uvod puta…", seenT:"Viđeno",
     themeH:"Tema", th_auto:"Automatski", th_light:"Svetla", th_dark:"Tamna",
     planShareTxt:"Cicerone plan", planGotT:"Primljen plan", planGotAdd:"Dodaj u moje planove", planGotOk:"Plan dodat ✓",
     nearNext:"do sledeće stanice",
@@ -757,6 +758,7 @@ const UI = {
     codePh:"Unlock code (e.g. madrid26)", makeLink:"Create share link", linkReady:"Link copied — send it ✓",
     needKeyFirst:"First enter and save your API key above.", codeShort:"The code needs at least 4 characters.",
     unlockT:"Enter access code", unlockS:"You've received an access link. Enter the code the owner gave you.", unlockB:"Unlock", wrongCode:"Wrong code — try again.", unlocked:"Access unlocked ✓",
+    mustBtn:"Guide's intro & must-sees", mustH:"Don't miss", mustGen:"Writing your trip intro…", seenT:"Seen",
     themeH:"Theme", th_auto:"Automatic", th_light:"Light", th_dark:"Dark",
     planShareTxt:"Cicerone plan", planGotT:"Plan received", planGotAdd:"Add to my plans", planGotOk:"Plan added ✓",
     nearNext:"to the next stop",
@@ -1458,6 +1460,7 @@ function locateMe(){
   if(!navigator.geolocation){ $("herestatus").textContent = t("locErr"); return; }
   navigator.geolocation.getCurrentPosition(pos=>{
     userPos = {lat:pos.coords.latitude, lng:pos.coords.longitude};
+    checkMustSee();
     // auto-switch city to wherever the user actually is
     const nearest = ALL_PLACES.map(p=>({p,d:haversine(userPos.lat,userPos.lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d)[0];
     if(nearest && nearest.d < 100000 && nearest.p.city !== city) setCity(nearest.p.city, true);
@@ -1887,7 +1890,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.19-0702"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.20-0640"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -2142,10 +2145,16 @@ function attachGeoSearch(inputId, boxId, onPick){
     if(inp.value.trim().length<3){ box.style.display="none"; return; }
     tm=setTimeout(async ()=>{
       try{
-        const c=CITIES[city].center;
-        const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(inp.value.trim())}&lat=${c[1]}&lon=${c[0]}&limit=5`);
-        const j=await r.json(); const res=(j.features||[]).filter(f=>f.geometry);
-        if(!res.length){ box.style.display="none"; return; }
+        const c=CITIES[city].center, q=inp.value.trim();
+        /* hotels often need the city name appended — try "name + city" first, then raw */
+        let res=[];
+        for(const query of [q+" "+CITIES[city].name, q]){
+          const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lat=${c[1]}&lon=${c[0]}&limit=8`);
+          const j=await r.json();
+          res=(j.features||[]).filter(f=>f.geometry && haversine(c[1],c[0],f.geometry.coordinates[1],f.geometry.coordinates[0])<60000);
+          if(res.length) break;
+        }
+        if(!res.length){ box.innerHTML=`<div class="sr-item"><span>${t("searchNoRes")}</span></div>`; box.style.display="block"; return; }
         box.innerHTML=res.map((f,i)=>{const p=f.properties||{};const sub=[p.street,p.city||p.county].filter(Boolean).join(", ");
           return `<div class="sr-item" data-i="${i}"><b>${esc(p.name||inp.value)}</b><span>${esc(sub)}</span></div>`;}).join("");
         box.style.display="block";
@@ -2212,6 +2221,14 @@ async function saveTrip(){
   toast(hotel&&hotel.lat==null&&hn ? t("hotelWarn") : t("tripSaved"));
 }
 function deleteTrip(){ if(!confirm(t("delTripQ"))) return; TRIP=null; store.set("tv_trip","null"); renderPlanView(); renderMarkers(); }
+/* the app's date prefix is the single source of truth — strip any weekday/date the model sneaks into a title */
+function cleanDayTitle(s){
+  return String(s||"")
+    .replace(/\b(ponedeljak|ponedjeljak|utorak|sreda|srijeda|četvrtak|cetvrtak|petak|subota|nedelja|nedjelja|monday|tuesday|wednesday|thursday|friday|saturday|sunday|lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo|lunedì|martedì|mercoledì|giovedì|venerdì|sabato|domenica|montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|dan\s*\d+|day\s*\d+|tag\s*\d+)\b/gi,"")
+    .replace(/\d{1,2}\.\s*\d{1,2}\.?(\s*\d{2,4})?/g,"")
+    .replace(/\s{2,}/g," ")
+    .replace(/^[\s—:,.\-–]+|[\s—:,.\-–]+$/g,"");
+}
 function tripDays(){
   const out=[]; if(!TRIP) return out;
   let d=new Date(TRIP.arrive+"T12:00:00"); const end=new Date(TRIP.depart+"T12:00:00");
@@ -2243,7 +2260,7 @@ async function generateTripPlans(btn){
     : "They use public transport and walking — keep each day a compact, walkable cluster (metro between clusters).";
   try{
     let arr = await anthropicJSON(
-      `You are planning a ${days.length}-day visit to ${cityFull(city)}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short theme in ${LANG_NAME[lang]}, WITHOUT the date), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: DAY 1 starts realistically only after arrival time + transfer + hotel check-in (fewer stops if arrival is late; if arrival is in the evening, day 1 may be just dinner nearby). LAST DAY must end in time: ${depBuffer}. ${trTxt} Group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
+      `You are planning a ${days.length}-day visit to ${cityFull(city)}. ${STRICT} Respond ONLY with a JSON array of exactly ${days.length} day objects, in order: {"title": string (short THEME only, 2-4 words in ${LANG_NAME[lang]} — NEVER include a date, weekday name, or "Day N"; the app adds the date itself), "stops":[4-6 objects: {"id": string (EXACT id from KNOWN PLACES — STRONGLY preferred) OR "name"+"lat"+"lng"+"cat"+"story"+"tip" for real places not on the list}]}. Rules: DAY 1 starts realistically only after arrival time + transfer + hotel check-in (fewer stops if arrival is late; if arrival is in the evening, day 1 may be just dinner nearby). LAST DAY must end in time: ${depBuffer}. ${trTxt} Group stops geographically per day, starting near the hotel when sensible; NEVER repeat a stop across days.
 KNOWN PLACES (id | title | lat,lng):\n${known}`,
       `Trip: arrive ${TRIP.arrive}${TRIP.arriveTime?" at "+TRIP.arriveTime:""}, ${modeTxt}. Depart ${TRIP.depart}${TRIP.departTime?" at "+TRIP.departTime:""}${TRIP.point?` from "${TRIP.point.name}"`:""}. (${days.length} days) ${hotelTxt} Notes from the traveler: ${TRIP.notes||"none"}.`, 8000);
     if(!Array.isArray(arr)||!arr.length) throw new Error("empty");
@@ -2262,12 +2279,70 @@ KNOWN PLACES (id | title | lat,lng):\n${known}`,
         const p={ id:"ai-trip-"+Date.now()+"-"+i+"-"+j, ai:true, city, cat:(CAT_ICON[s.cat]?s.cat:"landmark"), lat:+v.lat, lng:+v.lng, wiki:null, sr:lb, en:lb };
         SAVED.push(p); ids.push(p.id);
       });
-      if(ids.length) PLANS.push({id:"plan-"+Date.now()+"-"+i, name:`${days[i].label} — ${String(day.title||"")}`.trim(), city, stops:ids});
+      if(ids.length) PLANS.push({id:"plan-"+Date.now()+"-"+i, name:`${days[i].label} — ${cleanDayTitle(day.title)}`.replace(/ — $/,"").trim(), city, stops:ids});
     }
     store.set("tv_saved", JSON.stringify(SAVED));
     savePlans(); renderPlanView(); renderMarkers();
     toast(t("plansMade"));
   }catch(e){ toast(t("suggErr")); renderPlanView(); }
+}
+/* ---- guide's intro + must-see checklist (manual toggle + auto-check by location) ---- */
+async function genTripSummary(btn){
+  if(!TRIP || TRIP.city!==city) return;
+  if(!store.get("tv_key")){ toast(t("cityNeedKey")); showView("info"); return; }
+  if(btn) btn.innerHTML=`<span class="spin"></span> ${t("mustGen")}`;
+  const known = cityPlaces().map(p=>`${p.id}|${p.en.title}|${p.lat.toFixed(4)},${p.lng.toFixed(4)}`).join("\n");
+  try{
+    const arr=await anthropicJSON(
+      `You are a veteran local guide welcoming a visitor to ${cityFull(city)}. ${STRICT} Respond ONLY with a JSON array containing exactly one object: {"intro": string (70-110 words in ${LANG_NAME[lang]} — a warm, vivid welcome: what this city IS, what to see and FEEL, its rhythm and soul; no lists, flowing prose), "must":[6-8 objects: {"n": string (the iconic must-see name), "why": string (max 12 words in ${LANG_NAME[lang]} — why it cannot be missed), "id": string (EXACT id from KNOWN PLACES if it matches, else omit), "lat": number, "lng": number}]}. Must-sees are THE icons of this city.
+KNOWN PLACES (id | title | lat,lng):\n${known}`,
+      `Welcome intro + must-see list for my ${tripDays().length||1}-day trip to ${CITIES[city].name}. Notes: ${TRIP.notes||"none"}.`, 2500);
+    const o=arr[0]||{};
+    if(!o.intro || !Array.isArray(o.must)) throw new Error("empty");
+    /* verify items without a known id */
+    const rawNew=o.must.filter(m=>!(m.id&&findPlace(m.id))&&m&&m.n).map(m=>({name:m.n,lat:+m.lat,lng:+m.lng,_m:m}));
+    const ver=await verifyPlaces(rawNew, CITIES[city].center);
+    const okNames=new Set(ver.map(v=>v.name));
+    const must=o.must.filter(m=>{
+      if(m.id&&findPlace(m.id)){ const p=findPlace(m.id); m.lat=p.lat; m.lng=p.lng; return true; }
+      const v=ver.find(x=>x.name===m.n); if(v){ m.lat=v.lat; m.lng=v.lng; return true; }
+      return false;
+    }).map(m=>({n:String(m.n), why:String(m.why||""), id:m.id||null, lat:+m.lat, lng:+m.lng, done:false}));
+    if(!must.length) throw new Error("none");
+    TRIP.summary={intro:String(o.intro), must};
+    store.set("tv_trip", JSON.stringify(TRIP));
+    renderPlanView();
+  }catch(e){ toast(t("suggErr")); renderPlanView(); }
+}
+function toggleMust(i){
+  if(!TRIP||!TRIP.summary||!TRIP.summary.must[i]) return;
+  TRIP.summary.must[i].done=!TRIP.summary.must[i].done;
+  store.set("tv_trip", JSON.stringify(TRIP));
+  renderPlanView();
+}
+/* auto-check when the user is physically at a must-see (~120 m) */
+function checkMustSee(){
+  if(!TRIP||!TRIP.summary||TRIP.city!==city||!userPos) return;
+  let changed=false;
+  TRIP.summary.must.forEach(m=>{
+    if(!m.done && isFinite(+m.lat) && haversine(userPos.lat,userPos.lng,m.lat,m.lng)<=120){
+      m.done=true; changed=true; toast(`✓ ${t("seenT")}: ${m.n}`);
+    }
+  });
+  if(changed){
+    store.set("tv_trip", JSON.stringify(TRIP));
+    if($("view-plan").classList.contains("active")) renderPlanView();
+  }
+}
+function mustHTML(){
+  if(!(TRIP&&TRIP.city===city&&TRIP.summary)) return "";
+  const s=TRIP.summary, done=s.must.filter(m=>m.done).length;
+  return `<div class="pm-txt" style="margin-top:12px;font-style:normal">${esc(s.intro)}</div>
+    <p class="pm-disc" style="text-transform:uppercase;font-weight:800;letter-spacing:.6px;margin:10px 0 4px;color:var(--primary)">${ic("starfull",13)} ${t("mustH")} · ${done}/${s.must.length} ✓</p>
+    ${s.must.map((m,i)=>`<div class="stoprow" onclick="toggleMust(${i})">
+      <div class="n" style="${m.done?'background:var(--green);color:#fff':''}">${m.done?"✓":(i+1)}</div>
+      <div class="st" style="${m.done?'opacity:.55;text-decoration:line-through':''}">${esc(m.n)}<br><span style="font-size:12px;font-weight:400;color:var(--on-surface-var)">${esc(m.why)}</span></div>
+    </div>`).join("")}`;
 }
 function renderTripCard(){
   if(!(TRIP && TRIP.city===city)){
@@ -2285,6 +2360,8 @@ function renderTripCard(){
       : (TRIP.mode==="car"?`<div class="stoprow"><div class="n">${ic("car",13)}</div><div class="st">${t("m_car")}</div></div>`:"")}
     ${h?`<div class="stoprow"><div class="n">${ic("hotel",13)}</div><div class="st">${esc(h.name)}</div>${hotelBtn}</div>`:""}
     <p style="color:var(--on-surface-var);font-size:12.5px;margin-top:6px">${ic(TRIP.transport==="public"?"bus":"car",12)} ${t("tr_"+(TRIP.transport||"public"))}${TRIP.notes?` · ${esc(TRIP.notes)}`:""}</p>
+    ${mustHTML()}
+    ${!TRIP.summary?`<button class="abtn sec ripple" style="width:100%;margin-top:12px" onclick="genTripSummary(this)">${ic("magic",17)} ${t("mustBtn")}</button>`:""}
     <button class="abtn primary ripple" style="width:100%;margin-top:12px" onclick="generateTripPlans(this)">${ic("magic",17)} ${t("genPlans")}</button>
     ${TRIP.transport==="public"?`<button class="abtn sec ripple" style="width:100%;margin-top:8px" onclick="openTransitTickets()">${ic("ticket",17)} ${t("transitBtn")}</button>`:""}
   </div>`;
@@ -2599,6 +2676,7 @@ function startTourWatch(){
   if(tourWatch!=null || !navigator.geolocation) return;
   tourWatch = navigator.geolocation.watchPosition(pos=>{
     userPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    checkMustSee();
     if(!TOUR.active) return;
     renderTourBar();
     const p=findPlace(TOUR.stops[TOUR.idx]);
