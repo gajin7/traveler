@@ -381,6 +381,7 @@ nav button{overflow:visible}
       <button class="gopt ripple" id="foodchip" onclick="findFood('restaurant')"></button>
     </div>
     <div id="guidecard"></div>
+    <button class="bigbtn ripple" id="chatopenbtn" onclick="showView('chat')" style="margin-top:0;background:var(--tertiary-container,var(--secondary-container));color:var(--on-tertiary-container,var(--on-secondary-container))"><span id="chatopenic"></span><span id="chatopentxt"></span></button>
     <button class="bigbtn ripple" id="herebtn" onclick="locateMe()"><span id="hereic"></span><span id="herebtntxt"></span></button>
     <button class="bigbtn ripple" id="cambtn" style="background:var(--secondary-container);color:var(--on-secondary-container);margin-top:0" onclick="$('camfile').click()"><span id="camic"></span><span id="cambtntxt"></span></button>
     <button class="bigbtn ripple" id="localbtn" style="background:linear-gradient(135deg,#B7791F,#E8A13C);color:#fff;margin-top:0" onclick="openLocalMenu()"><span id="localic"></span><span id="localbtntxt"></span></button>
@@ -700,7 +701,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.21-1627";
+const APP_VERSION = "2026.08.21-1657";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -1100,18 +1101,20 @@ if(window.matchMedia){
 }
 
 /* ============ nav ============ */
-const TABS = [["list","book"],["here","myloc"],["food","food"],["map","map"],["plan","event"],["chat","chat"]];
+/* 2 + map + 2 — the map FAB sits exactly in the middle. "Vodič" (here) hosts both
+   the companion screen and the conversation (view-chat has no tab of its own). */
+const TABS = [["list","book"],["food","food"],["map","map"],["plan","event"],["here","chat"]];
 function renderNav(){
   $("nav").innerHTML = TABS.map(([id,icn]) =>
     id==="map"
       ? `<button id="tab-map" class="maptab" onclick="showView('map')"><span class="ic">${ic("map",26)}</span>${t("map")}</button>`
-      : `<button id="tab-${id}" onclick="showView('${id}')"><span class="ic">${ic(icn,22)}</span>${t(id==="food"?"foodTab":id)}</button>`).join("");
+      : `<button id="tab-${id}" onclick="showView('${id}')"><span class="ic">${ic(icn,22)}</span>${t(id==="food"?"foodTab":id==="here"?"chat":id)}</button>`).join("");
 }
 function showView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
   $("view-"+id).classList.add("active");
-  const tb=$("tab-"+id); if(tb) tb.classList.add("active");
+  const tb=$("tab-"+(id==="chat"?"here":id)); if(tb) tb.classList.add("active");
   $("infobtn").classList.toggle("on", id==="info");
   if(id==="map" && map) setTimeout(()=>map.resize(),50);
   if(id==="plan") renderPlanView();
@@ -1974,7 +1977,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.21-1627"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.21-1657"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -3628,6 +3631,8 @@ function renderAll(){
   $("heresub").textContent = t("hereSub");
   $("guidebtntxt").textContent = t("guideBtn");
   $("guideic").innerHTML = ic("magic",22);
+  $("chatopentxt").textContent = t("ask");
+  $("chatopenic").innerHTML = ic("chat",22);
   $("cafechip").innerHTML = ic("coffee",16) + " " + t("findCafe");
   $("foodchip").innerHTML = ic("food",16) + " " + t("findFood");
   $("foodtitle").textContent = t("foodTitle");
