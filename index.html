@@ -210,6 +210,7 @@ nav button{overflow:visible}
 .tb-btn{background:rgba(255,255,255,.12);border:none;color:#D0BCFF;border-radius:12px;padding:9px 12px;font-weight:700;font-size:12.5px;font-family:inherit;display:flex;align-items:center;gap:4px}
 .tb-btn.tb-end{color:#FFB4AB}
 .tb-btn.tb-min{padding:9px 8px;color:var(--inverse-on);opacity:.8}
+.tb-btn.tb-ico{padding:9px 8px;color:#EAD8A4}
 /* collapsed tour bar: a small pill, the map stays fully usable */
 #tourpill{position:fixed;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));background:var(--inverse-surface);color:var(--inverse-on);border-radius:999px;padding:8px 14px 8px 8px;display:none;align-items:center;gap:8px;z-index:70;box-shadow:var(--el3);font-weight:700;font-size:13px;cursor:pointer}
 #tourpill.on{display:flex}
@@ -225,6 +226,26 @@ nav button{overflow:visible}
 .gopts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .gopt{display:flex;align-items:center;gap:6px;background:var(--primary);color:#fff;border:none;border-radius:999px;padding:9px 14px;font-weight:700;font-size:13px;font-family:inherit}
 .gopt.more{background:transparent;color:var(--on-primary-container);border:1.5px solid var(--outline)}
+/* "Lokali" tab: mood chips + venue cards */
+#moodchips{display:flex;flex-wrap:wrap;gap:8px;padding:2px 16px 10px}
+.mood{display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--outline-var);color:var(--on-surface);border-radius:999px;padding:9px 14px;font-weight:700;font-size:13px;font-family:inherit}
+.mood.hot{background:var(--secondary-container);border-color:transparent;color:var(--on-secondary-container)}
+.mood.sel{background:var(--primary);border-color:transparent;color:#fff}
+.fsearch{display:flex;gap:8px;margin:0 16px 8px}
+.fsearch input{flex:1;min-width:0;background:var(--surface);border:1.5px solid var(--outline-var);border-radius:14px;padding:12px 14px;font-size:14px;font-family:inherit;color:var(--on-surface)}
+.fsearch .abtn{flex-shrink:0}
+#foodcards{padding:0 16px 100px}
+.fcard{background:var(--surface);border:1px solid var(--outline-var);border-radius:16px;padding:13px 14px;margin-bottom:10px;box-shadow:var(--el1)}
+.fcard .fh{display:flex;align-items:center;gap:10px}
+.fcard .fic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--secondary-container);color:var(--on-secondary-container);flex-shrink:0}
+.fcard .fn{font-weight:700;font-size:15px;line-height:1.3}
+.fcard .fd{font-size:12px;color:var(--on-surface-var);margin-top:2px}
+.fbadge{display:inline-flex;align-items:center;gap:3px;background:var(--primary-container);color:var(--on-primary-container);border-radius:999px;padding:2px 8px;font-size:10.5px;font-weight:800;vertical-align:2px}
+.fwhy{margin-top:9px;font-size:13px;line-height:1.5;background:var(--primary-container);color:var(--on-primary-container);border-radius:10px;padding:8px 10px;display:flex;gap:7px;align-items:flex-start}
+.fwhy svg{flex-shrink:0;margin-top:2px}
+.facts{display:flex;gap:8px;margin-top:10px}
+.fact{display:flex;align-items:center;gap:5px;background:var(--surface);border:1.5px solid var(--outline-var);color:var(--on-surface);border-radius:999px;padding:8px 13px;font-weight:700;font-size:12.5px;font-family:inherit}
+.fact.primary{background:var(--primary);border-color:transparent;color:#fff}
 .numbadge{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:2px solid #fff;box-shadow:var(--el1)}
 .numbadge.done{background:#1B6B45}
 /* AI suggestions */
@@ -355,6 +376,10 @@ nav button{overflow:visible}
   <div class="view" id="view-here">
     <div class="herehead"><h2 id="heretitle"></h2><p id="heresub"></p></div>
     <button class="bigbtn ripple" id="guidebtn" style="background:linear-gradient(135deg,#6750A4,#9A82DB);color:#fff" onclick="guideMe()"><span id="guideic"></span><span id="guidebtntxt"></span></button>
+    <div class="gopts" style="margin:0 16px 8px">
+      <button class="gopt ripple" id="cafechip" onclick="findFood('cafe')"></button>
+      <button class="gopt ripple" id="foodchip" onclick="findFood('restaurant')"></button>
+    </div>
     <div id="guidecard"></div>
     <button class="bigbtn ripple" id="herebtn" onclick="locateMe()"><span id="hereic"></span><span id="herebtntxt"></span></button>
     <button class="bigbtn ripple" id="cambtn" style="background:var(--secondary-container);color:var(--on-secondary-container);margin-top:0" onclick="$('camfile').click()"><span id="camic"></span><span id="cambtntxt"></span></button>
@@ -370,6 +395,16 @@ nav button{overflow:visible}
       <div class="statusline" id="suggstatus" style="padding:8px 0"></div>
     </div>
     <div class="cards" id="suggcards" style="padding-top:0"></div>
+  </div>
+  <div class="view" id="view-food">
+    <div class="herehead"><h2 id="foodtitle"></h2><p id="foodsub"></p></div>
+    <div id="moodchips"></div>
+    <div class="fsearch">
+      <input id="craveinput" autocomplete="off" onkeydown="if(event.key==='Enter')craveSearch()">
+      <button class="abtn primary ripple" id="cravebtn" onclick="craveSearch()"></button>
+    </div>
+    <div class="statusline" id="foodstatus"></div>
+    <div id="foodcards"></div>
   </div>
   <div class="view" id="view-plan">
     <div id="planview">
@@ -439,6 +474,8 @@ nav button{overflow:visible}
     <div class="tb-num" id="tbnum"></div>
     <div class="tb-txt"><div class="tb-name" id="tbname"></div><div class="tb-dist" id="tbdist"></div></div>
   </div>
+  <button class="tb-btn tb-ico" id="tbcafe" onclick="findFood('cafe')" aria-label="Coffee"></button>
+  <button class="tb-btn tb-ico" id="tbfood" onclick="findFood('restaurant')" aria-label="Food"></button>
   <button class="tb-btn" id="tbnext" onclick="advanceTour(true)"></button>
   <button class="tb-btn tb-end" id="tbend" onclick="endTour()"></button>
   <button class="tb-btn tb-min" id="tbmin" onclick="toggleTourBar()" aria-label="Minimize"></button>
@@ -663,7 +700,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.21-1608";
+const APP_VERSION = "2026.08.21-1627";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -673,7 +710,10 @@ const store = {
 
 /* ============ i18n ============ */
 const UI = {
-  sr:{ map:"Mapa", list:"Mesta", here:"Ovde", plan:"Put", chat:"Vodič", info:"Info",
+  sr:{ map:"Mapa", list:"Mesta", here:"Ovde", plan:"Put", chat:"Vodič", info:"Info", foodTab:"Lokali",
+    foodTitle:"Šta ti se jede?", foodSub:"Pravi lokali oko tebe — vodič izdvaja najbolje.", cravePh:"paella, vegansko, specialty coffee…", craveBtn:"Nađi",
+    mBreakfast:"Doručak", mCoffee:"Kafa", mLunch:"Ručak", mDinner:"Večera", mTapas:"Tapas", mSweet:"Slatko", mBars:"Barovi", mClub:"Klubovi",
+    aiPickT:"vodič preporučuje", toTourT:"U turu", mapT:"Mapa",
     myTrip:"Moj put", plansH:"Planovi", plansEmptyT:"Još nemaš planova",
     plansEmptyS:"Otvori bilo koje mesto i tapni „U plan” — ili u tabu Mesta tapni „Napravi turu”. Nazovi planove po danima: „Petak — centar”, „Subota — Prado”.",
     ticketsEmptyT:"Još nemaš sačuvanih karata",
@@ -693,6 +733,7 @@ const UI = {
     cityNeedKey:"Za dodavanje gradova treba API ključ (unesi ga u Info tabu).", cityAdded:"Grad dodat ✓",
     cityDelQ:"Obrisati ovaj grad i sva njegova mesta?", cityAiNote:"AI vodič za ovaj grad — mesta i priče je napisao AI, proveri detalje na licu mesta.",
     guideBtn:"Vodi me", guideThink:"Gledam gde si i šta ti se nudi…", guideErr:"Ne mogu sad da smislim — probaj opet.", guideMore:"Još predloga", passBy:"Prolaziš pored",
+    findCafe:"Kafa", findFood:"Klopa", onRouteT:"na tvojoj ruti", nearT:"blizu tebe", foodSearch:"Tražim prava mesta…", foodNone:"Nisam našao ništa u blizini.", addStopT:"Sledeća stanica",
     hereTitle:"Sada sam ovde", hereSub:"Pritisni dugme — pronaći ću šta je oko tebe i ispričati ti priču.",
     hereBtn:"Sada sam ovde", locating:"Tražim te…", locErr:"Ne mogu da te lociram. Dozvoli pristup lokaciji u podešavanjima browsera.",
     nearYou:"U tvojoj blizini", listen:"Slušaj", stop:"Zaustavi", ask:"Pitaj vodiča", nav:"Vodi me",
@@ -767,7 +808,10 @@ const UI = {
     obF3t:"Pitaj bilo šta", obF3s:"AI vodič odgovara na potpitanja, predlaže mesta, karte i prevoz.",
     obStart:"Kreni", feedback:"Pošalji utiske", feedbackSub:"Ovo je prototip — svaki komentar pomaže da napravimo pravu aplikaciju.",
     shareApp:"Podeli aplikaciju", sharePlace:"Podeli", copied:"Link kopiran ✓", shareTxt:"Pogledaj Cicerone — AI turistički vodič:" },
-  en:{ map:"Map", list:"Places", here:"Here", plan:"Trip", chat:"Guide", info:"Info",
+  en:{ map:"Map", list:"Places", here:"Here", plan:"Trip", chat:"Guide", info:"Info", foodTab:"Eat & drink",
+    foodTitle:"What are you craving?", foodSub:"Real venues around you — the guide picks the best.", cravePh:"paella, vegan, specialty coffee…", craveBtn:"Find",
+    mBreakfast:"Breakfast", mCoffee:"Coffee", mLunch:"Lunch", mDinner:"Dinner", mTapas:"Tapas", mSweet:"Sweet", mBars:"Bars", mClub:"Clubs",
+    aiPickT:"guide's pick", toTourT:"Add to tour", mapT:"Map",
     myTrip:"My trip", plansH:"Plans", plansEmptyT:"No plans yet",
     plansEmptyS:"Open any place and tap \"To plan\" — or tap \"Build a tour\" in the Places tab. Name plans by day: \"Friday — center\", \"Saturday — Prado\".",
     ticketsEmptyT:"No saved tickets yet",
@@ -796,6 +840,7 @@ const UI = {
     cityNeedKey:"Adding cities requires an API key (enter it in the Info tab).", cityAdded:"City added ✓",
     cityDelQ:"Delete this city and all its places?", cityAiNote:"AI guide for this city — places and stories were written by AI; double-check details on the spot.",
     guideBtn:"Guide me", guideThink:"Looking at where you are and what's on offer…", guideErr:"Can't think right now — try again.", guideMore:"More ideas", passBy:"You're passing",
+    findCafe:"Coffee", findFood:"Food", onRouteT:"on your route", nearT:"near you", foodSearch:"Finding real places…", foodNone:"Found nothing nearby.", addStopT:"Next stop",
     hereTitle:"I'm here now", hereSub:"Tap the button — I'll find what's around you and tell you its story.",
     hereBtn:"I'm here now", locating:"Locating you…", locErr:"Can't locate you. Allow location access in your browser settings.",
     nearYou:"Near you", listen:"Listen", stop:"Stop", ask:"Ask the guide", nav:"Take me there",
@@ -935,6 +980,9 @@ const UI = {
 const MI = {
 chevdown:"M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z",
 chevup:"M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z",
+coffee:"M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z",
+music:"M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z",
+cake:"M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.9 2 2 2zm4.6 9.99l-1.07-1.07-1.08 1.07c-1.3 1.3-3.58 1.31-4.89 0l-1.07-1.07-1.09 1.07C6.75 16.64 5.88 17 4.96 17c-.73 0-1.4-.23-1.96-.61V21c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-4.61c-.56.38-1.23.61-1.96.61-.92 0-1.79-.36-2.44-1.01zM18 9h-5V7h-2v2H6c-1.66 0-3 1.34-3 3v1.54c0 1.08.88 1.96 1.96 1.96.52 0 1.02-.2 1.38-.57l2.14-2.13 2.13 2.13c.74.74 2.03.74 2.77 0l2.14-2.13 2.13 2.13c.37.37.86.57 1.38.57 1.08 0 1.96-.88 1.96-1.96V12c.01-1.66-1.33-3-2.99-3z",
 explore:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm2.19 12.19L6 18l3.81-8.19L18 6l-3.81 8.19zM12 10.9c-.61 0-1.1.49-1.1 1.1s.49 1.1 1.1 1.1 1.1-.49 1.1-1.1-.49-1.1-1.1-1.1z",
 map:"M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z",
 book:"M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z",
@@ -1052,12 +1100,12 @@ if(window.matchMedia){
 }
 
 /* ============ nav ============ */
-const TABS = [["list","book"],["here","myloc"],["map","map"],["plan","event"],["chat","chat"]];
+const TABS = [["list","book"],["here","myloc"],["food","food"],["map","map"],["plan","event"],["chat","chat"]];
 function renderNav(){
   $("nav").innerHTML = TABS.map(([id,icn]) =>
     id==="map"
       ? `<button id="tab-map" class="maptab" onclick="showView('map')"><span class="ic">${ic("map",26)}</span>${t("map")}</button>`
-      : `<button id="tab-${id}" onclick="showView('${id}')"><span class="ic">${ic(icn,22)}</span>${t(id)}</button>`).join("");
+      : `<button id="tab-${id}" onclick="showView('${id}')"><span class="ic">${ic(icn,22)}</span>${t(id==="food"?"foodTab":id)}</button>`).join("");
 }
 function showView(id){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
@@ -1068,6 +1116,14 @@ function showView(id){
   if(id==="map" && map) setTimeout(()=>map.resize(),50);
   if(id==="plan") renderPlanView();
   if(id==="list") ensureCityRatings();
+  if(id==="food"){
+    renderMoods();
+    /* first visit today: jump straight to what fits the clock — zero taps to results */
+    if(!$("foodcards").innerHTML && !curMood){
+      const m=MOODS.find(moodFits);
+      if(m) pickMood(m.id);
+    }
+  }
 }
 
 /* ============ language ============ */
@@ -1918,7 +1974,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.21-1608"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.21-1627"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -2820,6 +2876,194 @@ function startAmbient(){
     }
   }, e=>{}, {enableHighAccuracy:true, maximumAge:8000, timeout:20000});
 }
+
+/* ============ food & nightlife — real OSM venues, AI-ranked (route-aware) ============ */
+let FOODF=[], FOODCAT="food";
+/* points along what's left of the walk: you → next few stops + midpoints between them */
+function routeSamplePoints(){
+  const pts=[];
+  if(userPos) pts.push([userPos.lat,userPos.lng]);
+  if(TOUR.active) TOUR.stops.slice(TOUR.idx, TOUR.idx+3).forEach(id=>{ const p=findPlace(id); if(p) pts.push([p.lat,p.lng]); });
+  if(pts.length>1){
+    const mids=[];
+    for(let i=0;i<pts.length-1;i++) mids.push([(pts[i][0]+pts[i+1][0])/2,(pts[i][1]+pts[i+1][1])/2]);
+    return pts.concat(mids).slice(0,5);
+  }
+  return pts;
+}
+/* real venues from OpenStreetMap via Photon — no AI, no invented places */
+async function photonPOI(q, tags, lat, lng, limit){
+  try{
+    const url="https://photon.komoot.io/api/?q="+encodeURIComponent(q)
+      +(tags||[]).map(tg=>"&osm_tag="+encodeURIComponent(tg)).join("")
+      +`&lat=${lat}&lon=${lng}&limit=${limit||6}&lang=en`;
+    const r=await fetch(url);
+    if(!r.ok) return [];
+    const j=await r.json();
+    return (j.features||[])
+      .map(f=>({name:f.properties.name, lat:f.geometry.coordinates[1], lng:f.geometry.coordinates[0], street:f.properties.street||""}))
+      .filter(v=>v.name);
+  }catch(e){ return []; }
+}
+/* gather + dedupe venues along the route (or around the user), closest-detour first */
+async function collectVenues(q, tags, maxDetour){
+  if(!userPos){
+    await new Promise(res=>navigator.geolocation
+      ? navigator.geolocation.getCurrentPosition(p=>{userPos={lat:p.coords.latitude,lng:p.coords.longitude};res()},()=>res(),{timeout:8000,maximumAge:30000})
+      : res());
+  }
+  const samples=routeSamplePoints();
+  if(!samples.length) return null;
+  const lists=await Promise.all(samples.map(s=>photonPOI(q, tags, s[0], s[1], 8)));
+  const seen=new Set(), found=[];
+  lists.flat().forEach(v=>{
+    const k=v.name.toLowerCase()+"|"+v.lat.toFixed(3);
+    if(seen.has(k)) return; seen.add(k);
+    v.detour=Math.min(...samples.map(s=>haversine(s[0],s[1],v.lat,v.lng)));
+    if(v.detour<=(maxDetour||900)) found.push(v);
+  });
+  found.sort((a,b)=>a.detour-b.detour);
+  return found;
+}
+/* one cheap AI call: pick the gems, one line why each (indices into the list) */
+async function rankVenues(list, craving){
+  const why={};
+  if(!store.get("tv_key") || list.length<2) return why;
+  try{
+    const out=await anthropicJSON(
+      `You are a local food & nightlife expert for ${cityFull(city)}. Travel only. Output ONLY JSON: {"picks":[{"n":0,"why":"..."}]} — up to 5 best venues from the list, by index${craving?`, best matching the craving "${craving}"`:""}. "why" = ONE short reason in ${LANG_NAME[lang]||"English"} (famous for, local gem, ideal right now). Only claim what you are confident about; if unsure of a venue, omit it.`,
+      list.map((v,i)=>`${i}|${v.name}|${v.street}|${Math.round(v.detour)}m`).join("\n"), 450);
+    const o=Array.isArray(out)?out[0]:out;
+    (o&&o.picks||[]).forEach(p=>{ if(list[p.n]!=null && p.why) why[p.n]=String(p.why); });
+  }catch(e){}
+  return why;
+}
+/* quick flow from the tour bar / here tab: bottom sheet, route-aware */
+async function findFood(kind){
+  const q=kind==="cafe"?"cafe":"restaurant";
+  const tags=kind==="cafe"?["amenity:cafe"]:["amenity:restaurant"];
+  toast(t("foodSearch"));
+  const found=await collectVenues(q, tags, 900);
+  if(found===null){ toast(t("locErr")); return; }
+  FOODF=found.slice(0,10); FOODCAT=kind==="cafe"?"drink":"food";
+  if(!FOODF.length){ toast(t("foodNone")); return; }
+  const why=await rankVenues(FOODF, null);
+  const order=[...FOODF.keys()].sort((a,b)=>((b in why)-(a in why)) || (FOODF[a].detour-FOODF[b].detour));
+  openMenu(`<h3>${ic(kind==="cafe"?"coffee":"food",18)} ${kind==="cafe"?t("findCafe"):t("findFood")} — ${TOUR.active?t("onRouteT"):t("nearT")}</h3>`+
+    order.slice(0,6).map(i=>{
+      const v=FOODF[i];
+      return `<button class="pm-item" style="flex-wrap:wrap" onclick="pickFood(${i})">
+        ${ic("place",16)} <b>${esc(v.name)}</b><span>${fmtDist(v.detour)}</span>
+        ${why[i]?`<div style="width:100%;font-size:12px;opacity:.75;text-align:left;padding-left:24px">${esc(why[i])}</div>`:""}
+      </button>`;
+    }).join("")+
+    `<button class="pm-item" style="justify-content:center" onclick="closePlanMenu()">${t("tourCancel")}</button>`);
+}
+/* turn a found venue into a place; as next tour stop when a tour runs, else walk there */
+function foodPlaceId(i){
+  const v=FOODF[i]; if(!v) return null;
+  const id="osm-"+v.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,40);
+  if(!findPlace(id)){
+    const pl={id, cat:FOODCAT, lat:v.lat, lng:v.lng, city, osm:true,
+      en:{title:v.name, story:"", tip:v.street}};
+    CITY_PLACES[city]=(CITY_PLACES[city]||[]).concat([pl]);
+    store.set("tv_cityplaces", JSON.stringify(CITY_PLACES));
+  }
+  return id;
+}
+function pickFood(i){
+  const v=FOODF[i]; if(!v) return;
+  closePlanMenu();
+  const id=foodPlaceId(i);
+  if(TOUR.active){
+    TOUR.stops.splice(TOUR.idx, 0, id);
+    routeCache={key:null,line:null};
+    saveTour(); drawTour(); renderTourBar();
+    toast(t("addStopT")+": "+v.name);
+    showView("map");
+  } else {
+    launchTour([id]);
+  }
+}
+
+/* ============ "Lokali" tab — mood-first food & nightlife, time-aware ============ */
+const MOODS=[
+  {id:"mBreakfast", ic:"coffee", q:"breakfast", tags:["amenity:cafe","shop:bakery"], cat:"food",  from:6,  to:11},
+  {id:"mCoffee",    ic:"coffee", q:"coffee",    tags:["amenity:cafe"],               cat:"drink", from:6,  to:19},
+  {id:"mLunch",     ic:"food",   q:"restaurant",tags:["amenity:restaurant"],         cat:"food",  from:11, to:16},
+  {id:"mSweet",     ic:"cake",   q:"ice cream", tags:["amenity:ice_cream","amenity:cafe"], cat:"food", from:10, to:23},
+  {id:"mTapas",     ic:"food",   q:"tapas",     tags:["amenity:restaurant","amenity:bar"], cat:"food", from:12, to:25},
+  {id:"mDinner",    ic:"food",   q:"restaurant",tags:["amenity:restaurant"],         cat:"food",  from:17, to:24},
+  {id:"mBars",      ic:"bar",    q:"bar",       tags:["amenity:bar","amenity:pub"],  cat:"drink", from:16, to:28},
+  {id:"mClub",      ic:"music",  q:"night club",tags:["amenity:nightclub"],          cat:"drink", from:21, to:30},
+];
+let curMood=null;
+/* does this mood fit the clock right now? (hours past midnight wrap: 1am = 25) */
+function moodFits(m){ const h=new Date().getHours(); const hh=h<6?h+24:h; return hh>=m.from && hh<m.to; }
+function renderMoods(){
+  const fits=MOODS.filter(moodFits), rest=MOODS.filter(m=>!moodFits(m));
+  $("moodchips").innerHTML=[...fits,...rest].map(m=>
+    `<button class="mood${curMood===m.id?" sel":moodFits(m)?" hot":""}" onclick="pickMood('${m.id}')">${ic(m.ic,15)} ${t(m.id)}</button>`).join("");
+}
+function pickMood(id){
+  curMood=id; renderMoods();
+  const m=MOODS.find(x=>x.id===id);
+  return runFoodTab(m.q, m.tags, m.cat, t(m.id), null);
+}
+function craveSearch(){
+  const q=($("craveinput").value||"").trim();
+  if(!q) return;
+  curMood=null; renderMoods();
+  return runFoodTab(q, ["amenity:restaurant","amenity:cafe","amenity:bar","amenity:fast_food","amenity:ice_cream"], "food", q, q);
+}
+async function runFoodTab(q, tags, cat, label, craving){
+  const st=$("foodstatus");
+  st.textContent=t("foodSearch");
+  $("foodcards").innerHTML="";
+  let found=await collectVenues(q, tags, 1500);
+  if(found===null){ st.textContent=t("locErr"); return; }
+  /* thin results or an explicit craving → ask the guide for famous real venues, then geo-verify them */
+  const aiNames=new Set();
+  if(store.get("tv_key") && (found.length<4 || craving)){
+    try{
+      const out=await anthropicJSON(
+        `Travel only. List up to 5 REAL, well-known venues in ${cityFull(city)} for: "${label}". Only places you are certain exist. ONLY JSON: [{"name":"..."}]`,
+        "List them now.", 300);
+      const names=(Array.isArray(out)?out:[]).map(x=>x&&x.name).filter(Boolean);
+      const verified=await verifyPlaces(names.map(n=>({name:n})), CITIES[city].center, 15000);
+      verified.forEach(p=>{
+        if(found.some(v=>v.name.toLowerCase()===p.name.toLowerCase())){ aiNames.add(p.name.toLowerCase()); return; }
+        const detour=userPos?haversine(userPos.lat,userPos.lng,p.lat,p.lng):0;
+        aiNames.add(p.name.toLowerCase());
+        found.push({name:p.name, lat:p.lat, lng:p.lng, street:"", detour});
+      });
+    }catch(e){}
+  }
+  if(!found.length){ st.textContent=t("foodNone"); return; }
+  found.sort((a,b)=>a.detour-b.detour);
+  FOODF=found.slice(0,14); FOODCAT=cat;
+  const why=await rankVenues(FOODF, craving);
+  const order=[...FOODF.keys()].sort((a,b)=>((b in why)-(a in why)) || (FOODF[a].detour-FOODF[b].detour));
+  st.textContent="";
+  $("foodcards").innerHTML=order.slice(0,8).map(i=>{
+    const v=FOODF[i], pick=aiNames.has(v.name.toLowerCase());
+    const gq=encodeURIComponent(v.name+", "+CITIES[city].name);
+    return `<div class="fcard">
+      <div class="fh">
+        <div class="fic">${ic(MOODS.find(m=>m.id===curMood)?.ic||"food",19)}</div>
+        <div style="min-width:0;flex:1">
+          <div class="fn">${esc(v.name)}${pick?` <span class="fbadge">${ic("magic",11)} ${t("aiPickT")}</span>`:""}</div>
+          <div class="fd">${fmtDist(v.detour)}${v.street?" · "+esc(v.street):""}</div>
+        </div>
+      </div>
+      ${why[i]?`<div class="fwhy">${ic("bulb",15)}<span>${esc(why[i])}</span></div>`:""}
+      <div class="facts">
+        <button class="fact primary" onclick="pickFood(${i})">${ic("walk",14)} ${TOUR.active?t("toTourT"):t("nav")}</button>
+        <button class="fact" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${gq}','_blank')">${ic("place",14)} ${t("mapT")}</button>
+      </div>
+    </div>`;
+  }).join("");
+}
 function drawTour(){
   if(!map || !TOUR.active) return;
   const draw = () => {
@@ -2871,6 +3115,8 @@ function renderTourBar(){
   $("tbnext").innerHTML = ic("send",14)+t("tourNext");
   $("tbend").innerHTML = ic("close",14)+t("tourEnd");
   $("tbmin").innerHTML = ic("chevdown",18);
+  $("tbcafe").innerHTML = ic("coffee",16);
+  $("tbfood").innerHTML = ic("food",16);
   bar.classList.add("on");
 }
 function openNextStop(){ if(TOUR.active && TOUR.stops[TOUR.idx]) openSheet(TOUR.stops[TOUR.idx]); }
@@ -2953,6 +3199,7 @@ RULES:
 - ALWAYS reply in the same language the user writes in (Serbian, English, Spanish, or any other). Default: ${LANG_NAME[lang]}.
 - Be vivid but concise: 2-6 sentences unless asked for more. You are speaking to someone standing in the street.
 - Tell stories, legends, local tips. Recommend real food/drink spots. If asked about practical details you are not sure of (current opening hours, exact prices, train schedules), say so honestly and suggest checking online.
+- If the user wants coffee or food NEARBY or ON THEIR ROUTE right now, first point them to the coffee/food buttons (on the tour bar and on the "I'm here" tab) — those find real open venues along their walk; you may add your own favorite picks on top.
 - User's nearest known places right now: ${near}.
 ${TRIP&&TRIP.city===city?`- USER'S TRIP: ${TRIP.arrive}${TRIP.arriveTime?" "+TRIP.arriveTime:""} → ${TRIP.depart}${TRIP.departTime?" "+TRIP.departTime:""}, mode: ${TRIP.mode||"?"}${TRIP.point?" via "+TRIP.point.name:""}${TRIP.hotel?", hotel: "+TRIP.hotel.name:""}, getting around: ${TRIP.transport||"public"}. Notes: ${TRIP.notes||"none"}.`:""}
 - EXISTING PLANS in ${CITIES[city].name} (plan_id | name | stops) — you CAN see and MODIFY these with the edit_plan tool:
@@ -3381,6 +3628,13 @@ function renderAll(){
   $("heresub").textContent = t("hereSub");
   $("guidebtntxt").textContent = t("guideBtn");
   $("guideic").innerHTML = ic("magic",22);
+  $("cafechip").innerHTML = ic("coffee",16) + " " + t("findCafe");
+  $("foodchip").innerHTML = ic("food",16) + " " + t("findFood");
+  $("foodtitle").textContent = t("foodTitle");
+  $("foodsub").textContent = t("foodSub");
+  $("craveinput").placeholder = t("cravePh");
+  $("cravebtn").textContent = t("craveBtn");
+  if($("view-food").classList.contains("active")) renderMoods();
   $("herebtntxt").textContent = t("hereBtn");
   $("suggtitle").innerHTML = ic("magic",18) + " " + t("suggTitle");
   $("suggsub").textContent = t("suggSub");
