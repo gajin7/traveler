@@ -209,6 +209,22 @@ nav button{overflow:visible}
 .tb-dist{font-size:12px;opacity:.8}
 .tb-btn{background:rgba(255,255,255,.12);border:none;color:#D0BCFF;border-radius:12px;padding:9px 12px;font-weight:700;font-size:12.5px;font-family:inherit;display:flex;align-items:center;gap:4px}
 .tb-btn.tb-end{color:#FFB4AB}
+.tb-btn.tb-min{padding:9px 8px;color:var(--inverse-on);opacity:.8}
+/* collapsed tour bar: a small pill, the map stays fully usable */
+#tourpill{position:fixed;right:12px;bottom:calc(88px + env(safe-area-inset-bottom));background:var(--inverse-surface);color:var(--inverse-on);border-radius:999px;padding:8px 14px 8px 8px;display:none;align-items:center;gap:8px;z-index:70;box-shadow:var(--el3);font-weight:700;font-size:13px;cursor:pointer}
+#tourpill.on{display:flex}
+#tourpill .tp-n{width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800}
+/* live position marker with heading arrow */
+.me-marker{width:40px;height:40px;position:relative;pointer-events:none}
+.me-dot{position:absolute;left:50%;top:50%;width:15px;height:15px;margin:-7.5px 0 0 -7.5px;border-radius:50%;background:#1A73E8;border:2.5px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.45)}
+.me-arrow{position:absolute;left:50%;top:50%;width:0;height:0;margin:-26px 0 0 -8px;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:13px solid #1A73E8;opacity:0;transition:opacity .3s;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.me-marker.hdg .me-arrow{opacity:.95}
+/* companion card: what the guide says + next moves */
+.gcard{margin:0 16px 10px;background:var(--primary-container);color:var(--on-primary-container);border-radius:16px;padding:14px 16px;box-shadow:var(--el1)}
+.gsay{font-size:14.5px;line-height:1.55}
+.gopts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.gopt{display:flex;align-items:center;gap:6px;background:var(--primary);color:#fff;border:none;border-radius:999px;padding:9px 14px;font-weight:700;font-size:13px;font-family:inherit}
+.gopt.more{background:transparent;color:var(--on-primary-container);border:1.5px solid var(--outline)}
 .numbadge{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:2px solid #fff;box-shadow:var(--el1)}
 .numbadge.done{background:#1B6B45}
 /* AI suggestions */
@@ -338,6 +354,8 @@ nav button{overflow:visible}
   </div>
   <div class="view" id="view-here">
     <div class="herehead"><h2 id="heretitle"></h2><p id="heresub"></p></div>
+    <button class="bigbtn ripple" id="guidebtn" style="background:linear-gradient(135deg,#6750A4,#9A82DB);color:#fff" onclick="guideMe()"><span id="guideic"></span><span id="guidebtntxt"></span></button>
+    <div id="guidecard"></div>
     <button class="bigbtn ripple" id="herebtn" onclick="locateMe()"><span id="hereic"></span><span id="herebtntxt"></span></button>
     <button class="bigbtn ripple" id="cambtn" style="background:var(--secondary-container);color:var(--on-secondary-container);margin-top:0" onclick="$('camfile').click()"><span id="camic"></span><span id="cambtntxt"></span></button>
     <button class="bigbtn ripple" id="localbtn" style="background:linear-gradient(135deg,#B7791F,#E8A13C);color:#fff;margin-top:0" onclick="openLocalMenu()"><span id="localic"></span><span id="localbtntxt"></span></button>
@@ -423,6 +441,10 @@ nav button{overflow:visible}
   </div>
   <button class="tb-btn" id="tbnext" onclick="advanceTour(true)"></button>
   <button class="tb-btn tb-end" id="tbend" onclick="endTour()"></button>
+  <button class="tb-btn tb-min" id="tbmin" onclick="toggleTourBar()" aria-label="Minimize"></button>
+</div>
+<div id="tourpill" onclick="toggleTourBar()">
+  <span class="tp-n" id="tpnum"></span><span id="tpdist"></span>
 </div>
 
 <script>
@@ -641,7 +663,7 @@ window.ALL_PLACES = PLACES.concat(PLACES2).concat(PLACES3).concat(PLACES4).conca
 
 </script>
 <script>
-const APP_VERSION = "2026.08.20-0709";
+const APP_VERSION = "2026.08.21-1608";
 /* ============ storage (safe wrapper — works even where localStorage is blocked) ============ */
 const store = {
   _mem:{},
@@ -670,6 +692,7 @@ const UI = {
     cityBad:"To ne izgleda kao pravi grad. Proveri ime i probaj ponovo.", cityLimit:"Maksimum je 10 dodatih gradova — obriši neki pa dodaj novi.",
     cityNeedKey:"Za dodavanje gradova treba API ključ (unesi ga u Info tabu).", cityAdded:"Grad dodat ✓",
     cityDelQ:"Obrisati ovaj grad i sva njegova mesta?", cityAiNote:"AI vodič za ovaj grad — mesta i priče je napisao AI, proveri detalje na licu mesta.",
+    guideBtn:"Vodi me", guideThink:"Gledam gde si i šta ti se nudi…", guideErr:"Ne mogu sad da smislim — probaj opet.", guideMore:"Još predloga", passBy:"Prolaziš pored",
     hereTitle:"Sada sam ovde", hereSub:"Pritisni dugme — pronaći ću šta je oko tebe i ispričati ti priču.",
     hereBtn:"Sada sam ovde", locating:"Tražim te…", locErr:"Ne mogu da te lociram. Dozvoli pristup lokaciji u podešavanjima browsera.",
     nearYou:"U tvojoj blizini", listen:"Slušaj", stop:"Zaustavi", ask:"Pitaj vodiča", nav:"Vodi me",
@@ -772,6 +795,7 @@ const UI = {
     cityBad:"That doesn't look like a real city. Check the name and try again.", cityLimit:"Maximum is 10 added cities — delete one to add another.",
     cityNeedKey:"Adding cities requires an API key (enter it in the Info tab).", cityAdded:"City added ✓",
     cityDelQ:"Delete this city and all its places?", cityAiNote:"AI guide for this city — places and stories were written by AI; double-check details on the spot.",
+    guideBtn:"Guide me", guideThink:"Looking at where you are and what's on offer…", guideErr:"Can't think right now — try again.", guideMore:"More ideas", passBy:"You're passing",
     hereTitle:"I'm here now", hereSub:"Tap the button — I'll find what's around you and tell you its story.",
     hereBtn:"I'm here now", locating:"Locating you…", locErr:"Can't locate you. Allow location access in your browser settings.",
     nearYou:"Near you", listen:"Listen", stop:"Stop", ask:"Ask the guide", nav:"Take me there",
@@ -909,6 +933,8 @@ const UI = {
 };
 /* ============ Material icons (official SVG paths, 24x24) ============ */
 const MI = {
+chevdown:"M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z",
+chevup:"M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z",
 explore:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm2.19 12.19L6 18l3.81-8.19L18 6l-3.81 8.19zM12 10.9c-.61 0-1.1.49-1.1 1.1s.49 1.1 1.1 1.1 1.1-.49 1.1-1.1-.49-1.1-1.1-1.1z",
 map:"M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z",
 book:"M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z",
@@ -1892,7 +1918,7 @@ async function checkUpdate(manual){
     const r = await fetch(location.pathname + "?vchk=" + Date.now(), {cache:"no-store"});
     const txt = await r.text();
     const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
-    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.20-0709"){
+    if(m && m[1] !== APP_VERSION && m[1] !== "2026.08.21-1608"){
       $("updtxt").textContent = t("updAvail");
       $("updgo").textContent = t("updBtn");
       $("updbar").classList.add("on");
@@ -2632,6 +2658,8 @@ function beginTour(){
 }
 function launchTour(orderedStops){
   TOUR = {active:true, stops:orderedStops, idx:0};
+  tourBarMin=false;
+  enableCompass(); /* still inside the user's tap — iOS permission prompt works here */
   saveTour();
   showView("map");
   drawTour(); renderTourBar(); startTourWatch();
@@ -2643,12 +2671,167 @@ function launchTour(orderedStops){
   speak(t("tourFollow"), lang);
 }
 function tourCoords(){ return TOUR.stops.map(id=>findPlace(id)).filter(Boolean).map(p=>[p.lng,p.lat]); }
+
+/* ---- walking route along real streets (OSRM foot profile), cached per stop set ---- */
+let routeCache = {key:null, line:null};
+async function fetchWalkRoute(coords){
+  const key = coords.map(c=>c[0].toFixed(5)+","+c[1].toFixed(5)).join(";");
+  if(routeCache.key===key) return routeCache.line;
+  let line=null;
+  try{
+    const r = await fetch("https://routing.openstreetmap.de/routed-foot/route/v1/foot/"+key+"?overview=full&geometries=geojson&steps=false");
+    if(r.ok){
+      const j = await r.json();
+      const g = j.routes && j.routes[0] && j.routes[0].geometry;
+      if(g && g.coordinates && g.coordinates.length>1) line = g.coordinates;
+    }
+  }catch(e){ /* offline or service down — straight line stays as fallback */ }
+  routeCache = {key, line};
+  return line;
+}
+
+/* ---- live position marker with direction of travel ---- */
+let meMarker=null, compassHeading=null, compassOn=false;
+function ensureMeMarker(){
+  if(!map || meMarker || !userPos) return;
+  const el=document.createElement("div");
+  el.className="me-marker";
+  el.innerHTML='<div class="me-arrow"></div><div class="me-dot"></div>';
+  meMarker = new maplibregl.Marker({element:el, rotationAlignment:"map", pitchAlignment:"map"})
+    .setLngLat([userPos.lng,userPos.lat]).addTo(map);
+}
+function updateMeMarker(pos){
+  if(!map || !userPos) return;
+  ensureMeMarker();
+  if(!meMarker) return;
+  meMarker.setLngLat([userPos.lng,userPos.lat]);
+  /* GPS heading is trustworthy only while moving; compass fills in when standing */
+  let h = null;
+  if(pos && pos.coords && pos.coords.heading!=null && isFinite(pos.coords.heading) && (pos.coords.speed||0)>0.5) h = pos.coords.heading;
+  else if(compassHeading!=null) h = compassHeading;
+  if(h!=null && isFinite(h)){ meMarker.setRotation(h); meMarker.getElement().classList.add("hdg"); }
+}
+function onCompass(e){
+  let h=null;
+  if(typeof e.webkitCompassHeading==="number") h=e.webkitCompassHeading;      /* iOS: clockwise from north */
+  else if(e.absolute===true && typeof e.alpha==="number") h=(360-e.alpha)%360; /* spec: alpha is counterclockwise */
+  if(h!=null && isFinite(h)){ compassHeading=h; updateMeMarker(null); }
+}
+/* iOS requires a user-gesture permission request — call only from tap handlers */
+function enableCompass(){
+  if(compassOn || !window.DeviceOrientationEvent) return;
+  const attach=()=>{ compassOn=true;
+    window.addEventListener("deviceorientationabsolute", onCompass, true);
+    window.addEventListener("deviceorientation", onCompass, true);
+  };
+  try{
+    if(typeof DeviceOrientationEvent.requestPermission==="function")
+      DeviceOrientationEvent.requestPermission().then(s=>{ if(s==="granted") attach(); }).catch(()=>{});
+    else attach();
+  }catch(e){}
+}
+
+/* ============ companion mode — one tap, the guide looks around and leads ============ */
+let ambientWatch=null, ambientTold=new Set();
+function todayPlan(){
+  const d=new Date(), k=d.getDate()+"."+(d.getMonth()+1)+".";
+  return PLANS.find(p=>p.city===city && p.name.includes(k)) || null;
+}
+function guideContext(){
+  const d=new Date();
+  const time=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]+" "+d.getHours()+":"+String(d.getMinutes()).padStart(2,"0");
+  const today=d.toISOString().slice(0,10);
+  const doneToday=new Set(VISITED.filter(v=>v.d===today).map(v=>v.id));
+  const near = userPos ? cityPlaces()
+    .map(p=>({p,d:haversine(userPos.lat,userPos.lng,p.lat,p.lng)}))
+    .sort((a,b)=>a.d-b.d).slice(0,10)
+    .map(x=>`${x.p.id}|${Lp(x.p).title}|${x.p.cat||""}|${Math.round(x.d)}m${doneToday.has(x.p.id)?"|VISITED":""}`)
+    .join("\n") : "unknown";
+  const pl=todayPlan();
+  const planLine = pl
+    ? `${pl.id}|${pl.name}|remaining: ${pl.stops.filter(id=>!doneToday.has(id)).map(id=>{const p=findPlace(id);return p?Lp(p).title:""}).filter(Boolean).join(", ")||"all done"}`
+    : "none";
+  return `Time: ${time}. City: ${cityFull(city)}.
+GPS: ${userPos?userPos.lat.toFixed(5)+","+userPos.lng.toFixed(5):"unknown"}.
+NEAR (id|name|cat|distance):
+${near}
+TODAY'S PLAN (plan_id|name|state): ${planLine}
+Visited today: ${[...doneToday].map(id=>{const p=findPlace(id);return p?Lp(p).title:""}).filter(Boolean).join(", ")||"nothing yet"}`;
+}
+function GUIDE_SYS(){
+  return `You are Cicerone, a warm local guide walking WITH the visitor right now. Output ONLY JSON:
+{"say":"...","options":[{"label":"...","act":"tour|story|plan","id":"..."}]}
+"say": 2-4 short spoken-style sentences in ${LANG_NAME[lang]||"English"}, like a friend guiding on the spot: what is around them, what fits THIS moment (time of day matters: meals, sunset, what closes soon), and the single best next move. Use ONLY places from CONTEXT — never invent, never mention places not listed. If today's plan has remaining stops, weave it in naturally.
+"options": up to 3 concrete next moves. act "tour"= walk them to that place (id = place id from NEAR). act "story" = tell the story of a place they are already at (under 120m). act "plan" = continue today's plan (id = plan_id). Short labels in the user's language.`;
+}
+async function guideMe(){
+  const st=$("herestatus");
+  st.textContent=t("locating");
+  $("guidecard").innerHTML="";
+  const pos=await new Promise(res=>{
+    if(!navigator.geolocation) return res(null);
+    navigator.geolocation.getCurrentPosition(res, ()=>res(null), {enableHighAccuracy:true,timeout:9000,maximumAge:15000});
+  });
+  if(pos) userPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+  enableCompass(); startAmbient();
+  if(!store.get("tv_key")){ st.textContent=t("cityNeedKey"); return; }
+  st.textContent=t("guideThink");
+  try{
+    const out=await anthropicJSON(GUIDE_SYS(), guideContext(), 700);
+    const o=Array.isArray(out)?out[0]:out;
+    if(!o || !o.say) throw new Error("empty");
+    renderGuideCard(o);
+    st.textContent="";
+    speak(String(o.say), lang);
+  }catch(e){ st.textContent=t("guideErr"); }
+}
+function renderGuideCard(o){
+  const opts=(o.options||[]).filter(x=>
+    x && x.act && (x.act==="plan" ? PLANS.some(p=>p.id===x.id) : !!findPlace(x.id))
+  ).slice(0,3);
+  $("guidecard").innerHTML=`<div class="gcard">
+    <div class="gsay">${esc(String(o.say))}</div>
+    <div class="gopts">${opts.map(x=>`<button class="gopt ripple" onclick="guideAct('${esc(x.act)}','${esc(x.id)}')">${ic(x.act==="story"?"volume":x.act==="plan"?"event":"walk",16)} ${esc(String(x.label||""))}</button>`).join("")}
+      <button class="gopt more ripple" onclick="guideMe()">${ic("refresh",16)} ${t("guideMore")}</button></div></div>`;
+}
+function guideAct(act,id){
+  if(act==="plan"){ startPlan(id); return; }
+  const p=findPlace(id); if(!p) return;
+  if(act==="story"){ openSheet(id); speak(Lp(p).title+". "+Lp(p).story+(Lp(p).tip?" … "+Lp(p).tip:""), lang, Lp(p).title); }
+  else { persistIfAI(id); launchTour([id]); }
+}
+/* passive companion: mention places you pass, once each — outside tours (tours narrate themselves) */
+function startAmbient(){
+  if(ambientWatch!=null || !navigator.geolocation) return;
+  ambientWatch=navigator.geolocation.watchPosition(pos=>{
+    userPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    updateMeMarker(pos);
+    if(TOUR.active) return;
+    const today=new Date().toISOString().slice(0,10);
+    const hit=cityPlaces()
+      .map(p=>({p,dist:haversine(userPos.lat,userPos.lng,p.lat,p.lng)}))
+      .filter(x=>x.dist<=80 && !ambientTold.has(x.p.id) && !VISITED.some(v=>v.id===x.p.id&&v.d===today))
+      .sort((a,b)=>a.dist-b.dist)[0];
+    if(hit){
+      ambientTold.add(hit.p.id);
+      logVisit(hit.p.id, hit.p.en.title);
+      toast(t("passBy")+": "+Lp(hit.p).title);
+      speak(t("passBy")+": "+Lp(hit.p).title+". "+Lp(hit.p).story, lang, Lp(hit.p).title);
+    }
+  }, e=>{}, {enableHighAccuracy:true, maximumAge:8000, timeout:20000});
+}
 function drawTour(){
   if(!map || !TOUR.active) return;
   const draw = () => {
     clearTourLayers();
-    map.addSource("tour",{type:"geojson",data:{type:"Feature",geometry:{type:"LineString",coordinates:tourCoords()}}});
+    const straight = tourCoords();
+    map.addSource("tour",{type:"geojson",data:{type:"Feature",geometry:{type:"LineString",coordinates:straight}}});
     map.addLayer({id:"tour-line",type:"line",source:"tour",paint:{"line-color":"#6750A4","line-width":4,"line-dasharray":[1.5,1.5],"line-opacity":.85}});
+    /* upgrade the straight line to a real street route as soon as OSRM answers */
+    if(straight.length>1) fetchWalkRoute(straight).then(line=>{
+      const src = map && map.getSource && map.getSource("tour");
+      if(line && src) src.setData({type:"Feature",geometry:{type:"LineString",coordinates:line}});
+    });
     TOUR.stops.forEach((id,i)=>{
       const p=findPlace(id); if(!p) return;
       const el=document.createElement("div");
@@ -2665,15 +2848,29 @@ function clearTourLayers(){
   if(map && map.getLayer && map.getLayer("tour-line")) map.removeLayer("tour-line");
   if(map && map.getSource && map.getSource("tour")) map.removeSource("tour");
 }
+let tourBarMin=false;
+function toggleTourBar(){ tourBarMin=!tourBarMin; renderTourBar(); }
 function renderTourBar(){
-  const bar=$("tourbar");
-  if(!TOUR.active || TOUR.idx>=TOUR.stops.length){ bar.classList.remove("on"); return; }
+  const bar=$("tourbar"), pill=$("tourpill");
+  if(!TOUR.active || TOUR.idx>=TOUR.stops.length){ bar.classList.remove("on"); pill.classList.remove("on"); return; }
   const p=findPlace(TOUR.stops[TOUR.idx]);
+  const dist = (userPos&&p) ? fmtDist(haversine(userPos.lat,userPos.lng,p.lat,p.lng)) : null;
+  const prog = (TOUR.idx+1)+"/"+TOUR.stops.length;
+  if(tourBarMin){
+    /* collapsed: small pill in the corner, map stays fully usable */
+    bar.classList.remove("on");
+    $("tpnum").textContent = (TOUR.idx+1);
+    $("tpdist").textContent = dist ? dist : prog;
+    pill.classList.add("on");
+    return;
+  }
+  pill.classList.remove("on");
   $("tbnum").textContent = (TOUR.idx+1);
   $("tbname").textContent = p ? Lp(p).title : "";
-  $("tbdist").textContent = (userPos&&p) ? fmtDist(haversine(userPos.lat,userPos.lng,p.lat,p.lng))+" · "+(TOUR.idx+1)+"/"+TOUR.stops.length : (TOUR.idx+1)+"/"+TOUR.stops.length;
+  $("tbdist").textContent = dist ? dist+" · "+prog : prog;
   $("tbnext").innerHTML = ic("send",14)+t("tourNext");
   $("tbend").innerHTML = ic("close",14)+t("tourEnd");
+  $("tbmin").innerHTML = ic("chevdown",18);
   bar.classList.add("on");
 }
 function openNextStop(){ if(TOUR.active && TOUR.stops[TOUR.idx]) openSheet(TOUR.stops[TOUR.idx]); }
@@ -2682,6 +2879,7 @@ function startTourWatch(){
   if(tourWatch!=null || !navigator.geolocation) return;
   tourWatch = navigator.geolocation.watchPosition(pos=>{
     userPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    updateMeMarker(pos);
     checkMustSee();
     if(!TOUR.active) return;
     renderTourBar();
@@ -2732,6 +2930,7 @@ function advanceTour(manual){
 function endTour(done){
   TOUR={active:false,stops:[],idx:0}; saveTour();
   stopTourWatch(); clearTourLayers(); renderTourBar();
+  if(meMarker){ meMarker.remove(); meMarker=null; }
   if(done===true) $("herestatus").textContent = t("tourDone");
 }
 
@@ -3180,6 +3379,8 @@ function renderAll(){
   $("backbtn").innerHTML = ic("close",20);
   $("heretitle").textContent = t("hereTitle");
   $("heresub").textContent = t("hereSub");
+  $("guidebtntxt").textContent = t("guideBtn");
+  $("guideic").innerHTML = ic("magic",22);
   $("herebtntxt").textContent = t("hereBtn");
   $("suggtitle").innerHTML = ic("magic",18) + " " + t("suggTitle");
   $("suggsub").textContent = t("suggSub");

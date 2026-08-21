@@ -1,4 +1,4 @@
-const V="cicerone-2026.08.20-0709";
+const V="cicerone-2026.08.21-1608";
 const SHELL=["./","index.html"];
 self.addEventListener("install",e=>{ e.waitUntil(caches.open(V).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())); });
 self.addEventListener("activate",e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
@@ -6,7 +6,7 @@ self.addEventListener("fetch",e=>{
   const req=e.request;
   if(req.method!=="GET") return;
   const u=req.url;
-  if(/api\.anthropic|photon\.komoot|api\.elevenlabs/.test(u)) return; // AI + geocoding: network only
+  if(/api\.anthropic|photon\.komoot|api\.elevenlabs|routing\.openstreetmap/.test(u)) return; // AI + geocoding + routing: network only
   if(req.mode==="navigate"){
     e.respondWith(fetch(req).then(r=>{ const cp=r.clone(); caches.open(V).then(c=>c.put(req,cp)); return r; })
       .catch(()=>caches.match(req).then(r=>r||caches.match("index.html"))));
